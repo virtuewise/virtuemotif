@@ -1,0 +1,538 @@
+{
+ "id": "rise",
+ "audio": "audio/rise.m4a",
+ "method": "mms_fa_ctc_forced_alignment",
+ "model": "torchaudio.pipelines.MMS_FA (ctc_alignment_mling_uroman)",
+ "generated": "2026-10-26T14:41:47",
+ "frame": 0.02,
+ "sections": [
+  {
+   "id": "verse1",
+   "window": [
+    16.5,
+    59.0
+   ],
+   "frames": 2123,
+   "edge": false,
+   "lines": [
+    {
+     "text": "Vuka, weZimbabwe, ilizwe lethu",
+     "translation": "Wake up, our Zimbabwe, our land",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Vuka,",
+       "from": 22.2,
+       "to": 23.5,
+       "score": 0.716
+      },
+      {
+       "i": 1,
+       "w": "weZimbabwe,",
+       "from": 24.42,
+       "to": 25.6,
+       "score": 0.663
+      },
+      {
+       "i": 2,
+       "w": "ilizwe",
+       "from": 26.46,
+       "to": 27.08,
+       "score": 0.706
+      },
+      {
+       "i": 3,
+       "w": "lethu",
+       "from": 27.24,
+       "to": 27.74,
+       "score": 0.66
+      }
+     ]
+    },
+    {
+     "text": "Kusile ukusa, kukhanya okusha",
+     "translation": "Dawn has broken, a new light shines",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Kusile",
+       "from": 30.62,
+       "to": 31.32,
+       "score": 0.874
+      },
+      {
+       "i": 1,
+       "w": "ukusa,",
+       "from": 31.42,
+       "to": 33.1,
+       "score": 0.74
+      },
+      {
+       "i": 2,
+       "w": "kukhanya",
+       "from": 34.9,
+       "to": 35.6,
+       "score": 0.658
+      },
+      {
+       "i": 3,
+       "w": "okusha",
+       "from": 35.6,
+       "to": 36.32,
+       "score": 0.638
+      }
+     ]
+    },
+    {
+     "text": "Izandla phezulu, sibumbene sonke",
+     "translation": "Hands held high, we are all united",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Izandla",
+       "from": 39.28,
+       "to": 39.9,
+       "score": 0.725
+      },
+      {
+       "i": 1,
+       "w": "phezulu,",
+       "from": 40.08,
+       "to": 41.64,
+       "score": 0.612
+      },
+      {
+       "i": 2,
+       "w": "sibumbene",
+       "from": 42.94,
+       "to": 44.14,
+       "score": 0.787
+      },
+      {
+       "i": 3,
+       "w": "sonke",
+       "from": 44.34,
+       "to": 45.22,
+       "score": 0.916
+      }
+     ]
+    },
+    {
+     "text": "Silethemba njalo lokuthula",
+     "translation": "With hope and peace always",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Silethemba",
+       "from": 47.2,
+       "to": 48.4,
+       "score": 0.834
+      },
+      {
+       "i": 1,
+       "w": "njalo",
+       "from": 48.54,
+       "to": 50.2,
+       "score": 0.708
+      },
+      {
+       "i": 2,
+       "w": "lokuthula",
+       "from": 52.22,
+       "to": 53.4,
+       "score": 0.779
+      }
+     ]
+    }
+   ],
+   "start": 20.9,
+   "end": 88.44
+  },
+  {
+   "id": "chorus1",
+   "window": [
+    87.0,
+    123.0
+   ],
+   "frames": 1798,
+   "edge": false,
+   "lines": [
+    {
+     "text": "Oh, Zimbabwe, land of grace and light",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Oh,",
+       "from": 89.84,
+       "to": 91.08,
+       "score": 0.129
+      },
+      {
+       "i": 1,
+       "w": "Zimbabwe,",
+       "from": 91.16,
+       "to": 93.08,
+       "score": 0.123
+      },
+      {
+       "i": 2,
+       "w": "land",
+       "from": 94.04,
+       "to": 94.4,
+       "score": 0.236
+      },
+      {
+       "i": 3,
+       "w": "of",
+       "from": 94.48,
+       "to": 94.62,
+       "score": 0.101
+      },
+      {
+       "i": 4,
+       "w": "grace",
+       "from": 94.7,
+       "to": 95.56,
+       "score": 0.124
+      },
+      {
+       "i": 5,
+       "w": "and",
+       "from": 95.64,
+       "to": 95.82,
+       "score": 0.033
+      },
+      {
+       "i": 6,
+       "w": "light",
+       "from": 95.82,
+       "to": 98.36,
+       "score": 0.017
+      }
+     ]
+    },
+    {
+     "text": "Underneath the sun, we stand upright",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Underneath",
+       "from": 98.38,
+       "to": 99.78,
+       "score": 0.176
+      },
+      {
+       "i": 1,
+       "w": "the",
+       "from": 99.78,
+       "to": 99.86,
+       "score": 0.014
+      },
+      {
+       "i": 2,
+       "w": "sun,",
+       "from": 100.08,
+       "to": 102.96,
+       "score": 0.315
+      },
+      {
+       "i": 3,
+       "w": "we",
+       "from": 103.0,
+       "to": 103.1,
+       "score": 0.032
+      },
+      {
+       "i": 4,
+       "w": "stand",
+       "from": 103.2,
+       "to": 104.02,
+       "score": 0.347
+      },
+      {
+       "i": 5,
+       "w": "upright",
+       "from": 104.12,
+       "to": 104.86,
+       "score": 0.118
+      }
+     ]
+    },
+    {
+     "text": "Underneath the sun, we stand upright",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Underneath",
+       "from": 115.52,
+       "to": 116.9,
+       "score": 0.291
+      },
+      {
+       "i": 1,
+       "w": "the",
+       "from": 116.9,
+       "to": 116.96,
+       "score": 0.098
+      },
+      {
+       "i": 2,
+       "w": "sun,",
+       "from": 117.2,
+       "to": 119.08,
+       "score": 0.189
+      },
+      {
+       "i": 3,
+       "w": "we",
+       "from": 120.08,
+       "to": 120.2,
+       "score": 0.293
+      },
+      {
+       "i": 4,
+       "w": "stand",
+       "from": 120.3,
+       "to": 121.16,
+       "score": 0.532
+      },
+      {
+       "i": 5,
+       "w": "upright",
+       "from": 121.24,
+       "to": 121.96,
+       "score": 0.147
+      }
+     ]
+    }
+   ],
+   "start": 88.54,
+   "end": 126.46
+  },
+  {
+   "id": "chorus2",
+   "window": [
+    153.0,
+    179.0
+   ],
+   "frames": 1299,
+   "edge": false,
+   "lines": [
+    {
+     "text": "Oh, Zimbabwe, land of grace and light",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Oh,",
+       "from": 158.78,
+       "to": 159.5,
+       "score": 0.022
+      },
+      {
+       "i": 1,
+       "w": "Zimbabwe,",
+       "from": 159.76,
+       "to": 162.14,
+       "score": 0.056
+      },
+      {
+       "i": 2,
+       "w": "land",
+       "from": 162.42,
+       "to": 162.96,
+       "score": 0.181
+      },
+      {
+       "i": 3,
+       "w": "of",
+       "from": 163.06,
+       "to": 163.22,
+       "score": 0.135
+      },
+      {
+       "i": 4,
+       "w": "grace",
+       "from": 163.3,
+       "to": 164.14,
+       "score": 0.19
+      },
+      {
+       "i": 5,
+       "w": "and",
+       "from": 164.46,
+       "to": 165.12,
+       "score": 0.095
+      },
+      {
+       "i": 6,
+       "w": "light",
+       "from": 165.3,
+       "to": 165.66,
+       "score": 0.044
+      }
+     ]
+    },
+    {
+     "text": "Underneath the sun, we stand upright",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Underneath",
+       "from": 167.0,
+       "to": 168.34,
+       "score": 0.166
+      },
+      {
+       "i": 1,
+       "w": "the",
+       "from": 168.34,
+       "to": 168.42,
+       "score": 0.052
+      },
+      {
+       "i": 2,
+       "w": "sun,",
+       "from": 168.64,
+       "to": 170.06,
+       "score": 0.109
+      },
+      {
+       "i": 3,
+       "w": "we",
+       "from": 171.54,
+       "to": 171.66,
+       "score": 0.03
+      },
+      {
+       "i": 4,
+       "w": "stand",
+       "from": 171.76,
+       "to": 172.62,
+       "score": 0.094
+      },
+      {
+       "i": 5,
+       "w": "upright",
+       "from": 172.7,
+       "to": 173.46,
+       "score": 0.024
+      }
+     ]
+    }
+   ],
+   "start": 157.48,
+   "end": 180.84
+  },
+  {
+   "id": "bridge",
+   "window": [
+    175.0,
+    192.0
+   ],
+   "frames": 849,
+   "edge": false,
+   "lines": [
+    {
+     "text": "Bambanani!",
+     "translation": "Hold together!",
+     "style": "whisper",
+     "words": [
+      {
+       "i": 0,
+       "w": "Bambanani!",
+       "from": 182.24,
+       "to": 183.44,
+       "score": 0.342
+      }
+     ]
+    },
+    {
+     "text": "Bambanani!",
+     "translation": "Hold together!",
+     "style": "whisper",
+     "words": [
+      {
+       "i": 0,
+       "w": "Bambanani!",
+       "from": 184.04,
+       "to": 184.84,
+       "score": 0.371
+      }
+     ]
+    },
+    {
+     "text": "Bambanani!",
+     "translation": "Hold together!",
+     "style": "whisper",
+     "words": [
+      {
+       "i": 0,
+       "w": "Bambanani!",
+       "from": 185.1,
+       "to": 186.06,
+       "score": 0.224
+      }
+     ]
+    },
+    {
+     "text": "Bambanani!",
+     "translation": "Hold together!",
+     "style": "whisper",
+     "words": [
+      {
+       "i": 0,
+       "w": "Bambanani!",
+       "from": 186.52,
+       "to": 187.72,
+       "score": 0.126
+      }
+     ]
+    },
+    {
+     "text": "Bambanani!",
+     "translation": "Hold together!",
+     "style": "whisper",
+     "words": [
+      {
+       "i": 0,
+       "w": "Bambanani!",
+       "from": 188.36,
+       "to": 189.12,
+       "score": 0.233
+      }
+     ]
+    },
+    {
+     "text": "Bambanani!",
+     "translation": "Hold together!",
+     "style": "whisper",
+     "words": [
+      {
+       "i": 0,
+       "w": "Bambanani!",
+       "from": 189.4,
+       "to": 190.52,
+       "score": 0.318
+      }
+     ]
+    }
+   ],
+   "start": 180.94,
+   "end": 195.02
+  }
+ ]
+}

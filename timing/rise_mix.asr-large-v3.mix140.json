@@ -1,0 +1,122 @@
+{
+ "id": "rise_mix",
+ "model": "large-v3",
+ "language": "en",
+ "language_probability": 1,
+ "window": [
+  140.0,
+  180.0
+ ],
+ "segments": [
+  {
+   "from": 141.94,
+   "to": 143.34,
+   "text": "Zimbabwe",
+   "words": [
+    {
+     "w": "Zimbabwe",
+     "from": 141.94,
+     "to": 143.34
+    }
+   ]
+  },
+  {
+   "from": 161.0,
+   "to": 164.58,
+   "text": "Land of grace and light",
+   "words": [
+    {
+     "w": "Land",
+     "from": 161.0,
+     "to": 161.7
+    },
+    {
+     "w": "of",
+     "from": 161.7,
+     "to": 163.1
+    },
+    {
+     "w": "grace",
+     "from": 163.1,
+     "to": 163.5
+    },
+    {
+     "w": "and",
+     "from": 163.5,
+     "to": 164.16
+    },
+    {
+     "w": "light",
+     "from": 164.16,
+     "to": 164.58
+    }
+   ]
+  },
+  {
+   "from": 166.38,
+   "to": 168.86,
+   "text": "Underneath the sun",
+   "words": [
+    {
+     "w": "Underneath",
+     "from": 166.38,
+     "to": 167.78
+    },
+    {
+     "w": "the",
+     "from": 167.78,
+     "to": 168.38
+    },
+    {
+     "w": "sun",
+     "from": 168.38,
+     "to": 168.86
+    }
+   ]
+  },
+  {
+   "from": 169.44,
+   "to": 173.02,
+   "text": "We stand upright",
+   "words": [
+    {
+     "w": "We",
+     "from": 169.44,
+     "to": 171.6
+    },
+    {
+     "w": "stand",
+     "from": 171.6,
+     "to": 171.94
+    },
+    {
+     "w": "upright",
+     "from": 171.94,
+     "to": 173.02
+    }
+   ]
+  },
+  {
+   "from": 174.82,
+   "to": 177.58,
+   "text": "Oh, oh, oh",
+   "words": [
+    {
+     "w": "Oh,",
+     "from": 174.82,
+     "to": 176.22
+    },
+    {
+     "w": "oh,",
+     "from": 176.22,
+     "to": 176.92
+    },
+    {
+     "w": "oh",
+     "from": 176.92,
+     "to": 177.58
+    }
+   ]
+  }
+ ]
+}

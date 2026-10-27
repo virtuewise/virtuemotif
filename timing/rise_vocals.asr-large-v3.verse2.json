@@ -1,0 +1,156 @@
+{
+ "id": "rise_vocals",
+ "model": "large-v3",
+ "language": "en",
+ "language_probability": 1,
+ "window": [
+  128.0,
+  182.0
+ ],
+ "segments": [
+  {
+   "from": 136.78,
+   "to": 138.18,
+   "text": "Thank you.",
+   "words": [
+    {
+     "w": "Thank",
+     "from": 136.78,
+     "to": 138.18
+    },
+    {
+     "w": "you.",
+     "from": 138.18,
+     "to": 138.18
+    }
+   ]
+  },
+  {
+   "from": 158.4,
+   "to": 160.42,
+   "text": "Rising up",
+   "words": [
+    {
+     "w": "Rising",
+     "from": 158.4,
+     "to": 159.8
+    },
+    {
+     "w": "up",
+     "from": 159.8,
+     "to": 160.42
+    }
+   ]
+  },
+  {
+   "from": 160.42,
+   "to": 164.58,
+   "text": "Under grace and light",
+   "words": [
+    {
+     "w": "Under",
+     "from": 160.42,
+     "to": 161.86
+    },
+    {
+     "w": "grace",
+     "from": 161.86,
+     "to": 163.52
+    },
+    {
+     "w": "and",
+     "from": 163.52,
+     "to": 164.14
+    },
+    {
+     "w": "light",
+     "from": 164.14,
+     "to": 164.58
+    }
+   ]
+  },
+  {
+   "from": 166.28,
+   "to": 168.88,
+   "text": "Underneath the sun",
+   "words": [
+    {
+     "w": "Underneath",
+     "from": 166.28,
+     "to": 167.68
+    },
+    {
+     "w": "the",
+     "from": 167.68,
+     "to": 168.4
+    },
+    {
+     "w": "sun",
+     "from": 168.4,
+     "to": 168.88
+    }
+   ]
+  },
+  {
+   "from": 170.0,
+   "to": 172.96,
+   "text": "We stand upright",
+   "words": [
+    {
+     "w": "We",
+     "from": 170.0,
+     "to": 171.6
+    },
+    {
+     "w": "stand",
+     "from": 171.6,
+     "to": 171.96
+    },
+    {
+     "w": "upright",
+     "from": 171.96,
+     "to": 172.96
+    }
+   ]
+  },
+  {
+   "from": 174.86,
+   "to": 177.28,
+   "text": "Oh, Amma",
+   "words": [
+    {
+     "w": "Oh,",
+     "from": 174.86,
+     "to": 176.26
+    },
+    {
+     "w": "Amma",
+     "from": 176.26,
+     "to": 177.28
+    }
+   ]
+  },
+  {
+   "from": 177.86,
+   "to": 181.68,
+   "text": "Pambanani, Pambanani, Pambanani",
+   "words": [
+    {
+     "w": "Pambanani,",
+     "from": 177.86,
+     "to": 179.08
+    },
+    {
+     "w": "Pambanani,",
+     "from": 179.2,
+     "to": 180.54
+    },
+    {
+     "w": "Pambanani",
+     "from": 180.58,
+     "to": 181.68
+    }
+   ]
+  }
+ ]
+}

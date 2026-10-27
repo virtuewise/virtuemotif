@@ -1,0 +1,12 @@
+resolution: "1920x1080"
+fps: 30
+output_dir: "out"
+visual_effects: [waveform, typography]
+visual_params:
+  waveform:
+    colour: "#ff8c00"
+    amplitude: 0.8
+  typography:
+    font: "BebasNeue"
+    size: 96
+    bounce: true

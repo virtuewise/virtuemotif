@@ -1,0 +1,107 @@
+{
+  "id": "horizon",
+  "title": "The Horizon of Light",
+  "subtitle": "Tarisiro",
+  "artist": "virtuemotif",
+  "audio": "audio/horizon.m4a",
+  "duration": 259.61,
+  "palette": "dusk",
+  "sections": [
+    {
+      "id": "intro",
+      "label": "Intro — instrumental",
+      "start": 0.0,
+      "end": 44.0,
+      "look": "wide",
+      "lines": []
+    },
+    {
+      "id": "verse1",
+      "label": "Verse 1 — English",
+      "start": 44.0,
+      "end": 67.6,
+      "look": "walkers",
+      "lines": [
+        { "text": "We breathe the air of a morning unwritten" },
+        { "text": "Where the red soil remembers the strength of the past" },
+        { "text": "Like the mist on the mountains, our spirits awaken" },
+        { "text": "To a future where healing and harmony last" }
+      ]
+    },
+    {
+      "id": "chorus1",
+      "label": "Chorus — Ndebele / Shona / English",
+      "start": 68.0,
+      "end": 97.0,
+      "look": "raise",
+      "lines": [
+        { "text": "Thula, lizwe lethu, kukhanya kwelanga", "translation": "Be still, our land, the sun shines" },
+        { "text": "Nyika yedu yose yava nerunyararo", "translation": "Our whole land now has peace" },
+        { "text": "We are the pulse of the earth, wild and free" },
+        { "text": "Bound by the spirit of unity" }
+      ]
+    },
+    {
+      "id": "verse2",
+      "label": "Verse 2 — Shona / Ndebele",
+      "start": 97.5,
+      "end": 124.0,
+      "look": "mbira",
+      "lines": [
+        { "text": "Mumvuri wenyeredzi, simba remadzinde", "translation": "In the shadow of stars, the strength of our roots" },
+        { "text": "Isizwe esihle, esilethemba", "translation": "A beautiful nation filled with hope" },
+        { "text": "We trace the rivers that run to the sea" },
+        { "text": "Carrying grace for the ages to be" }
+      ]
+    },
+    {
+      "id": "chorus2",
+      "label": "Chorus — reprise",
+      "start": 124.5,
+      "end": 153.5,
+      "look": "giant",
+      "lines": [
+        { "text": "Thula, lizwe lethu, kukhanya kwelanga", "translation": "Be still, our land, the sun shines" },
+        { "text": "Nyika yedu yose yava nerunyararo", "translation": "Our whole land now has peace" },
+        { "text": "We are the pulse of the earth, wild and free" },
+        { "text": "Bound by the spirit of unity" }
+      ]
+    },
+    {
+      "id": "bridge",
+      "label": "Bridge — vocalise",
+      "start": 154.0,
+      "end": 183.5,
+      "look": "night",
+      "lines": [
+        { "text": "Lumina…", "translation": "Shine…", "style": "whisper" },
+        { "text": "Vuka…", "translation": "Awaken…", "style": "whisper" },
+        { "text": "Simuka…", "translation": "Rise…", "style": "whisper" }
+      ]
+    },
+    {
+      "id": "final",
+      "label": "Final chorus",
+      "start": 184.0,
+      "end": 212.0,
+      "look": "raise",
+      "lines": [
+        { "text": "Thula, lizwe lethu, kukhanya kwelanga", "translation": "Be still, our land, the sun shines" },
+        { "text": "Nyika yedu yose yava nerunyararo", "translation": "Our whole land now has peace" },
+        { "text": "We are the pulse of the earth, wild and free" },
+        { "text": "Bound by the spirit of unity" }
+      ]
+    },
+    {
+      "id": "outro",
+      "label": "Outro",
+      "start": 212.5,
+      "end": 235.0,
+      "look": "wide",
+      "lines": [
+        { "text": "In the quiet of dawn, a new land is born" },
+        { "text": "Guided by truth, by grace, by the light" }
+      ]
+    }
+  ]
+}

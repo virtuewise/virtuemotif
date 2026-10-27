@@ -1,0 +1,26 @@
+[
+  {
+    "tag": "S1 mix 157.5-163 zimbabwe",
+    "start": 157.5,
+    "end": 163.0,
+    "text": "Zimbabwe"
+  },
+  {
+    "tag": "S2 mix 157.5-163 oh zimbabwe",
+    "start": 157.5,
+    "end": 163.0,
+    "text": "Oh, Zimbabwe"
+  },
+  {
+    "tag": "S3 mix 157.5-163 rising up",
+    "start": 157.5,
+    "end": 163.0,
+    "text": "Rising up"
+  },
+  {
+    "tag": "S4 mix 160-166 land of grace",
+    "start": 160.0,
+    "end": 166.0,
+    "text": "Land of grace and light"
+  }
+]

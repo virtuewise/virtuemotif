@@ -1,0 +1,97 @@
+{
+  "id": "rise",
+  "title": "Rise Together",
+  "subtitle": "Vuka Zimbabwe",
+  "artist": "virtuemotif",
+  "audio": "audio/rise.m4a",
+  "duration": 214.81,
+  "palette": "sunrise",
+  "note": "Structure + text verified against the Demucs vocal stem and the full mix (faster-whisper large-v3, MMS_FA forced alignment). The written sheet's Shona verse 2, chorus lines 3-4 and outro are NOT sung in the generated track; they are archived in archive/rise.written.json. 136.5-158 s and 191.5-208 s carry vocals but no recoverable words (melisma / vocalise), so they are wordless in the film.",
+  "sections": [
+    {
+      "id": "intro",
+      "label": "Intro",
+      "start": 0.0,
+      "end": 21.5,
+      "look": "wide",
+      "lines": []
+    },
+    {
+      "id": "verse1",
+      "label": "Verse 1 — Ndebele",
+      "start": 21.5,
+      "end": 54.0,
+      "look": "walkers",
+      "lines": [
+        { "text": "Vuka, weZimbabwe, ilizwe lethu", "translation": "Wake up, our Zimbabwe, our land" },
+        { "text": "Kusile ukusa, kukhanya okusha", "translation": "Dawn has broken, a new light shines" },
+        { "text": "Izandla phezulu, sibumbene sonke", "translation": "Hands held high, we are all united" },
+        { "text": "Silethemba njalo lokuthula", "translation": "With hope and peace always" }
+      ]
+    },
+    {
+      "id": "chorus1",
+      "label": "Chorus",
+      "start": 71.0,
+      "end": 123.0,
+      "look": "raise",
+      "align_window": [87.0, 123.0],
+      "lines": [
+        { "text": "Oh, Zimbabwe, land of grace and light" },
+        { "text": "Underneath the sun, we stand upright" },
+        { "text": "Underneath the sun, we stand upright" }
+      ]
+    },
+    {
+      "id": "interlude",
+      "label": "Interlude",
+      "start": 123.0,
+      "end": 136.5,
+      "look": "mbira",
+      "lines": []
+    },
+    {
+      "id": "verse2",
+      "label": "Verse 2 — vocal",
+      "start": 136.5,
+      "end": 158.0,
+      "look": "giant",
+      "lines": []
+    },
+    {
+      "id": "chorus2",
+      "label": "Chorus — reprise",
+      "start": 158.0,
+      "end": 174.0,
+      "look": "raise",
+      "lines": [
+        { "text": "Oh, Zimbabwe, land of grace and light" },
+        { "text": "Underneath the sun, we stand upright" }
+      ]
+    },
+    {
+      "id": "bridge",
+      "label": "Bridge — call and response",
+      "start": 174.0,
+      "end": 191.5,
+      "look": "night",
+      "align_window": [175.0, 192.0],
+      "lines": [
+        { "text": "Bambanani!", "translation": "Hold together!", "style": "whisper" },
+        { "text": "Bambanani!", "translation": "Hold together!", "style": "whisper" },
+        { "text": "Bambanani!", "translation": "Hold together!", "style": "whisper" },
+        { "text": "Bambanani!", "translation": "Hold together!", "style": "whisper" },
+        { "text": "Bambanani!", "translation": "Hold together!", "style": "whisper" },
+        { "text": "Bambanani!", "translation": "Hold together!", "style": "whisper" }
+      ]
+    },
+    {
+      "id": "outro",
+      "label": "Outro",
+      "start": 191.5,
+      "end": 214.81,
+      "look": "wide",
+      "lines": []
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+song_id: "example"
+audio_path: "film/public/audio/example.m4a"
+lyrics_path: "film/public/lyrics/example.txt"
+style_preset: "cinematic_xd"
+visual_effects: [waveform, typography, env]
+visual_params: {}

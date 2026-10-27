@@ -1,0 +1,96 @@
+{
+  "id": "rise",
+  "title": "Rise Together",
+  "subtitle": "Vuka Zimbabwe",
+  "artist": "virtuemotif",
+  "audio": "audio/rise.m4a",
+  "duration": 214.81,
+  "palette": "sunrise",
+  "note": "ARCHIVED written sheet (pre-verification). Kept for reference; not used by the build.",
+  "sections": [
+    {
+      "id": "intro",
+      "label": "Intro",
+      "start": 8.0,
+      "end": 20.0,
+      "look": "wide",
+      "lines": []
+    },
+    {
+      "id": "verse1",
+      "label": "Verse 1 — Ndebele",
+      "start": 20.5,
+      "end": 55.0,
+      "look": "walkers",
+      "lines": [
+        { "text": "Vuka, weZimbabwe, ilizwe lethu", "translation": "Wake up, our Zimbabwe, our land" },
+        { "text": "Kusile ukusa, kukhanya okusha", "translation": "Dawn has broken, a new light shines" },
+        { "text": "Izandla phezulu, sibumbene sonke", "translation": "Hands held high, we are all united" },
+        { "text": "Silethemba njalo lokuthula", "translation": "With hope and peace always" }
+      ]
+    },
+    {
+      "id": "chorus1",
+      "label": "Chorus — English",
+      "start": 55.5,
+      "end": 95.0,
+      "look": "raise",
+      "lines": [
+        { "text": "Oh, Zimbabwe, land of grace and light" },
+        { "text": "Underneath the sun, we stand upright" },
+        { "text": "From mountain peaks to valleys flowing free" },
+        { "text": "We pledge our hearts to unity and peace" }
+      ]
+    },
+    {
+      "id": "verse2",
+      "label": "Verse 2 — Shona",
+      "start": 95.5,
+      "end": 135.0,
+      "look": "mbira",
+      "lines": [
+        { "text": "Kubva kuZambezi kusvika Limpopo", "translation": "From Zambezi to Limpopo" },
+        { "text": "Nyika yedu yakanaka, inoera", "translation": "Our beautiful, sacred land" },
+        { "text": "Tineushingi hwekuaka ramangwana", "translation": "We have the courage to build the future" },
+        { "text": "Nerunyararo, rudo, neruramisiro", "translation": "With peace, love, and justice" }
+      ]
+    },
+    {
+      "id": "chorus2",
+      "label": "Chorus — reprise",
+      "start": 135.5,
+      "end": 175.0,
+      "look": "giant",
+      "lines": [
+        { "text": "Oh, Zimbabwe, land of grace and light" },
+        { "text": "Underneath the sun, we stand upright" },
+        { "text": "From mountain peaks to valleys flowing free" },
+        { "text": "We pledge our hearts to unity and peace" }
+      ]
+    },
+    {
+      "id": "bridge",
+      "label": "Bridge — call and response",
+      "start": 175.5,
+      "end": 191.0,
+      "look": "night",
+      "lines": [
+        { "text": "Batana!", "translation": "Unite!", "style": "whisper" },
+        { "text": "Bambanani!", "translation": "Hold together!", "style": "whisper" },
+        { "text": "Forever we stand strong as one!", "style": "whisper" }
+      ]
+    },
+    {
+      "id": "outro",
+      "label": "Outro",
+      "start": 191.5,
+      "end": 211.0,
+      "look": "wide",
+      "lines": [
+        { "text": "Land of our pride, our heritage, our home" },
+        { "text": "Ngaikomborerwe nyika yeZimbabwe", "translation": "May the land of Zimbabwe be blessed" },
+        { "text": "Peace, unity, and freedom — forevermore" }
+      ]
+    }
+  ]
+}

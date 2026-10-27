@@ -1,0 +1,106 @@
+{
+ "id": "rise_vocals",
+ "model": "large-v3",
+ "language": "en",
+ "language_probability": 1,
+ "window": [
+  53.0,
+  130.0
+ ],
+ "segments": [
+  {
+   "from": 89.24,
+   "to": 104.42,
+   "text": "Oh, Zimbabwe, land of grace and light, underneath the sun, we stand upright.",
+   "words": [
+    {
+     "w": "Oh,",
+     "from": 89.24,
+     "to": 90.54
+    },
+    {
+     "w": "Zimbabwe,",
+     "from": 90.54,
+     "to": 91.84
+    },
+    {
+     "w": "land",
+     "from": 92.02,
+     "to": 92.68
+    },
+    {
+     "w": "of",
+     "from": 92.68,
+     "to": 94.5
+    },
+    {
+     "w": "grace",
+     "from": 94.5,
+     "to": 94.92
+    },
+    {
+     "w": "and",
+     "from": 94.92,
+     "to": 95.56
+    },
+    {
+     "w": "light,",
+     "from": 95.56,
+     "to": 96.02
+    },
+    {
+     "w": "underneath",
+     "from": 96.28,
+     "to": 97.18
+    },
+    {
+     "w": "the",
+     "from": 97.18,
+     "to": 99.8
+    },
+    {
+     "w": "sun,",
+     "from": 99.8,
+     "to": 100.64
+    },
+    {
+     "w": "we",
+     "from": 100.68,
+     "to": 102.96
+    },
+    {
+     "w": "stand",
+     "from": 102.96,
+     "to": 103.34
+    },
+    {
+     "w": "upright.",
+     "from": 103.34,
+     "to": 104.42
+    }
+   ]
+  },
+  {
+   "from": 117.7,
+   "to": 121.54,
+   "text": "We stand upright.",
+   "words": [
+    {
+     "w": "We",
+     "from": 117.7,
+     "to": 119.1
+    },
+    {
+     "w": "stand",
+     "from": 119.1,
+     "to": 120.5
+    },
+    {
+     "w": "upright.",
+     "from": 120.5,
+     "to": 121.54
+    }
+   ]
+  }
+ ]
+}

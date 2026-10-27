@@ -1,0 +1,648 @@
+{
+ "id": "horizon_vocals",
+ "model": "large-v3",
+ "language": "la",
+ "language_probability": 0.276,
+ "segments": [
+  {
+   "from": 42.88,
+   "to": 51.66,
+   "text": "We breathe the air of a morning unwritten",
+   "words": [
+    {
+     "w": "We",
+     "from": 42.88,
+     "to": 44.28
+    },
+    {
+     "w": "breathe",
+     "from": 44.28,
+     "to": 44.86
+    },
+    {
+     "w": "the",
+     "from": 44.86,
+     "to": 45.66
+    },
+    {
+     "w": "air",
+     "from": 45.66,
+     "to": 46.14
+    },
+    {
+     "w": "of",
+     "from": 46.14,
+     "to": 47.78
+    },
+    {
+     "w": "a",
+     "from": 47.78,
+     "to": 49.56
+    },
+    {
+     "w": "morning",
+     "from": 49.56,
+     "to": 50.16
+    },
+    {
+     "w": "unwritten",
+     "from": 50.16,
+     "to": 51.66
+    }
+   ]
+  },
+  {
+   "from": 51.66,
+   "to": 67.36,
+   "text": "where the red soil remembers the strength of the past like the mist on the mountains",
+   "words": [
+    {
+     "w": "where",
+     "from": 51.66,
+     "to": 54.44
+    },
+    {
+     "w": "the",
+     "from": 54.44,
+     "to": 54.76
+    },
+    {
+     "w": "red",
+     "from": 54.76,
+     "to": 55.1
+    },
+    {
+     "w": "soil",
+     "from": 55.1,
+     "to": 55.5
+    },
+    {
+     "w": "remembers",
+     "from": 55.5,
+     "to": 56.68
+    },
+    {
+     "w": "the",
+     "from": 56.68,
+     "to": 58.2
+    },
+    {
+     "w": "strength",
+     "from": 58.2,
+     "to": 59.0
+    },
+    {
+     "w": "of",
+     "from": 59.0,
+     "to": 60.3
+    },
+    {
+     "w": "the",
+     "from": 60.3,
+     "to": 60.58
+    },
+    {
+     "w": "past",
+     "from": 60.58,
+     "to": 61.24
+    },
+    {
+     "w": "like",
+     "from": 61.24,
+     "to": 64.48
+    },
+    {
+     "w": "the",
+     "from": 64.48,
+     "to": 64.96
+    },
+    {
+     "w": "mist",
+     "from": 64.96,
+     "to": 65.34
+    },
+    {
+     "w": "on",
+     "from": 65.34,
+     "to": 65.78
+    },
+    {
+     "w": "the",
+     "from": 65.78,
+     "to": 66.48
+    },
+    {
+     "w": "mountains",
+     "from": 66.48,
+     "to": 67.36
+    }
+   ]
+  },
+  {
+   "from": 67.36,
+   "to": 81.02,
+   "text": "our spirits awaken to a future where healing and harmony",
+   "words": [
+    {
+     "w": "our",
+     "from": 67.36,
+     "to": 69.98
+    },
+    {
+     "w": "spirits",
+     "from": 69.98,
+     "to": 71.06
+    },
+    {
+     "w": "awaken",
+     "from": 71.06,
+     "to": 71.84
+    },
+    {
+     "w": "to",
+     "from": 71.84,
+     "to": 75.32
+    },
+    {
+     "w": "a",
+     "from": 75.32,
+     "to": 75.6
+    },
+    {
+     "w": "future",
+     "from": 75.6,
+     "to": 76.22
+    },
+    {
+     "w": "where",
+     "from": 76.22,
+     "to": 76.58
+    },
+    {
+     "w": "healing",
+     "from": 76.58,
+     "to": 77.74
+    },
+    {
+     "w": "and",
+     "from": 77.74,
+     "to": 78.94
+    },
+    {
+     "w": "harmony",
+     "from": 78.94,
+     "to": 81.02
+    }
+   ]
+  },
+  {
+   "from": 81.02,
+   "to": 81.78,
+   "text": "Mani les,",
+   "words": [
+    {
+     "w": "Mani",
+     "from": 81.02,
+     "to": 81.5
+    },
+    {
+     "w": "les,",
+     "from": 81.5,
+     "to": 81.78
+    }
+   ]
+  },
+  {
+   "from": 86.02,
+   "to": 88.0,
+   "text": "tu la lili sveletu,",
+   "words": [
+    {
+     "w": "tu",
+     "from": 86.02,
+     "to": 86.14
+    },
+    {
+     "w": "la",
+     "from": 86.14,
+     "to": 86.52
+    },
+    {
+     "w": "lili",
+     "from": 86.52,
+     "to": 86.84
+    },
+    {
+     "w": "sveletu,",
+     "from": 86.84,
+     "to": 88.0
+    }
+   ]
+  },
+  {
+   "from": 90.98,
+   "to": 92.62,
+   "text": "kukania vela,",
+   "words": [
+    {
+     "w": "kukania",
+     "from": 90.9,
+     "to": 91.58
+    },
+    {
+     "w": "vela,",
+     "from": 91.58,
+     "to": 92.62
+    }
+   ]
+  },
+  {
+   "from": 96.2,
+   "to": 98.38,
+   "text": "nika ieduioseava,",
+   "words": [
+    {
+     "w": "nika",
+     "from": 96.2,
+     "to": 97.02
+    },
+    {
+     "w": "ieduioseava,",
+     "from": 97.02,
+     "to": 98.38
+    }
+   ]
+  },
+  {
+   "from": 100.84,
+   "to": 103.08,
+   "text": "nerunia laro,",
+   "words": [
+    {
+     "w": "nerunia",
+     "from": 100.84,
+     "to": 102.2
+    },
+    {
+     "w": "laro,",
+     "from": 102.2,
+     "to": 103.08
+    }
+   ]
+  },
+  {
+   "from": 105.74,
+   "to": 108.8,
+   "text": "tu la lili sveletu.",
+   "words": [
+    {
+     "w": "tu",
+     "from": 105.74,
+     "to": 107.1
+    },
+    {
+     "w": "la",
+     "from": 107.1,
+     "to": 107.38
+    },
+    {
+     "w": "lili",
+     "from": 107.38,
+     "to": 107.74
+    },
+    {
+     "w": "sveletu.",
+     "from": 107.74,
+     "to": 108.8
+    }
+   ]
+  },
+  {
+   "from": 111.12,
+   "to": 123.82,
+   "text": "Ukania wēlā, nīkā ieru iōsē iāma, nēru ōñārāro.",
+   "words": [
+    {
+     "w": "Ukania",
+     "from": 111.12,
+     "to": 112.52
+    },
+    {
+     "w": "wēlā,",
+     "from": 112.52,
+     "to": 113.5
+    },
+    {
+     "w": "nīkā",
+     "from": 113.74,
+     "to": 117.28
+    },
+    {
+     "w": "ieru",
+     "from": 117.28,
+     "to": 117.86
+    },
+    {
+     "w": "iōsē",
+     "from": 117.86,
+     "to": 118.44
+    },
+    {
+     "w": "iāma,",
+     "from": 118.44,
+     "to": 119.26
+    },
+    {
+     "w": "nēru",
+     "from": 119.48,
+     "to": 122.6
+    },
+    {
+     "w": "ōñārāro.",
+     "from": 122.6,
+     "to": 123.82
+    }
+   ]
+  },
+  {
+   "from": 129.02,
+   "to": 138.64,
+   "text": "Mōguri wēnyerētē, sīmbāne mātindē, īsīs wēsīkē, e sīlētēmbā.",
+   "words": [
+    {
+     "w": "Mōguri",
+     "from": 128.82,
+     "to": 129.52
+    },
+    {
+     "w": "wēnyerētē,",
+     "from": 129.52,
+     "to": 130.58
+    },
+    {
+     "w": "sīmbāne",
+     "from": 130.9,
+     "to": 132.3
+    },
+    {
+     "w": "mātindē,",
+     "from": 132.3,
+     "to": 133.4
+    },
+    {
+     "w": "īsīs",
+     "from": 133.78,
+     "to": 134.92
+    },
+    {
+     "w": "wēsīkē,",
+     "from": 134.92,
+     "to": 135.92
+    },
+    {
+     "w": "e",
+     "from": 136.18,
+     "to": 137.06
+    },
+    {
+     "w": "sīlētēmbā.",
+     "from": 137.06,
+     "to": 138.64
+    }
+   ]
+  },
+  {
+   "from": 138.64,
+   "to": 148.32,
+   "text": "He trades the rivers that run to the sea Carrying grapes for the ages to be",
+   "words": [
+    {
+     "w": "He",
+     "from": 138.64,
+     "to": 138.96
+    },
+    {
+     "w": "trades",
+     "from": 138.96,
+     "to": 139.6
+    },
+    {
+     "w": "the",
+     "from": 139.6,
+     "to": 140.42
+    },
+    {
+     "w": "rivers",
+     "from": 140.42,
+     "to": 140.92
+    },
+    {
+     "w": "that",
+     "from": 140.92,
+     "to": 141.52
+    },
+    {
+     "w": "run",
+     "from": 141.52,
+     "to": 141.86
+    },
+    {
+     "w": "to",
+     "from": 141.86,
+     "to": 142.76
+    },
+    {
+     "w": "the",
+     "from": 142.76,
+     "to": 143.0
+    },
+    {
+     "w": "sea",
+     "from": 143.0,
+     "to": 143.34
+    },
+    {
+     "w": "Carrying",
+     "from": 143.34,
+     "to": 145.34
+    },
+    {
+     "w": "grapes",
+     "from": 145.34,
+     "to": 145.76
+    },
+    {
+     "w": "for",
+     "from": 145.76,
+     "to": 146.5
+    },
+    {
+     "w": "the",
+     "from": 146.5,
+     "to": 146.72
+    },
+    {
+     "w": "ages",
+     "from": 146.72,
+     "to": 147.34
+    },
+    {
+     "w": "to",
+     "from": 147.34,
+     "to": 147.94
+    },
+    {
+     "w": "be",
+     "from": 147.94,
+     "to": 148.32
+    }
+   ]
+  },
+  {
+   "from": 202.68,
+   "to": 224.54,
+   "text": "Abba, Abba, Abba, Abba.",
+   "words": [
+    {
+     "w": "Abba,",
+     "from": 202.68,
+     "to": 204.08
+    },
+    {
+     "w": "Abba,",
+     "from": 204.08,
+     "to": 204.08
+    },
+    {
+     "w": "Abba,",
+     "from": 204.3,
+     "to": 205.54
+    },
+    {
+     "w": "Abba.",
+     "from": 205.56,
+     "to": 224.54
+    }
+   ]
+  },
+  {
+   "from": 230.94,
+   "to": 248.92,
+   "text": "In the quiet of dawn, a new land is born, guided by truth, by grace, by the light.",
+   "words": [
+    {
+     "w": "In",
+     "from": 230.94,
+     "to": 232.02
+    },
+    {
+     "w": "the",
+     "from": 232.02,
+     "to": 232.14
+    },
+    {
+     "w": "quiet",
+     "from": 232.14,
+     "to": 232.88
+    },
+    {
+     "w": "of",
+     "from": 232.88,
+     "to": 233.36
+    },
+    {
+     "w": "dawn,",
+     "from": 233.36,
+     "to": 233.88
+    },
+    {
+     "w": "a",
+     "from": 234.28,
+     "to": 237.28
+    },
+    {
+     "w": "new",
+     "from": 237.28,
+     "to": 237.64
+    },
+    {
+     "w": "land",
+     "from": 237.64,
+     "to": 238.12
+    },
+    {
+     "w": "is",
+     "from": 238.12,
+     "to": 238.62
+    },
+    {
+     "w": "born,",
+     "from": 238.62,
+     "to": 238.98
+    },
+    {
+     "w": "guided",
+     "from": 239.5,
+     "to": 243.0
+    },
+    {
+     "w": "by",
+     "from": 243.0,
+     "to": 243.68
+    },
+    {
+     "w": "truth,",
+     "from": 243.68,
+     "to": 244.56
+    },
+    {
+     "w": "by",
+     "from": 244.94,
+     "to": 246.42
+    },
+    {
+     "w": "grace,",
+     "from": 246.42,
+     "to": 247.26
+    },
+    {
+     "w": "by",
+     "from": 247.26,
+     "to": 247.9
+    },
+    {
+     "w": "the",
+     "from": 247.9,
+     "to": 248.36
+    },
+    {
+     "w": "light.",
+     "from": 248.36,
+     "to": 248.92
+    }
+   ]
+  },
+  {
+   "from": 258.64,
+   "to": 259.58,
+   "text": "www.youtube.com",
+   "words": [
+    {
+     "w": "www",
+     "from": 258.64,
+     "to": 259.58
+    },
+    {
+     "w": ".youtube",
+     "from": 259.58,
+     "to": 259.58
+    },
+    {
+     "w": ".com",
+     "from": 259.58,
+     "to": 259.58
+    }
+   ]
+  }
+ ]
+}

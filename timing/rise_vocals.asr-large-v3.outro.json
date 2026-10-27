@@ -1,0 +1,34 @@
+{
+ "id": "rise_vocals",
+ "model": "large-v3",
+ "language": "en",
+ "language_probability": 1,
+ "window": [
+  178.0,
+  214.8
+ ],
+ "segments": [
+  {
+   "from": 178.0,
+   "to": 181.84,
+   "text": "Bambanani, Bambanali, Bambanali",
+   "words": [
+    {
+     "w": "Bambanani,",
+     "from": 178.0,
+     "to": 179.06
+    },
+    {
+     "w": "Bambanali,",
+     "from": 179.2,
+     "to": 180.48
+    },
+    {
+     "w": "Bambanali",
+     "from": 180.58,
+     "to": 181.84
+    }
+   ]
+  }
+ ]
+}

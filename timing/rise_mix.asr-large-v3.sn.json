@@ -1,0 +1,24 @@
+{
+ "id": "rise_mix",
+ "model": "large-v3",
+ "language": "sn",
+ "language_probability": 1,
+ "window": [
+  134.0,
+  160.0
+ ],
+ "segments": [
+  {
+   "from": 141.98,
+   "to": 143.38,
+   "text": "Zimbabwe",
+   "words": [
+    {
+     "w": "Zimbabwe",
+     "from": 141.98,
+     "to": 143.38
+    }
+   ]
+  }
+ ]
+}

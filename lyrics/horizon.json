@@ -1,0 +1,91 @@
+{
+  "id": "horizon",
+  "title": "The Horizon of Light",
+  "subtitle": "Tarisiro",
+  "artist": "virtuemotif",
+  "audio": "audio/horizon.m4a",
+  "duration": 259.61,
+  "palette": "dusk",
+  "note": "Structure verified against the separated vocal stem (Demucs htdemucs) + MMS_FA + Whisper large-v3. The generated track sings verse 1, then the two Ndebele chorus lines twice, then verse 2. It does not sing the written English chorus lines, the second chorus or the final chorus; 151-230 s is instrumental / vocalise.",
+  "sections": [
+    {
+      "id": "intro",
+      "label": "Intro — instrumental",
+      "start": 0.0,
+      "end": 43.0,
+      "look": "wide",
+      "lines": []
+    },
+    {
+      "id": "verse1",
+      "label": "Verse 1 — English",
+      "start": 43.0,
+      "end": 84.8,
+      "look": "walkers",
+      "lines": [
+        { "text": "We breathe the air of a morning unwritten" },
+        { "text": "Where the red soil remembers the strength of the past" },
+        { "text": "Like the mist on the mountains, our spirits awaken" },
+        { "text": "To a future where healing and harmony last" }
+      ]
+    },
+    {
+      "id": "chorus1",
+      "label": "Chorus — Ndebele, sung twice",
+      "start": 84.8,
+      "end": 126.5,
+      "look": "raise",
+      "lines": [
+        { "text": "Thula, lizwe lethu, kukhanya kwelanga", "translation": "Be still, our land, the sun shines" },
+        { "text": "Nyika yedu yose yava nerunyararo", "translation": "Our whole land now has peace" },
+        { "text": "Thula, lizwe lethu, kukhanya kwelanga", "translation": "Be still, our land, the sun shines" },
+        { "text": "Nyika yedu yose yava nerunyararo", "translation": "Our whole land now has peace" }
+      ]
+    },
+    {
+      "id": "verse2",
+      "label": "Verse 2 — Shona / Ndebele / English",
+      "start": 126.5,
+      "end": 151.2,
+      "look": "mbira",
+      "lines": [
+        { "text": "Mumvuri wenyeredzi, simba remadzinde", "translation": "In the shadow of stars, the strength of our roots" },
+        { "text": "Isizwe esihle, esilethemba", "translation": "A beautiful nation filled with hope" },
+        { "text": "We trace the rivers that run to the sea" },
+        { "text": "Carrying grace for the ages to be" }
+      ]
+    },
+    {
+      "id": "interlude",
+      "label": "Interlude — instrumental",
+      "start": 151.2,
+      "end": 196.0,
+      "look": "night",
+      "lines": []
+    },
+    {
+      "id": "bridge",
+      "label": "Bridge — vocalise",
+      "start": 196.0,
+      "end": 230.4,
+      "look": "giant",
+      "align": false,
+      "lines": [
+        { "text": "Lumina…", "translation": "Shine…", "style": "whisper", "from": 196.0, "to": 207.0 },
+        { "text": "Vuka…", "translation": "Awaken…", "style": "whisper", "from": 208.0, "to": 219.0 },
+        { "text": "Simuka…", "translation": "Rise…", "style": "whisper", "from": 220.0, "to": 230.0 }
+      ]
+    },
+    {
+      "id": "outro",
+      "label": "Outro",
+      "start": 230.4,
+      "end": 256.0,
+      "look": "wide",
+      "lines": [
+        { "text": "In the quiet of dawn, a new land is born" },
+        { "text": "Guided by truth, by grace, by the light" }
+      ]
+    }
+  ]
+}

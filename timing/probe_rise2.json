@@ -1,0 +1,44 @@
+[
+  {
+    "tag": "Q1 137-160 chorus x2?",
+    "start": 136.0,
+    "end": 160.0,
+    "text": "Oh, Zimbabwe, land of grace and light | Underneath the sun, we stand upright | Oh, Zimbabwe, land of grace and light | Underneath the sun, we stand upright"
+  },
+  {
+    "tag": "Q2 137-160 verse1-ndebele?",
+    "start": 136.0,
+    "end": 160.0,
+    "text": "Vuka, weZimbabwe, ilizwe lethu | Kusile ukusa, kukhanya okusha | Izandla phezulu, sibumbene sonke | Silethemba njalo lokuthula"
+  },
+  {
+    "tag": "Q3 reprise 157.5-174.5 simple",
+    "start": 157.5,
+    "end": 174.5,
+    "text": "Under grace and light | Underneath the sun, we stand upright"
+  },
+  {
+    "tag": "Q4 bridge A 175.5-184.5",
+    "start": 175.5,
+    "end": 184.5,
+    "text": "Batana! | Bambanani!"
+  },
+  {
+    "tag": "Q5 bridge B 181.5-190.5",
+    "start": 181.5,
+    "end": 190.5,
+    "text": "Bambanani! | Bambanani! | Forever we stand strong as one"
+  },
+  {
+    "tag": "Q6 outro shona x2 189.5-208.5",
+    "start": 189.5,
+    "end": 208.5,
+    "text": "Ngaikomborerwe nyika yeZimbabwe | Ngaikomborerwe nyika yeZimbabwe"
+  },
+  {
+    "tag": "Q7 outro en x2 189.5-208.5",
+    "start": 189.5,
+    "end": 208.5,
+    "text": "Peace, unity, and freedom forevermore | Peace, unity, and freedom forevermore"
+  }
+]

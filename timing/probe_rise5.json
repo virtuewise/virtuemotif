@@ -1,0 +1,14 @@
+[
+  {
+    "tag": "T1 104.5-123.5 full 2-line chorus",
+    "start": 104.5,
+    "end": 123.5,
+    "text": "Oh, Zimbabwe, land of grace and light | Underneath the sun, we stand upright"
+  },
+  {
+    "tag": "T2 104.5-123.5 wrong-text control",
+    "start": 104.5,
+    "end": 123.5,
+    "text": "From mountain peaks to valleys flowing free | We pledge our hearts to unity and peace"
+  }
+]

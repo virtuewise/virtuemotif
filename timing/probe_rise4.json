@@ -1,0 +1,26 @@
+[
+  {
+    "tag": "R1 104.8-116.2 chorus line1 pass3",
+    "start": 104.8,
+    "end": 116.2,
+    "text": "Oh, Zimbabwe, land of grace and light"
+  },
+  {
+    "tag": "R2 145-159 2-line chorus",
+    "start": 145.0,
+    "end": 159.0,
+    "text": "Oh, Zimbabwe, land of grace and light | Underneath the sun, we stand upright"
+  },
+  {
+    "tag": "R3 145-159 rising-up variant",
+    "start": 145.0,
+    "end": 159.0,
+    "text": "Rising up | Under grace and light | Underneath the sun, we stand upright"
+  },
+  {
+    "tag": "R4 191-208.5 bambanani",
+    "start": 191.0,
+    "end": 208.5,
+    "text": "Bambanani! | Bambanani!"
+  }
+]

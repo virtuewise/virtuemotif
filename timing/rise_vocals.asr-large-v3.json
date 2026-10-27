@@ -1,0 +1,296 @@
+{
+ "id": "rise_vocals",
+ "model": "large-v3",
+ "language": "en",
+ "language_probability": 0.604,
+ "segments": [
+  {
+   "from": 8.28,
+   "to": 11.08,
+   "text": "Thank you.",
+   "words": [
+    {
+     "w": "Thank",
+     "from": 8.28,
+     "to": 9.68
+    },
+    {
+     "w": "you.",
+     "from": 9.68,
+     "to": 11.08
+    }
+   ]
+  },
+  {
+   "from": 30.22,
+   "to": 36.32,
+   "text": "usile gusa kukanyo gusha",
+   "words": [
+    {
+     "w": "usile",
+     "from": 30.22,
+     "to": 31.62
+    },
+    {
+     "w": "gusa",
+     "from": 31.62,
+     "to": 33.02
+    },
+    {
+     "w": "kukanyo",
+     "from": 33.02,
+     "to": 35.68
+    },
+    {
+     "w": "gusha",
+     "from": 35.68,
+     "to": 36.32
+    }
+   ]
+  },
+  {
+   "from": 38.42,
+   "to": 45.06,
+   "text": "izanda pezulu sibumbe nesonge",
+   "words": [
+    {
+     "w": "izanda",
+     "from": 38.42,
+     "to": 39.82
+    },
+    {
+     "w": "pezulu",
+     "from": 39.82,
+     "to": 41.22
+    },
+    {
+     "w": "sibumbe",
+     "from": 41.22,
+     "to": 43.62
+    },
+    {
+     "w": "nesonge",
+     "from": 43.62,
+     "to": 45.06
+    }
+   ]
+  },
+  {
+   "from": 46.0,
+   "to": 53.22,
+   "text": "sile temanjalo ologutuna",
+   "words": [
+    {
+     "w": "sile",
+     "from": 46.0,
+     "to": 47.5
+    },
+    {
+     "w": "temanjalo",
+     "from": 47.5,
+     "to": 50.04
+    },
+    {
+     "w": "ologutuna",
+     "from": 50.04,
+     "to": 53.22
+    }
+   ]
+  },
+  {
+   "from": 69.58,
+   "to": 70.24,
+   "text": "Thank you.",
+   "words": [
+    {
+     "w": "Thank",
+     "from": 69.58,
+     "to": 70.02
+    },
+    {
+     "w": "you.",
+     "from": 70.02,
+     "to": 70.24
+    }
+   ]
+  },
+  {
+   "from": 91.02,
+   "to": 104.4,
+   "text": "Zimbabwe, under grace and love, land of grace and light, under grace and love, underneath the sun, we stand upright.",
+   "words": [
+    {
+     "w": "Zimbabwe,",
+     "from": 91.02,
+     "to": 91.94
+    },
+    {
+     "w": "under",
+     "from": 92.0,
+     "to": 92.68
+    },
+    {
+     "w": "grace",
+     "from": 92.68,
+     "to": 93.26
+    },
+    {
+     "w": "and",
+     "from": 93.26,
+     "to": 93.42
+    },
+    {
+     "w": "love,",
+     "from": 93.42,
+     "to": 93.8
+    },
+    {
+     "w": "land",
+     "from": 93.8,
+     "to": 94.06
+    },
+    {
+     "w": "of",
+     "from": 94.06,
+     "to": 94.52
+    },
+    {
+     "w": "grace",
+     "from": 94.52,
+     "to": 94.94
+    },
+    {
+     "w": "and",
+     "from": 94.94,
+     "to": 95.64
+    },
+    {
+     "w": "light,",
+     "from": 95.64,
+     "to": 96.08
+    },
+    {
+     "w": "under",
+     "from": 96.36,
+     "to": 96.9
+    },
+    {
+     "w": "grace",
+     "from": 96.9,
+     "to": 97.44
+    },
+    {
+     "w": "and",
+     "from": 97.44,
+     "to": 97.68
+    },
+    {
+     "w": "love,",
+     "from": 97.68,
+     "to": 98.02
+    },
+    {
+     "w": "underneath",
+     "from": 98.04,
+     "to": 98.76
+    },
+    {
+     "w": "the",
+     "from": 98.76,
+     "to": 99.8
+    },
+    {
+     "w": "sun,",
+     "from": 99.8,
+     "to": 100.48
+    },
+    {
+     "w": "we",
+     "from": 100.56,
+     "to": 102.94
+    },
+    {
+     "w": "stand",
+     "from": 102.94,
+     "to": 103.32
+    },
+    {
+     "w": "upright.",
+     "from": 103.32,
+     "to": 104.4
+    }
+   ]
+  },
+  {
+   "from": 117.7,
+   "to": 121.54,
+   "text": "We stand upright.",
+   "words": [
+    {
+     "w": "We",
+     "from": 117.7,
+     "to": 119.1
+    },
+    {
+     "w": "stand",
+     "from": 119.1,
+     "to": 120.5
+    },
+    {
+     "w": "upright.",
+     "from": 120.5,
+     "to": 121.54
+    }
+   ]
+  },
+  {
+   "from": 141.96,
+   "to": 143.36,
+   "text": "Zimbabwe",
+   "words": [
+    {
+     "w": "Zimbabwe",
+     "from": 141.96,
+     "to": 143.36
+    }
+   ]
+  },
+  {
+   "from": 166.4,
+   "to": 172.94,
+   "text": "Underneath the sun we stand upright",
+   "words": [
+    {
+     "w": "Underneath",
+     "from": 166.4,
+     "to": 167.8
+    },
+    {
+     "w": "the",
+     "from": 167.8,
+     "to": 168.42
+    },
+    {
+     "w": "sun",
+     "from": 168.42,
+     "to": 168.92
+    },
+    {
+     "w": "we",
+     "from": 168.92,
+     "to": 171.4
+    },
+    {
+     "w": "stand",
+     "from": 171.4,
+     "to": 172.08
+    },
+    {
+     "w": "upright",
+     "from": 172.08,
+     "to": 172.94
+    }
+   ]
+  }
+ ]
+}

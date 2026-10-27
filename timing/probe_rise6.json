@@ -1,0 +1,26 @@
+[
+  {
+    "tag": "B1 176.5-181.5 batana",
+    "start": 176.5,
+    "end": 181.5,
+    "text": "Batana!"
+  },
+  {
+    "tag": "B2 176.5-181.5 bambanani",
+    "start": 176.5,
+    "end": 181.5,
+    "text": "Bambanani!"
+  },
+  {
+    "tag": "B3 181.5-183.6 batana",
+    "start": 181.5,
+    "end": 183.6,
+    "text": "Batana!"
+  },
+  {
+    "tag": "B4 181.5-183.6 bambanani",
+    "start": 181.5,
+    "end": 183.6,
+    "text": "Bambanani!"
+  }
+]

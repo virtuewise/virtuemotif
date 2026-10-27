@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.venv*/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Caches
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Node / JS
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.remotion/
+*/.remotion/
+
+# Build & rendered output
+out/
+build/
+
+# Stems & temporary audio caches
+timing/stems/
+
+# OS metadata
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store

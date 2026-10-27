@@ -1,0 +1,1361 @@
+{
+ "id": "horizon",
+ "audio": "audio/horizon.m4a",
+ "method": "mms_fa_ctc_forced_alignment",
+ "model": "torchaudio.pipelines.MMS_FA (ctc_alignment_mling_uroman)",
+ "generated": "2026-10-26T13:01:05",
+ "frame": 0.02,
+ "sections": [
+  {
+   "id": "verse1",
+   "window": [
+    0.0,
+    259.605
+   ],
+   "lines": [
+    {
+     "text": "We breathe the air of a morning unwritten",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "We",
+       "from": 44.32,
+       "to": 44.44,
+       "score": 0.441
+      },
+      {
+       "i": 1,
+       "w": "breathe",
+       "from": 44.54,
+       "to": 45.7,
+       "score": 0.342
+      },
+      {
+       "i": 2,
+       "w": "the",
+       "from": 45.7,
+       "to": 46.0,
+       "score": 0.243
+      },
+      {
+       "i": 3,
+       "w": "air",
+       "from": 46.36,
+       "to": 49.32,
+       "score": 0.002
+      },
+      {
+       "i": 4,
+       "w": "of",
+       "from": 49.36,
+       "to": 49.5,
+       "score": 0.411
+      },
+      {
+       "i": 5,
+       "w": "a",
+       "from": 49.56,
+       "to": 49.58,
+       "score": 0.314
+      },
+      {
+       "i": 6,
+       "w": "morning",
+       "from": 49.72,
+       "to": 50.38,
+       "score": 0.521
+      },
+      {
+       "i": 7,
+       "w": "unwritten",
+       "from": 50.52,
+       "to": 51.86,
+       "score": 0.411
+      }
+     ]
+    },
+    {
+     "text": "Where the red soil remembers the strength of the past",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Where",
+       "from": 54.42,
+       "to": 54.66,
+       "score": 0.694
+      },
+      {
+       "i": 1,
+       "w": "the",
+       "from": 54.68,
+       "to": 54.76,
+       "score": 0.824
+      },
+      {
+       "i": 2,
+       "w": "red",
+       "from": 54.88,
+       "to": 55.28,
+       "score": 0.87
+      },
+      {
+       "i": 3,
+       "w": "soil",
+       "from": 55.36,
+       "to": 55.62,
+       "score": 0.313
+      },
+      {
+       "i": 4,
+       "w": "remembers",
+       "from": 55.78,
+       "to": 57.08,
+       "score": 0.871
+      },
+      {
+       "i": 5,
+       "w": "the",
+       "from": 58.34,
+       "to": 58.46,
+       "score": 0.908
+      },
+      {
+       "i": 6,
+       "w": "strength",
+       "from": 58.6,
+       "to": 60.06,
+       "score": 0.597
+      },
+      {
+       "i": 7,
+       "w": "of",
+       "from": 60.24,
+       "to": 60.44,
+       "score": 0.924
+      },
+      {
+       "i": 8,
+       "w": "the",
+       "from": 60.52,
+       "to": 60.62,
+       "score": 0.912
+      },
+      {
+       "i": 9,
+       "w": "past",
+       "from": 60.72,
+       "to": 61.9,
+       "score": 0.792
+      }
+     ]
+    },
+    {
+     "text": "Like the mist on the mountains, our spirits awaken",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Like",
+       "from": 64.46,
+       "to": 64.88,
+       "score": 0.875
+      },
+      {
+       "i": 1,
+       "w": "the",
+       "from": 64.9,
+       "to": 65.0,
+       "score": 0.756
+      },
+      {
+       "i": 2,
+       "w": "mist",
+       "from": 65.12,
+       "to": 65.54,
+       "score": 0.749
+      },
+      {
+       "i": 3,
+       "w": "on",
+       "from": 65.68,
+       "to": 66.4,
+       "score": 0.313
+      },
+      {
+       "i": 4,
+       "w": "the",
+       "from": 66.42,
+       "to": 66.48,
+       "score": 0.013
+      },
+      {
+       "i": 5,
+       "w": "mountains,",
+       "from": 66.6,
+       "to": 68.08,
+       "score": 0.83
+      },
+      {
+       "i": 6,
+       "w": "our",
+       "from": 70.16,
+       "to": 70.3,
+       "score": 0.07
+      },
+      {
+       "i": 7,
+       "w": "spirits",
+       "from": 70.38,
+       "to": 71.42,
+       "score": 0.391
+      },
+      {
+       "i": 8,
+       "w": "awaken",
+       "from": 71.54,
+       "to": 72.52,
+       "score": 0.773
+      }
+     ]
+    },
+    {
+     "text": "To a future where healing and harmony last",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "To",
+       "from": 75.28,
+       "to": 75.42,
+       "score": 0.486
+      },
+      {
+       "i": 1,
+       "w": "a",
+       "from": 75.56,
+       "to": 75.58,
+       "score": 0.249
+      },
+      {
+       "i": 2,
+       "w": "future",
+       "from": 75.72,
+       "to": 76.42,
+       "score": 0.4
+      },
+      {
+       "i": 3,
+       "w": "where",
+       "from": 76.42,
+       "to": 77.02,
+       "score": 0.361
+      },
+      {
+       "i": 4,
+       "w": "healing",
+       "from": 77.04,
+       "to": 78.82,
+       "score": 0.263
+      },
+      {
+       "i": 5,
+       "w": "and",
+       "from": 78.9,
+       "to": 79.58,
+       "score": 0.16
+      },
+      {
+       "i": 6,
+       "w": "harmony",
+       "from": 79.66,
+       "to": 81.42,
+       "score": 0.26
+      },
+      {
+       "i": 7,
+       "w": "last",
+       "from": 81.58,
+       "to": 86.12,
+       "score": 0.254
+      }
+     ]
+    }
+   ],
+   "start": 43.12,
+   "end": 84.74
+  },
+  {
+   "id": "chorus1",
+   "window": [
+    0.0,
+    259.605
+   ],
+   "lines": [
+    {
+     "text": "Thula, lizwe lethu, kukhanya kwelanga",
+     "translation": "Be still, our land, the sun shines",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Thula,",
+       "from": 86.14,
+       "to": 86.48,
+       "score": 0.24
+      },
+      {
+       "i": 1,
+       "w": "lizwe",
+       "from": 86.62,
+       "to": 87.14,
+       "score": 0.179
+      },
+      {
+       "i": 2,
+       "w": "lethu,",
+       "from": 87.26,
+       "to": 88.04,
+       "score": 0.178
+      },
+      {
+       "i": 3,
+       "w": "kukhanya",
+       "from": 90.94,
+       "to": 91.7,
+       "score": 0.388
+      },
+      {
+       "i": 4,
+       "w": "kwelanga",
+       "from": 91.84,
+       "to": 93.22,
+       "score": 0.363
+      }
+     ]
+    },
+    {
+     "text": "Nyika yedu yose yava nerunyararo",
+     "translation": "Our whole land now has peace",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Nyika",
+       "from": 96.14,
+       "to": 96.5,
+       "score": 0.698
+      },
+      {
+       "i": 1,
+       "w": "yedu",
+       "from": 96.64,
+       "to": 96.94,
+       "score": 0.583
+      },
+      {
+       "i": 2,
+       "w": "yose",
+       "from": 97.04,
+       "to": 97.6,
+       "score": 0.664
+      },
+      {
+       "i": 3,
+       "w": "yava",
+       "from": 97.72,
+       "to": 98.5,
+       "score": 0.518
+      },
+      {
+       "i": 4,
+       "w": "nerunyararo",
+       "from": 101.36,
+       "to": 108.0,
+       "score": 0.257
+      }
+     ]
+    },
+    {
+     "text": "We are the pulse of the earth, wild and free",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "We",
+       "from": 108.1,
+       "to": 108.24,
+       "score": 0.444
+      },
+      {
+       "i": 1,
+       "w": "are",
+       "from": 108.38,
+       "to": 108.52,
+       "score": 0.433
+      },
+      {
+       "i": 2,
+       "w": "the",
+       "from": 108.72,
+       "to": 108.9,
+       "score": 0.073
+      },
+      {
+       "i": 3,
+       "w": "pulse",
+       "from": 111.74,
+       "to": 112.14,
+       "score": 0.103
+      },
+      {
+       "i": 4,
+       "w": "of",
+       "from": 112.54,
+       "to": 112.58,
+       "score": 0.006
+      },
+      {
+       "i": 5,
+       "w": "the",
+       "from": 112.66,
+       "to": 112.84,
+       "score": 0.324
+      },
+      {
+       "i": 6,
+       "w": "earth,",
+       "from": 112.94,
+       "to": 117.04,
+       "score": 0.196
+      },
+      {
+       "i": 7,
+       "w": "wild",
+       "from": 117.04,
+       "to": 117.26,
+       "score": 0.241
+      },
+      {
+       "i": 8,
+       "w": "and",
+       "from": 117.32,
+       "to": 117.48,
+       "score": 0.355
+      },
+      {
+       "i": 9,
+       "w": "free",
+       "from": 117.56,
+       "to": 117.8,
+       "score": 0.045
+      }
+     ]
+    },
+    {
+     "text": "Bound by the spirit of unity",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Bound",
+       "from": 117.88,
+       "to": 118.32,
+       "score": 0.206
+      },
+      {
+       "i": 1,
+       "w": "by",
+       "from": 118.54,
+       "to": 118.58,
+       "score": 0.42
+      },
+      {
+       "i": 2,
+       "w": "the",
+       "from": 119.2,
+       "to": 119.32,
+       "score": 0.007
+      },
+      {
+       "i": 3,
+       "w": "spirit",
+       "from": 119.42,
+       "to": 122.5,
+       "score": 0.019
+      },
+      {
+       "i": 4,
+       "w": "of",
+       "from": 122.56,
+       "to": 122.6,
+       "score": 0.028
+      },
+      {
+       "i": 5,
+       "w": "unity",
+       "from": 122.62,
+       "to": 122.9,
+       "score": 0.299
+      }
+     ]
+    }
+   ],
+   "start": 84.94,
+   "end": 127.54
+  },
+  {
+   "id": "verse2",
+   "window": [
+    0.0,
+    259.605
+   ],
+   "lines": [
+    {
+     "text": "Mumvuri wenyeredzi, simba remadzinde",
+     "translation": "In the shadow of stars, the strength of our roots",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Mumvuri",
+       "from": 128.94,
+       "to": 129.52,
+       "score": 0.355
+      },
+      {
+       "i": 1,
+       "w": "wenyeredzi,",
+       "from": 129.6,
+       "to": 130.6,
+       "score": 0.566
+      },
+      {
+       "i": 2,
+       "w": "simba",
+       "from": 131.58,
+       "to": 132.12,
+       "score": 0.886
+      },
+      {
+       "i": 3,
+       "w": "remadzinde",
+       "from": 132.24,
+       "to": 133.22,
+       "score": 0.578
+      }
+     ]
+    },
+    {
+     "text": "Isizwe esihle, esilethemba",
+     "translation": "A beautiful nation filled with hope",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Isizwe",
+       "from": 134.22,
+       "to": 134.96,
+       "score": 0.021
+      },
+      {
+       "i": 1,
+       "w": "esihle,",
+       "from": 135.08,
+       "to": 137.04,
+       "score": 0.037
+      },
+      {
+       "i": 2,
+       "w": "esilethemba",
+       "from": 137.14,
+       "to": 138.42,
+       "score": 0.159
+      }
+     ]
+    },
+    {
+     "text": "We trace the rivers that run to the sea",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "We",
+       "from": 138.78,
+       "to": 138.88,
+       "score": 0.098
+      },
+      {
+       "i": 1,
+       "w": "trace",
+       "from": 139.16,
+       "to": 140.26,
+       "score": 0.382
+      },
+      {
+       "i": 2,
+       "w": "the",
+       "from": 140.28,
+       "to": 140.6,
+       "score": 0.301
+      },
+      {
+       "i": 3,
+       "w": "rivers",
+       "from": 140.7,
+       "to": 141.38,
+       "score": 0.271
+      },
+      {
+       "i": 4,
+       "w": "that",
+       "from": 141.38,
+       "to": 141.62,
+       "score": 0.237
+      },
+      {
+       "i": 5,
+       "w": "run",
+       "from": 141.78,
+       "to": 142.44,
+       "score": 0.446
+      },
+      {
+       "i": 6,
+       "w": "to",
+       "from": 142.62,
+       "to": 142.78,
+       "score": 0.818
+      },
+      {
+       "i": 7,
+       "w": "the",
+       "from": 142.86,
+       "to": 142.96,
+       "score": 0.031
+      },
+      {
+       "i": 8,
+       "w": "sea",
+       "from": 143.08,
+       "to": 144.76,
+       "score": 0.319
+      }
+     ]
+    },
+    {
+     "text": "Carrying grace for the ages to be",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Carrying",
+       "from": 144.76,
+       "to": 145.42,
+       "score": 0.116
+      },
+      {
+       "i": 1,
+       "w": "grace",
+       "from": 145.48,
+       "to": 145.94,
+       "score": 0.052
+      },
+      {
+       "i": 2,
+       "w": "for",
+       "from": 146.34,
+       "to": 146.98,
+       "score": 0.024
+      },
+      {
+       "i": 3,
+       "w": "the",
+       "from": 147.06,
+       "to": 147.18,
+       "score": 0.083
+      },
+      {
+       "i": 4,
+       "w": "ages",
+       "from": 147.18,
+       "to": 147.72,
+       "score": 0.129
+      },
+      {
+       "i": 5,
+       "w": "to",
+       "from": 147.82,
+       "to": 147.94,
+       "score": 0.494
+      },
+      {
+       "i": 6,
+       "w": "be",
+       "from": 148.08,
+       "to": 148.2,
+       "score": 0.137
+      }
+     ]
+    }
+   ],
+   "start": 127.74,
+   "end": 151.24
+  },
+  {
+   "id": "chorus2",
+   "window": [
+    0.0,
+    259.605
+   ],
+   "lines": [
+    {
+     "text": "Thula, lizwe lethu, kukhanya kwelanga",
+     "translation": "Be still, our land, the sun shines",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Thula,",
+       "from": 152.64,
+       "to": 155.6,
+       "score": 0.013
+      },
+      {
+       "i": 1,
+       "w": "lizwe",
+       "from": 155.7,
+       "to": 156.0,
+       "score": 0.017
+      },
+      {
+       "i": 2,
+       "w": "lethu,",
+       "from": 156.12,
+       "to": 156.46,
+       "score": 0.014
+      },
+      {
+       "i": 3,
+       "w": "kukhanya",
+       "from": 156.58,
+       "to": 159.28,
+       "score": 0.056
+      },
+      {
+       "i": 4,
+       "w": "kwelanga",
+       "from": 159.34,
+       "to": 159.72,
+       "score": 0.036
+      }
+     ]
+    },
+    {
+     "text": "Nyika yedu yose yava nerunyararo",
+     "translation": "Our whole land now has peace",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Nyika",
+       "from": 159.8,
+       "to": 160.16,
+       "score": 0.037
+      },
+      {
+       "i": 1,
+       "w": "yedu",
+       "from": 161.74,
+       "to": 171.62,
+       "score": 0.018
+      },
+      {
+       "i": 2,
+       "w": "yose",
+       "from": 171.62,
+       "to": 176.0,
+       "score": 0.01
+      },
+      {
+       "i": 3,
+       "w": "yava",
+       "from": 176.08,
+       "to": 176.28,
+       "score": 0.011
+      },
+      {
+       "i": 4,
+       "w": "nerunyararo",
+       "from": 176.36,
+       "to": 176.86,
+       "score": 0.012
+      }
+     ]
+    },
+    {
+     "text": "We are the pulse of the earth, wild and free",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "We",
+       "from": 177.2,
+       "to": 177.44,
+       "score": 0.009
+      },
+      {
+       "i": 1,
+       "w": "are",
+       "from": 177.44,
+       "to": 178.8,
+       "score": 0.012
+      },
+      {
+       "i": 2,
+       "w": "the",
+       "from": 179.22,
+       "to": 179.46,
+       "score": 0.007
+      },
+      {
+       "i": 3,
+       "w": "pulse",
+       "from": 180.0,
+       "to": 180.54,
+       "score": 0.006
+      },
+      {
+       "i": 4,
+       "w": "of",
+       "from": 180.72,
+       "to": 180.9,
+       "score": 0.009
+      },
+      {
+       "i": 5,
+       "w": "the",
+       "from": 180.9,
+       "to": 180.98,
+       "score": 0.01
+      },
+      {
+       "i": 6,
+       "w": "earth,",
+       "from": 181.0,
+       "to": 181.12,
+       "score": 0.007
+      },
+      {
+       "i": 7,
+       "w": "wild",
+       "from": 181.12,
+       "to": 181.32,
+       "score": 0.007
+      },
+      {
+       "i": 8,
+       "w": "and",
+       "from": 181.32,
+       "to": 181.5,
+       "score": 0.014
+      },
+      {
+       "i": 9,
+       "w": "free",
+       "from": 181.5,
+       "to": 181.64,
+       "score": 0.009
+      }
+     ]
+    },
+    {
+     "text": "Bound by the spirit of unity",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Bound",
+       "from": 181.78,
+       "to": 182.92,
+       "score": 0.007
+      },
+      {
+       "i": 1,
+       "w": "by",
+       "from": 183.02,
+       "to": 183.06,
+       "score": 0.006
+      },
+      {
+       "i": 2,
+       "w": "the",
+       "from": 183.3,
+       "to": 183.4,
+       "score": 0.01
+      },
+      {
+       "i": 3,
+       "w": "spirit",
+       "from": 183.92,
+       "to": 190.58,
+       "score": 0.01
+      },
+      {
+       "i": 4,
+       "w": "of",
+       "from": 190.64,
+       "to": 190.94,
+       "score": 0.01
+      },
+      {
+       "i": 5,
+       "w": "unity",
+       "from": 190.96,
+       "to": 191.76,
+       "score": 0.009
+      }
+     ]
+    }
+   ],
+   "start": 151.44,
+   "end": 190.42
+  },
+  {
+   "id": "bridge",
+   "window": [
+    0.0,
+    259.605
+   ],
+   "lines": [
+    {
+     "text": "Lumina…",
+     "translation": "Shine…",
+     "style": "whisper",
+     "words": [
+      {
+       "i": 0,
+       "w": "Lumina…",
+       "from": 191.82,
+       "to": 192.4,
+       "score": 0.012
+      }
+     ]
+    },
+    {
+     "text": "Vuka…",
+     "translation": "Awaken…",
+     "style": "whisper",
+     "words": [
+      {
+       "i": 0,
+       "w": "Vuka…",
+       "from": 192.7,
+       "to": 193.22,
+       "score": 0.051
+      }
+     ]
+    },
+    {
+     "text": "Simuka…",
+     "translation": "Rise…",
+     "style": "whisper",
+     "words": [
+      {
+       "i": 0,
+       "w": "Simuka…",
+       "from": 193.22,
+       "to": 193.5,
+       "score": 0.008
+      }
+     ]
+    }
+   ],
+   "start": 190.62,
+   "end": 192.1
+  },
+  {
+   "id": "final",
+   "window": [
+    0.0,
+    259.605
+   ],
+   "lines": [
+    {
+     "text": "Thula, lizwe lethu, kukhanya kwelanga",
+     "translation": "Be still, our land, the sun shines",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Thula,",
+       "from": 193.5,
+       "to": 193.64,
+       "score": 0.073
+      },
+      {
+       "i": 1,
+       "w": "lizwe",
+       "from": 194.04,
+       "to": 194.4,
+       "score": 0.008
+      },
+      {
+       "i": 2,
+       "w": "lethu,",
+       "from": 194.66,
+       "to": 196.78,
+       "score": 0.017
+      },
+      {
+       "i": 3,
+       "w": "kukhanya",
+       "from": 196.92,
+       "to": 197.4,
+       "score": 0.032
+      },
+      {
+       "i": 4,
+       "w": "kwelanga",
+       "from": 197.58,
+       "to": 198.82,
+       "score": 0.101
+      }
+     ]
+    },
+    {
+     "text": "Nyika yedu yose yava nerunyararo",
+     "translation": "Our whole land now has peace",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Nyika",
+       "from": 199.02,
+       "to": 200.66,
+       "score": 0.048
+      },
+      {
+       "i": 1,
+       "w": "yedu",
+       "from": 200.66,
+       "to": 201.46,
+       "score": 0.062
+      },
+      {
+       "i": 2,
+       "w": "yose",
+       "from": 202.18,
+       "to": 202.66,
+       "score": 0.025
+      },
+      {
+       "i": 3,
+       "w": "yava",
+       "from": 203.48,
+       "to": 204.04,
+       "score": 0.179
+      },
+      {
+       "i": 4,
+       "w": "nerunyararo",
+       "from": 204.86,
+       "to": 207.54,
+       "score": 0.052
+      }
+     ]
+    },
+    {
+     "text": "We are the pulse of the earth, wild and free",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "We",
+       "from": 207.78,
+       "to": 207.9,
+       "score": 0.018
+      },
+      {
+       "i": 1,
+       "w": "are",
+       "from": 208.84,
+       "to": 209.26,
+       "score": 0.096
+      },
+      {
+       "i": 2,
+       "w": "the",
+       "from": 209.54,
+       "to": 209.7,
+       "score": 0.114
+      },
+      {
+       "i": 3,
+       "w": "pulse",
+       "from": 210.7,
+       "to": 211.32,
+       "score": 0.026
+      },
+      {
+       "i": 4,
+       "w": "of",
+       "from": 214.06,
+       "to": 214.24,
+       "score": 0.04
+      },
+      {
+       "i": 5,
+       "w": "the",
+       "from": 214.34,
+       "to": 214.4,
+       "score": 0.057
+      },
+      {
+       "i": 6,
+       "w": "earth,",
+       "from": 214.44,
+       "to": 215.3,
+       "score": 0.053
+      },
+      {
+       "i": 7,
+       "w": "wild",
+       "from": 215.3,
+       "to": 215.82,
+       "score": 0.016
+      },
+      {
+       "i": 8,
+       "w": "and",
+       "from": 215.86,
+       "to": 216.4,
+       "score": 0.044
+      },
+      {
+       "i": 9,
+       "w": "free",
+       "from": 216.4,
+       "to": 216.68,
+       "score": 0.006
+      }
+     ]
+    },
+    {
+     "text": "Bound by the spirit of unity",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Bound",
+       "from": 217.04,
+       "to": 217.42,
+       "score": 0.005
+      },
+      {
+       "i": 1,
+       "w": "by",
+       "from": 217.44,
+       "to": 217.92,
+       "score": 0.004
+      },
+      {
+       "i": 2,
+       "w": "the",
+       "from": 217.92,
+       "to": 218.04,
+       "score": 0.021
+      },
+      {
+       "i": 3,
+       "w": "spirit",
+       "from": 218.32,
+       "to": 224.78,
+       "score": 0.012
+      },
+      {
+       "i": 4,
+       "w": "of",
+       "from": 224.88,
+       "to": 225.64,
+       "score": 0.02
+      },
+      {
+       "i": 5,
+       "w": "unity",
+       "from": 225.74,
+       "to": 231.76,
+       "score": 0.029
+      }
+     ]
+    }
+   ],
+   "start": 192.3,
+   "end": 230.4
+  },
+  {
+   "id": "outro",
+   "window": [
+    0.0,
+    259.605
+   ],
+   "lines": [
+    {
+     "text": "In the quiet of dawn, a new land is born",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "In",
+       "from": 231.8,
+       "to": 231.92,
+       "score": 0.395
+      },
+      {
+       "i": 1,
+       "w": "the",
+       "from": 231.92,
+       "to": 231.98,
+       "score": 0.004
+      },
+      {
+       "i": 2,
+       "w": "quiet",
+       "from": 232.1,
+       "to": 233.06,
+       "score": 0.297
+      },
+      {
+       "i": 3,
+       "w": "of",
+       "from": 233.16,
+       "to": 233.32,
+       "score": 0.778
+      },
+      {
+       "i": 4,
+       "w": "dawn,",
+       "from": 233.44,
+       "to": 233.82,
+       "score": 0.279
+      },
+      {
+       "i": 5,
+       "w": "a",
+       "from": 237.18,
+       "to": 237.2,
+       "score": 0.908
+      },
+      {
+       "i": 6,
+       "w": "new",
+       "from": 237.36,
+       "to": 237.62,
+       "score": 0.627
+      },
+      {
+       "i": 7,
+       "w": "land",
+       "from": 237.8,
+       "to": 238.26,
+       "score": 0.953
+      },
+      {
+       "i": 8,
+       "w": "is",
+       "from": 238.36,
+       "to": 238.56,
+       "score": 0.815
+      },
+      {
+       "i": 9,
+       "w": "born",
+       "from": 238.66,
+       "to": 239.04,
+       "score": 0.592
+      }
+     ]
+    },
+    {
+     "text": "Guided by truth, by grace, by the light",
+     "translation": "",
+     "style": "display",
+     "words": [
+      {
+       "i": 0,
+       "w": "Guided",
+       "from": 242.58,
+       "to": 243.32,
+       "score": 0.744
+      },
+      {
+       "i": 1,
+       "w": "by",
+       "from": 243.42,
+       "to": 243.94,
+       "score": 0.742
+      },
+      {
+       "i": 2,
+       "w": "truth,",
+       "from": 244.2,
+       "to": 246.04,
+       "score": 0.515
+      },
+      {
+       "i": 3,
+       "w": "by",
+       "from": 246.04,
+       "to": 246.36,
+       "score": 0.804
+      },
+      {
+       "i": 4,
+       "w": "grace,",
+       "from": 246.5,
+       "to": 247.56,
+       "score": 0.501
+      },
+      {
+       "i": 5,
+       "w": "by",
+       "from": 247.64,
+       "to": 248.04,
+       "score": 0.356
+      },
+      {
+       "i": 6,
+       "w": "the",
+       "from": 248.16,
+       "to": 248.26,
+       "score": 0.246
+      },
+      {
+       "i": 7,
+       "w": "light",
+       "from": 248.36,
+       "to": 249.4,
+       "score": 0.326
+      }
+     ]
+    }
+   ],
+   "start": 230.6,
+   "end": 253.9
+  }
+ ]
+}

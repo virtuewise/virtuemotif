@@ -1,0 +1,675 @@
+{
+ "id": "horizon",
+ "model": "large-v3",
+ "language": "en",
+ "language_probability": 0.323,
+ "segments": [
+  {
+   "from": 27.18,
+   "to": 29.98,
+   "text": "God bless you.",
+   "words": [
+    {
+     "w": "God",
+     "from": 27.18,
+     "to": 28.58
+    },
+    {
+     "w": "bless",
+     "from": 28.58,
+     "to": 29.98
+    },
+    {
+     "w": "you.",
+     "from": 29.98,
+     "to": 29.98
+    }
+   ]
+  },
+  {
+   "from": 42.88,
+   "to": 46.12,
+   "text": "We breathe the air",
+   "words": [
+    {
+     "w": "We",
+     "from": 42.88,
+     "to": 44.28
+    },
+    {
+     "w": "breathe",
+     "from": 44.28,
+     "to": 44.86
+    },
+    {
+     "w": "the",
+     "from": 44.86,
+     "to": 45.66
+    },
+    {
+     "w": "air",
+     "from": 45.66,
+     "to": 46.12
+    }
+   ]
+  },
+  {
+   "from": 47.14,
+   "to": 51.44,
+   "text": "Of a morning unwritten",
+   "words": [
+    {
+     "w": "Of",
+     "from": 47.14,
+     "to": 48.82
+    },
+    {
+     "w": "a",
+     "from": 48.82,
+     "to": 49.56
+    },
+    {
+     "w": "morning",
+     "from": 49.56,
+     "to": 50.18
+    },
+    {
+     "w": "unwritten",
+     "from": 50.18,
+     "to": 51.44
+    }
+   ]
+  },
+  {
+   "from": 53.1,
+   "to": 56.7,
+   "text": "Where the red sun remembers",
+   "words": [
+    {
+     "w": "Where",
+     "from": 53.1,
+     "to": 54.5
+    },
+    {
+     "w": "the",
+     "from": 54.5,
+     "to": 54.76
+    },
+    {
+     "w": "red",
+     "from": 54.76,
+     "to": 55.1
+    },
+    {
+     "w": "sun",
+     "from": 55.1,
+     "to": 55.44
+    },
+    {
+     "w": "remembers",
+     "from": 55.44,
+     "to": 56.7
+    }
+   ]
+  },
+  {
+   "from": 56.7,
+   "to": 67.38,
+   "text": "The strength of the past Like the mist on the mountains",
+   "words": [
+    {
+     "w": "The",
+     "from": 56.7,
+     "to": 58.42
+    },
+    {
+     "w": "strength",
+     "from": 58.42,
+     "to": 59.2
+    },
+    {
+     "w": "of",
+     "from": 59.2,
+     "to": 60.3
+    },
+    {
+     "w": "the",
+     "from": 60.3,
+     "to": 60.58
+    },
+    {
+     "w": "past",
+     "from": 60.58,
+     "to": 61.22
+    },
+    {
+     "w": "Like",
+     "from": 61.22,
+     "to": 64.58
+    },
+    {
+     "w": "the",
+     "from": 64.58,
+     "to": 64.96
+    },
+    {
+     "w": "mist",
+     "from": 64.96,
+     "to": 65.34
+    },
+    {
+     "w": "on",
+     "from": 65.34,
+     "to": 65.76
+    },
+    {
+     "w": "the",
+     "from": 65.76,
+     "to": 66.48
+    },
+    {
+     "w": "mountains",
+     "from": 66.48,
+     "to": 67.38
+    }
+   ]
+  },
+  {
+   "from": 68.84,
+   "to": 81.92,
+   "text": "Our spirits awaken To a future where healing and harmony last",
+   "words": [
+    {
+     "w": "Our",
+     "from": 68.84,
+     "to": 70.24
+    },
+    {
+     "w": "spirits",
+     "from": 70.24,
+     "to": 71.06
+    },
+    {
+     "w": "awaken",
+     "from": 71.06,
+     "to": 72.1
+    },
+    {
+     "w": "To",
+     "from": 72.1,
+     "to": 75.4
+    },
+    {
+     "w": "a",
+     "from": 75.4,
+     "to": 75.6
+    },
+    {
+     "w": "future",
+     "from": 75.6,
+     "to": 76.22
+    },
+    {
+     "w": "where",
+     "from": 76.22,
+     "to": 76.58
+    },
+    {
+     "w": "healing",
+     "from": 76.58,
+     "to": 77.9
+    },
+    {
+     "w": "and",
+     "from": 77.9,
+     "to": 79.0
+    },
+    {
+     "w": "harmony",
+     "from": 79.0,
+     "to": 80.82
+    },
+    {
+     "w": "last",
+     "from": 80.82,
+     "to": 81.92
+    }
+   ]
+  },
+  {
+   "from": 86.32,
+   "to": 86.8,
+   "text": "God bless you.",
+   "words": [
+    {
+     "w": "God",
+     "from": 86.32,
+     "to": 86.64
+    },
+    {
+     "w": "bless",
+     "from": 86.64,
+     "to": 86.64
+    },
+    {
+     "w": "you.",
+     "from": 86.64,
+     "to": 86.8
+    }
+   ]
+  },
+  {
+   "from": 111.92,
+   "to": 123.76,
+   "text": "Uka n'yagwela, nika yeduyo seyana, n'eru n'yagaro",
+   "words": [
+    {
+     "w": "Uka",
+     "from": 111.92,
+     "to": 112.04
+    },
+    {
+     "w": "n",
+     "from": 112.04,
+     "to": 112.3
+    },
+    {
+     "w": "'yagwela,",
+     "from": 112.3,
+     "to": 113.16
+    },
+    {
+     "w": "nika",
+     "from": 113.48,
+     "to": 117.28
+    },
+    {
+     "w": "yeduyo",
+     "from": 117.28,
+     "to": 118.08
+    },
+    {
+     "w": "seyana,",
+     "from": 118.08,
+     "to": 119.26
+    },
+    {
+     "w": "n",
+     "from": 119.5,
+     "to": 122.12
+    },
+    {
+     "w": "'eru",
+     "from": 122.12,
+     "to": 122.54
+    },
+    {
+     "w": "n",
+     "from": 122.54,
+     "to": 122.82
+    },
+    {
+     "w": "'yagaro",
+     "from": 122.82,
+     "to": 123.76
+    }
+   ]
+  },
+  {
+   "from": 127.46,
+   "to": 133.14,
+   "text": "M'vudiu e nyereti, simba ne mazinde",
+   "words": [
+    {
+     "w": "M",
+     "from": 127.46,
+     "to": 128.68
+    },
+    {
+     "w": "'vudiu",
+     "from": 128.68,
+     "to": 129.66
+    },
+    {
+     "w": "e",
+     "from": 129.66,
+     "to": 129.84
+    },
+    {
+     "w": "nyereti,",
+     "from": 129.84,
+     "to": 130.66
+    },
+    {
+     "w": "simba",
+     "from": 130.72,
+     "to": 132.24
+    },
+    {
+     "w": "ne",
+     "from": 132.24,
+     "to": 132.38
+    },
+    {
+     "w": "mazinde",
+     "from": 132.38,
+     "to": 133.14
+    }
+   ]
+  },
+  {
+   "from": 133.92,
+   "to": 138.46,
+   "text": "Isi izwa esi ije, esi le temba",
+   "words": [
+    {
+     "w": "Isi",
+     "from": 133.89,
+     "to": 134.5
+    },
+    {
+     "w": "izwa",
+     "from": 134.5,
+     "to": 134.96
+    },
+    {
+     "w": "esi",
+     "from": 134.96,
+     "to": 135.42
+    },
+    {
+     "w": "ije,",
+     "from": 135.42,
+     "to": 135.76
+    },
+    {
+     "w": "esi",
+     "from": 136.06,
+     "to": 137.24
+    },
+    {
+     "w": "le",
+     "from": 137.24,
+     "to": 137.48
+    },
+    {
+     "w": "temba",
+     "from": 137.48,
+     "to": 138.46
+    }
+   ]
+  },
+  {
+   "from": 138.46,
+   "to": 148.4,
+   "text": "We trace the rivers that run to the sea Carrying grace for the ages to be",
+   "words": [
+    {
+     "w": "We",
+     "from": 138.46,
+     "to": 138.94
+    },
+    {
+     "w": "trace",
+     "from": 138.94,
+     "to": 139.34
+    },
+    {
+     "w": "the",
+     "from": 139.34,
+     "to": 140.4
+    },
+    {
+     "w": "rivers",
+     "from": 140.4,
+     "to": 140.86
+    },
+    {
+     "w": "that",
+     "from": 140.86,
+     "to": 141.52
+    },
+    {
+     "w": "run",
+     "from": 141.52,
+     "to": 141.88
+    },
+    {
+     "w": "to",
+     "from": 141.88,
+     "to": 142.76
+    },
+    {
+     "w": "the",
+     "from": 142.76,
+     "to": 142.94
+    },
+    {
+     "w": "sea",
+     "from": 142.94,
+     "to": 143.34
+    },
+    {
+     "w": "Carrying",
+     "from": 143.34,
+     "to": 145.36
+    },
+    {
+     "w": "grace",
+     "from": 145.36,
+     "to": 145.84
+    },
+    {
+     "w": "for",
+     "from": 145.84,
+     "to": 146.5
+    },
+    {
+     "w": "the",
+     "from": 146.5,
+     "to": 146.72
+    },
+    {
+     "w": "ages",
+     "from": 146.72,
+     "to": 147.32
+    },
+    {
+     "w": "to",
+     "from": 147.32,
+     "to": 147.96
+    },
+    {
+     "w": "be",
+     "from": 147.96,
+     "to": 148.4
+    }
+   ]
+  },
+  {
+   "from": 190.22,
+   "to": 193.9,
+   "text": "In the quiet of dawn",
+   "words": [
+    {
+     "w": "In",
+     "from": 190.22,
+     "to": 191.46
+    },
+    {
+     "w": "the",
+     "from": 191.46,
+     "to": 191.66
+    },
+    {
+     "w": "quiet",
+     "from": 191.66,
+     "to": 192.28
+    },
+    {
+     "w": "of",
+     "from": 192.28,
+     "to": 193.44
+    },
+    {
+     "w": "dawn",
+     "from": 193.44,
+     "to": 193.9
+    }
+   ]
+  },
+  {
+   "from": 193.9,
+   "to": 198.44,
+   "text": "In the quiet of dawn",
+   "words": [
+    {
+     "w": "In",
+     "from": 193.9,
+     "to": 195.64
+    },
+    {
+     "w": "the",
+     "from": 195.64,
+     "to": 196.98
+    },
+    {
+     "w": "quiet",
+     "from": 196.98,
+     "to": 197.6
+    },
+    {
+     "w": "of",
+     "from": 197.6,
+     "to": 198.0
+    },
+    {
+     "w": "dawn",
+     "from": 198.0,
+     "to": 198.44
+    }
+   ]
+  },
+  {
+   "from": 230.84,
+   "to": 239.02,
+   "text": "In the quiet of dawn, a new land is born",
+   "words": [
+    {
+     "w": "In",
+     "from": 230.84,
+     "to": 231.9
+    },
+    {
+     "w": "the",
+     "from": 231.9,
+     "to": 232.14
+    },
+    {
+     "w": "quiet",
+     "from": 232.14,
+     "to": 232.78
+    },
+    {
+     "w": "of",
+     "from": 232.78,
+     "to": 233.36
+    },
+    {
+     "w": "dawn,",
+     "from": 233.36,
+     "to": 233.88
+    },
+    {
+     "w": "a",
+     "from": 234.18,
+     "to": 237.3
+    },
+    {
+     "w": "new",
+     "from": 237.3,
+     "to": 237.64
+    },
+    {
+     "w": "land",
+     "from": 237.64,
+     "to": 238.12
+    },
+    {
+     "w": "is",
+     "from": 238.12,
+     "to": 238.62
+    },
+    {
+     "w": "born",
+     "from": 238.62,
+     "to": 239.02
+    }
+   ]
+  },
+  {
+   "from": 242.12,
+   "to": 248.9,
+   "text": "Guided by truth, by grace, by the light",
+   "words": [
+    {
+     "w": "Guided",
+     "from": 242.12,
+     "to": 243.18
+    },
+    {
+     "w": "by",
+     "from": 243.18,
+     "to": 243.7
+    },
+    {
+     "w": "truth,",
+     "from": 243.7,
+     "to": 244.6
+    },
+    {
+     "w": "by",
+     "from": 244.94,
+     "to": 246.44
+    },
+    {
+     "w": "grace,",
+     "from": 246.44,
+     "to": 247.22
+    },
+    {
+     "w": "by",
+     "from": 247.22,
+     "to": 247.9
+    },
+    {
+     "w": "the",
+     "from": 247.9,
+     "to": 248.36
+    },
+    {
+     "w": "light",
+     "from": 248.36,
+     "to": 248.9
+    }
+   ]
+  },
+  {
+   "from": 258.46,
+   "to": 259.58,
+   "text": "Thank you.",
+   "words": [
+    {
+     "w": "Thank",
+     "from": 258.46,
+     "to": 259.52
+    },
+    {
+     "w": "you.",
+     "from": 259.52,
+     "to": 259.58
+    }
+   ]
+  }
+ ]
+}
