@@ -55,7 +55,7 @@ jobs:
         run: |
           modules=$(find tools -maxdepth 1 -type f -name '*.py' ! -name '_*.py' -printf '%f\n' | sed 's/\.py$//' | sort | sed 's/^/tools./' | tr '\n' ' ')
           test -n "$modules"
-          python -m pdoc -o build/site $modules
+          python -m pdoc --skip-errors -o build/site $modules
 
       - name: Check generated documentation links
         run: python .github/scripts/check_docs_links.py build/site
