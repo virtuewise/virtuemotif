@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw
 
 from .base import VisualEffect
 
+
 class WaveformEffect(VisualEffect):
     """Render a simple waveform synced to RMS of the audio chunk.
 
