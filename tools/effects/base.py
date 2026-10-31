@@ -4,6 +4,7 @@ from typing import Any
 
 from PIL import Image
 
+
 class VisualEffect:
     """Base class for all visual‑lyric effects.
 
