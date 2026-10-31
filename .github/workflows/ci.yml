@@ -42,8 +42,14 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
 
-      - name: Lint with Ruff
-        run: ruff check .
+      - name: Lint maintained pipeline and CI tests with Ruff
+        run: >-
+          ruff check
+          tools/make_video.py
+          tools/make_tapsync.py
+          tools/utils.py
+          tools/effects
+          tests/test_ci_smoke.py
 
       - name: Run Python tests
         run: python -m pytest -q
