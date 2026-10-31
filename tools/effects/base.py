@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
+
 from PIL import Image
 
 class VisualEffect:
@@ -11,7 +12,7 @@ class VisualEffect:
     current frame.
     """
 
-    def __init__(self, params: Dict[str, Any] | None = None) -> None:
+    def __init__(self, params: dict[str, Any] | None = None) -> None:
         self.params = params or {}
 
     def apply(self, audio_chunk: Any, prev_frames: list[Image.Image]) -> Image.Image:
