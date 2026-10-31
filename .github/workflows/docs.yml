@@ -8,6 +8,7 @@ on:
       - ".github/scripts/check_docs_links.py"
       - "requirements-dev.txt"
       - "site/index.html"
+      - "site/tools.html"
       - "tools/**"
   workflow_dispatch:
 
@@ -32,10 +33,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: pip
@@ -49,7 +50,7 @@ jobs:
       - name: Prepare clean publishing directory
         run: |
           mkdir -p build/site
-          cp site/index.html build/site/index.html
+          cp site/index.html site/tools.html build/site/
 
       - name: Build public API reference
         run: |
