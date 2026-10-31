@@ -52,7 +52,7 @@ jobs:
           cp site/index.html build/site/index.html
 
       - name: Build complete API reference
-        run: python -m pdoc -o build/site tools
+        run: python -m pdoc --exclude 'tools._dbg_labels' --exclude 'tools._dl_model' -o build/site tools
 
       - name: Check generated documentation links
         run: python .github/scripts/check_docs_links.py build/site
