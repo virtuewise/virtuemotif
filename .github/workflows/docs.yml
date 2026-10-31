@@ -8,6 +8,7 @@ on:
       - ".github/scripts/check_docs_links.py"
       - "requirements-dev.txt"
       - "site/index.html"
+      - "site/tools.html"
       - "tools/**"
   workflow_dispatch:
 
@@ -49,7 +50,7 @@ jobs:
       - name: Prepare clean publishing directory
         run: |
           mkdir -p build/site
-          cp site/index.html build/site/index.html
+          cp site/index.html site/tools.html build/site/
 
       - name: Build public API reference
         run: |
