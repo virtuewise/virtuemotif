@@ -16,12 +16,16 @@ except ImportError:
 
 
 def load_audio(path: str | pathlib.Path, fps: int) -> list[np.ndarray]:
-    """Load an audio file and return a list of chunks, one per video frame.
+    """Load audio and partition it into frame-aligned chunks.
 
-    The audio is resampled to ``fps`` chunks per second so that each chunk
-    corresponds to a single video frame.  The function returns a list of NumPy
-    arrays containing the raw float32 samples for each chunk.
+    Chunk boundaries are derived from the sample rate and frame index rather
+    than a truncated, fixed chunk size. This preserves every input sample when
+    the sample rate is not evenly divisible by fps. Multichannel audio is
+    converted to mono so the SoundFile and FFmpeg paths have the same shape.
     """
+    if fps <= 0:
+        raise ValueError("fps must be a positive integer")
+
     path = pathlib.Path(path)
     data = None
     samplerate = 22050
@@ -33,7 +37,7 @@ def load_audio(path: str | pathlib.Path, fps: int) -> list[np.ndarray]:
             data = None
 
     if data is None:
-        # Fallback to ffmpeg – produce raw f32le PCM on stdout.
+        # Fallback to ffmpeg – produce raw mono f32le PCM on stdout.
         cmd = [
             "ffmpeg",
             "-v",
@@ -51,12 +55,19 @@ def load_audio(path: str | pathlib.Path, fps: int) -> list[np.ndarray]:
         raw = subprocess.run(cmd, capture_output=True, check=True).stdout
         data = np.frombuffer(raw, dtype=np.float32)
         samplerate = 22050
+    elif data.ndim > 1:
+        data = np.mean(data, axis=1, dtype=np.float32)
 
-    # Determine chunk size (samples per frame)
-    samples_per_frame = int(samplerate / fps)
-    n_frames = len(data) // samples_per_frame
-    chunks = [
-        data[i * samples_per_frame : (i + 1) * samples_per_frame]
-        for i in range(n_frames)
-    ]
+    if samplerate <= 0:
+        raise ValueError(f"Audio sample rate must be positive; got {samplerate}")
+
+    # Rational frame boundaries avoid cumulative rounding drift and include a
+    # final partial chunk instead of silently dropping its samples.
+    n_frames = (len(data) * fps + samplerate - 1) // samplerate
+    chunks = []
+    for i in range(n_frames):
+        start = (i * samplerate) // fps
+        end = min(((i + 1) * samplerate) // fps, len(data))
+        if end > start:
+            chunks.append(data[start:end])
     return chunks
