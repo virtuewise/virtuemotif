@@ -58,7 +58,15 @@ jobs:
         run: python -m compileall -q tools tests
 
       - name: Build API documentation
-        run: python -m pdoc -o site tools.make_video tools.make_tapsync tools.utils tools.effects
+        run: python -m pdoc -o build/api-docs tools.make_video tools.make_tapsync tools.utils tools.effects
+
+      - name: Upload API documentation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-documentation
+          path: build/api-docs/
+          if-no-files-found: error
+          retention-days: 14
 
   remotion-quality:
     name: Remotion type check and composition validation
