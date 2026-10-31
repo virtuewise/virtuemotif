@@ -40,7 +40,7 @@ def load_config(song_id: str) -> dict[str, Any]:
     return cfg
 
 
-def render_frames(cfg: Dict[str, Any]) -> Path:
+def render_frames(cfg: dict[str, Any]) -> Path:
     """Render each frame according to active effects and audio."""
     output_dir = Path(cfg.get("output_dir", "out")) / cfg["song_id"]
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -88,7 +88,7 @@ def render_frames(cfg: Dict[str, Any]) -> Path:
     return output_dir
 
 
-def encode_video(frames_dir: Path, cfg: Dict[str, Any]) -> Path:
+def encode_video(frames_dir: Path, cfg: dict[str, Any]) -> Path:
     """Encode rendered frames into an MP4 video using ffmpeg."""
     out_dir = Path(cfg.get("output_dir", "out"))
     out_dir.mkdir(parents=True, exist_ok=True)
