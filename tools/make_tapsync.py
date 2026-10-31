@@ -1,7 +1,7 @@
 """Build a tap-sync page per song: press SPACE on each line as you hear it start."""
+import html
 import json
 import pathlib
-import html
 
 ROOT = pathlib.Path(r"C:\Users\Dell\Documents\Default Project")
 OUT = ROOT / "timing"
