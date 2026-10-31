@@ -58,7 +58,7 @@ jobs:
         run: python -m compileall -q tools tests
 
       - name: Build API documentation
-        run: python -m pdoc -o site tools
+        run: python -m pdoc -o site tools.make_video tools.make_tapsync tools.utils tools.effects
 
   remotion-quality:
     name: Remotion type check and composition validation
