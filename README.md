@@ -97,7 +97,7 @@ Open `timing/tap-sync-<song_id>.html` in any modern web browser.
 ## Documentation
 
 - **Tool Guides**: Browse comprehensive guides for each tool in [`docs/tools/`](docs/tools/).
-- **API Reference**: Open [`site/index.html`](site/index.html) or run `python -m pdoc -o site tools` to browse docstrings.
+- **API Reference**: Browse the [published API reference](https://virtuewise.github.io/virtuemotif/index.html). To build it locally, run `python -m pdoc -o build/api-docs tools`.
 - **Contributing Guidelines**: See [`CONTRIBUTING.md`](CONTRIBUTING.md) for style and development practices.
 - **Release History**: See [`CHANGELOG.md`](CHANGELOG.md).
 

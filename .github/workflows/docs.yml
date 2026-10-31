@@ -5,8 +5,9 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/docs.yml"
+      - ".github/scripts/check_docs_links.py"
       - "requirements-dev.txt"
-      - "site/**"
+      - "site/index.html"
       - "tools/**"
   workflow_dispatch:
 
@@ -48,10 +49,13 @@ jobs:
       - name: Prepare clean publishing directory
         run: |
           mkdir -p build/site
-          cp -a site/. build/site/
+          cp site/index.html build/site/index.html
 
-      - name: Build maintained API reference
-        run: python -m pdoc -o build/site tools.make_video tools.make_tapsync tools.utils tools.effects
+      - name: Build complete API reference
+        run: python -m pdoc -o build/site tools
+
+      - name: Check generated documentation links
+        run: python .github/scripts/check_docs_links.py build/site
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
