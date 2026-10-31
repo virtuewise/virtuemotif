@@ -9,7 +9,7 @@ from __future__ import annotations
 import argparse
 import subprocess
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import yaml
 from PIL import Image
@@ -18,7 +18,7 @@ from tools import utils
 from tools.effects import EFFECT_REGISTRY
 
 
-def load_config(song_id: str) -> Dict[str, Any]:
+def load_config(song_id: str) -> dict[str, Any]:
     """Load default config combined with song-specific config."""
     defaults_path = Path("config/defaults.yaml")
     song_path = Path(f"songs/{song_id}.yaml")
