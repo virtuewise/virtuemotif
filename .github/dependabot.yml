@@ -9,8 +9,7 @@ updates:
       - dependencies
       - python
     groups:
-      python-development:
-        dependency-type: development
+      python-dependencies:
         patterns:
           - "*"
 
