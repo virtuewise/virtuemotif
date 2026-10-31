@@ -29,7 +29,7 @@ def load_audio(path: str | pathlib.Path, fps: int) -> list[np.ndarray]:
     if sf is not None:
         try:
             data, samplerate = sf.read(path, dtype="float32")
-        except Exception:
+        except (OSError, RuntimeError, ValueError):
             data = None
 
     if data is None:

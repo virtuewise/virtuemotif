@@ -9,7 +9,7 @@ from __future__ import annotations
 import argparse
 import subprocess
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import yaml
 from PIL import Image
@@ -18,7 +18,7 @@ from tools import utils
 from tools.effects import EFFECT_REGISTRY
 
 
-def load_config(song_id: str) -> Dict[str, Any]:
+def load_config(song_id: str) -> dict[str, Any]:
     """Load default config combined with song-specific config."""
     defaults_path = Path("config/defaults.yaml")
     song_path = Path(f"songs/{song_id}.yaml")
@@ -40,7 +40,7 @@ def load_config(song_id: str) -> Dict[str, Any]:
     return cfg
 
 
-def render_frames(cfg: Dict[str, Any]) -> Path:
+def render_frames(cfg: dict[str, Any]) -> Path:
     """Render each frame according to active effects and audio."""
     output_dir = Path(cfg.get("output_dir", "out")) / cfg["song_id"]
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -88,7 +88,7 @@ def render_frames(cfg: Dict[str, Any]) -> Path:
     return output_dir
 
 
-def encode_video(frames_dir: Path, cfg: Dict[str, Any]) -> Path:
+def encode_video(frames_dir: Path, cfg: dict[str, Any]) -> Path:
     """Encode rendered frames into an MP4 video using ffmpeg."""
     out_dir = Path(cfg.get("output_dir", "out"))
     out_dir.mkdir(parents=True, exist_ok=True)

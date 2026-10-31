@@ -1,4 +1,9 @@
-# requirements-dev.txt
+# Development and CI dependencies
+# Includes runtime libraries used by the Python rendering pipeline.
+numpy>=1.26.0
+Pillow>=10.0.0
+PyYAML>=6.0.1
+soundfile>=0.12.1
 
 pdoc>=14.5.0
 pytest>=8.0.0

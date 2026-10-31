@@ -1,11 +1,13 @@
 """Build a tap-sync page per song: press SPACE on each line as you hear it start."""
-import json
-import pathlib
 import html
+import json
+import os
+import pathlib
 
-ROOT = pathlib.Path(r"C:\Users\Dell\Documents\Default Project")
+ROOT = pathlib.Path(
+    os.environ.get("VIRTUEMOTIF_ROOT", pathlib.Path(__file__).resolve().parents[1])
+).expanduser()
 OUT = ROOT / "timing"
-OUT.mkdir(exist_ok=True)
 
 TPL = """<!doctype html>
 <html><head><meta charset="utf-8"><title>Tap sync — __TITLE__</title>
@@ -113,6 +115,8 @@ paint();
 """
 
 def main() -> None:
+    """Generate tap-sync HTML pages for every lyrics JSON file."""
+    OUT.mkdir(parents=True, exist_ok=True)
     for p in sorted((ROOT / "lyrics").glob("*.json")):
         song = json.loads(p.read_text(encoding="utf-8"))
         flat = []
