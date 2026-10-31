@@ -52,7 +52,7 @@ export const LyricLine: React.FC<{
   y?: number;
 }> = ({ text, translation, from, to, offset = 0, size = 104, whisper = false, words: wordTimes, y = 0 }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, width } = useVideoConfig();
   const t = frame / fps + offset;
 
   if (t < from - 0.2 || t > to + 0.6) return null;
@@ -65,10 +65,16 @@ export const LyricLine: React.FC<{
   const outStart = to - 0.75;
   const exit = clamp((t - outStart) / 0.75);
 
-  const fs = whisper ? size : Math.min(116, Math.max(58, 1420 / (Math.max(text.length, 1) * 0.37)));
+  const isPortrait = width < 1080;
+  const fs = whisper
+    ? (isPortrait ? size * 0.75 : size)
+    : Math.min(isPortrait ? 84 : 116, Math.max(isPortrait ? 42 : 58, (width * 0.74) / (Math.max(text.length, 1) * 0.37)));
   const lineOpacity = 1 - exit;
+  const enterP = clamp((t - from) / 0.65);
+  const fallY = (1 - easeOut(enterP)) * -32;
   const rise = interpolate(exit, [0, 1], [0, -26]);
   const blur = interpolate(exit, [0, 1], [0, 7]);
+  const maxW = Math.min(1560, width * 0.88);
 
   return (
     <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
@@ -76,7 +82,7 @@ export const LyricLine: React.FC<{
       <div
         style={{
           position: "absolute",
-          width: 1900,
+          width: Math.min(1900, width * 0.98),
           height: 640,
           top: "50%",
           marginTop: -320,
@@ -87,8 +93,9 @@ export const LyricLine: React.FC<{
       />
       <div
         style={{
-          width: 1560,
-          transform: `translateY(${y + rise}px)`,
+          width: maxW,
+          margin: "0 auto",
+          transform: `translateY(${y + rise + fallY}px)`,
           opacity: lineOpacity,
           filter: blur > 0.05 ? `blur(${blur}px)` : undefined,
           textAlign: "center",
@@ -189,27 +196,38 @@ export const TitleCard: React.FC<{
   offset?: number;
 }> = ({ title, subtitle, kicker, artist, from, to, offset = 0 }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
   const t = frame / fps + offset;
   if (t < from || t > to) return null;
   const p = clamp((t - from) / 1.4);
   const out = clamp((t - (to - 1.1)) / 1.1);
   const e = easeOut(p);
   const scale = interpolate(e, [0, 1], [1.045, 1]);
+  const fallY = (1 - e) * -45; // Smoothly drops and settles into center without overlapping
+  const isPortrait = width < height;
+  const titleFontSize = isPortrait ? Math.min(84, width * 0.076) : Math.min(124, width * 0.064);
+
   return (
     <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", opacity: 1 - out }}>
-      <div style={{ textAlign: "center", transform: `scale(${scale})` }}>
+      <div
+        style={{
+          textAlign: "center",
+          width: Math.min(1500, width * 0.88),
+          margin: "0 auto",
+          transform: `scale(${scale}) translateY(${fallY}px)`,
+        }}
+      >
 
         <div
           style={{
             fontFamily: FONT_MONO,
             fontWeight: 600,
-            fontSize: 19,
+            fontSize: isPortrait ? 15 : 19,
             letterSpacing: "0.52em",
             color: P.amber,
             textTransform: "uppercase",
             opacity: clamp((t - from) / 0.9),
-            marginBottom: 30,
+            marginBottom: isPortrait ? 18 : 30,
           }}
         >
           {kicker ?? "A lyrical film"}
@@ -218,13 +236,13 @@ export const TitleCard: React.FC<{
         <div
           style={{
             fontFamily: FONT_DISPLAY,
-            fontSize: 132,
-            lineHeight: 0.92,
+            fontSize: titleFontSize,
+            lineHeight: 1.04,
             letterSpacing: "-0.01em",
             color: P.bone,
             textTransform: "uppercase",
             textShadow: "0 4px 0 #2A140F, 0 26px 60px rgba(0,0,0,0.6)",
-            clipPath: `inset(0 ${(1 - e) * 100}% 0 0)`,
+            opacity: e,
           }}
         >
           {title}
@@ -232,9 +250,9 @@ export const TitleCard: React.FC<{
 
         <div
           style={{
-            width: 760 * e,
+            width: Math.min(760, width * 0.6) * e,
             height: 2,
-            margin: "34px auto 26px",
+            margin: isPortrait ? "22px auto 18px" : "34px auto 26px",
             background: `linear-gradient(90deg, transparent, ${P.ochre}, transparent)`,
           }}
         />
@@ -244,7 +262,7 @@ export const TitleCard: React.FC<{
             style={{
               fontFamily: FONT_SERIF,
               fontStyle: "italic",
-              fontSize: 76,
+              fontSize: isPortrait ? 46 : 72,
               color: P.cream,
               opacity: clamp((t - from - 0.5) / 0.8),
               textShadow: "0 6px 26px rgba(0,0,0,0.7)",

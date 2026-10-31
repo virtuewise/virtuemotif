@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "scripts": {
+    "render": "remotion render film/src/index.ts SmartFurScene out/video.mp4 --frames 0-180",
+    "render": "remotion render src/index.ts SmartFurScene out/video.mp4 --frames 0-180"
+  },
+  "devDependencies": {
+    "@remotion/cli": "^4.0.539",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@remotion/renderer": "^4.0.539",
+    "remotion": "^4.0.539"
+  }
+}

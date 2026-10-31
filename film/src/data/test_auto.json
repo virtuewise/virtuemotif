@@ -1,0 +1,673 @@
+{
+ "id": "horizon",
+ "title": "Horizon",
+ "subtitle": "Smart Auto Lyrics",
+ "artist": "virtuemotif",
+ "audio": "audio/horizon.m4a",
+ "duration": 259.61,
+ "palette": "dusk",
+ "sections": [
+  {
+   "id": "intro",
+   "label": "Intro — Instrumental",
+   "look": "wide",
+   "start": 0,
+   "end": 44.2,
+   "lines": []
+  },
+  {
+   "id": "verse1",
+   "label": "Verse 1",
+   "look": "walkers",
+   "start": 44.2,
+   "end": 106.94,
+   "lines": [
+    {
+     "text": "We breathe the air of a morning unwritten",
+     "translation": "[Shona translation]",
+     "style": "display",
+     "from": 44.2,
+     "to": 53.48,
+     "words": [
+      {
+       "w": "We",
+       "from": 44.32,
+       "to": 44.44
+      },
+      {
+       "w": "breathe",
+       "from": 44.56,
+       "to": 45.76
+      },
+      {
+       "w": "the",
+       "from": 45.8,
+       "to": 46.02
+      },
+      {
+       "w": "air",
+       "from": 46.18,
+       "to": 46.5
+      },
+      {
+       "w": "of",
+       "from": 49.38,
+       "to": 49.52
+      },
+      {
+       "w": "a",
+       "from": 49.58,
+       "to": 49.6
+      },
+      {
+       "w": "morning",
+       "from": 49.74,
+       "to": 50.38
+      },
+      {
+       "w": "unwritten",
+       "from": 50.58,
+       "to": 51.88
+      }
+     ]
+    },
+    {
+     "text": "Where the red soil remembers the strength of the past",
+     "translation": "[Shona translation]",
+     "style": "display",
+     "from": 54.36,
+     "to": 63.4,
+     "words": [
+      {
+       "w": "Where",
+       "from": 54.48,
+       "to": 54.7
+      },
+      {
+       "w": "the",
+       "from": 54.72,
+       "to": 54.8
+      },
+      {
+       "w": "red",
+       "from": 54.94,
+       "to": 55.32
+      },
+      {
+       "w": "soil",
+       "from": 55.4,
+       "to": 55.66
+      },
+      {
+       "w": "remembers",
+       "from": 55.8,
+       "to": 57.12
+      },
+      {
+       "w": "the",
+       "from": 58.38,
+       "to": 58.5
+      },
+      {
+       "w": "strength",
+       "from": 58.64,
+       "to": 60.1
+      },
+      {
+       "w": "of",
+       "from": 60.26,
+       "to": 60.48
+      },
+      {
+       "w": "the",
+       "from": 60.56,
+       "to": 60.66
+      },
+      {
+       "w": "past",
+       "from": 60.76,
+       "to": 61.8
+      }
+     ]
+    },
+    {
+     "text": "Like the mist on the mountains, our spirits awaken",
+     "translation": "[Shona translation]",
+     "style": "display",
+     "from": 64.38,
+     "to": 74.16,
+     "words": [
+      {
+       "w": "Like",
+       "from": 64.5,
+       "to": 64.92
+      },
+      {
+       "w": "the",
+       "from": 64.94,
+       "to": 65.04
+      },
+      {
+       "w": "mist",
+       "from": 65.16,
+       "to": 65.58
+      },
+      {
+       "w": "on",
+       "from": 65.72,
+       "to": 66.44
+      },
+      {
+       "w": "the",
+       "from": 66.46,
+       "to": 66.52
+      },
+      {
+       "w": "mountains,",
+       "from": 66.64,
+       "to": 68.12
+      },
+      {
+       "w": "our",
+       "from": 70.22,
+       "to": 70.34
+      },
+      {
+       "w": "spirits",
+       "from": 70.42,
+       "to": 71.48
+      },
+      {
+       "w": "awaken",
+       "from": 71.58,
+       "to": 72.56
+      }
+     ]
+    },
+    {
+     "text": "To a future where healing and harmony last",
+     "translation": "[Shona translation]",
+     "style": "display",
+     "from": 75.22,
+     "to": 84.78,
+     "words": [
+      {
+       "w": "To",
+       "from": 75.34,
+       "to": 75.48
+      },
+      {
+       "w": "a",
+       "from": 75.62,
+       "to": 75.64
+      },
+      {
+       "w": "future",
+       "from": 75.78,
+       "to": 76.44
+      },
+      {
+       "w": "where",
+       "from": 76.48,
+       "to": 77.08
+      },
+      {
+       "w": "healing",
+       "from": 77.12,
+       "to": 78.42
+      },
+      {
+       "w": "and",
+       "from": 79.46,
+       "to": 79.62
+      },
+      {
+       "w": "harmony",
+       "from": 79.72,
+       "to": 81.54
+      },
+      {
+       "w": "last",
+       "from": 81.66,
+       "to": 86.22
+      }
+     ]
+    },
+    {
+     "text": "Thula, lizwe lethu, kukhanya kwelanga",
+     "translation": "Be still, our land, the sun shines",
+     "style": "display",
+     "from": 86.08,
+     "to": 96.14,
+     "words": [
+      {
+       "w": "Thula,",
+       "from": 86.2,
+       "to": 86.54
+      },
+      {
+       "w": "lizwe",
+       "from": 86.68,
+       "to": 87.18
+      },
+      {
+       "w": "lethu,",
+       "from": 87.32,
+       "to": 88.1
+      },
+      {
+       "w": "kukhanya",
+       "from": 91.02,
+       "to": 91.76
+      },
+      {
+       "w": "kwelanga",
+       "from": 91.9,
+       "to": 96.08
+      }
+     ]
+    },
+    {
+     "text": "Nyika yedu yose yava nerunyararo",
+     "translation": "Our whole land now has peace",
+     "style": "display",
+     "from": 96.16,
+     "to": 104.48,
+     "words": [
+      {
+       "w": "Nyika",
+       "from": 96.22,
+       "to": 96.56
+      },
+      {
+       "w": "yedu",
+       "from": 96.7,
+       "to": 97
+      },
+      {
+       "w": "yose",
+       "from": 97.1,
+       "to": 97.64
+      },
+      {
+       "w": "yava",
+       "from": 97.78,
+       "to": 98.56
+      },
+      {
+       "w": "nerunyararo",
+       "from": 101.44,
+       "to": 102.88
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "verse2",
+   "label": "Verse 2",
+   "look": "dusk",
+   "start": 106.94,
+   "end": 196,
+   "lines": [
+    {
+     "text": "Thula, lizwe lethu, kukhanya kwelanga",
+     "translation": "Be still, our land, the sun shines",
+     "style": "display",
+     "from": 106.94,
+     "to": 117,
+     "words": [
+      {
+       "w": "Thula,",
+       "from": 107.06,
+       "to": 107.44
+      },
+      {
+       "w": "lizwe",
+       "from": 107.54,
+       "to": 108.08
+      },
+      {
+       "w": "lethu,",
+       "from": 108.18,
+       "to": 108.98
+      },
+      {
+       "w": "kukhanya",
+       "from": 111.82,
+       "to": 112.64
+      },
+      {
+       "w": "kwelanga",
+       "from": 112.74,
+       "to": 117.06
+      }
+     ]
+    },
+    {
+     "text": "Nyika yedu yose yava nerunyararo",
+     "translation": "Our whole land now has peace",
+     "style": "display",
+     "from": 117.02,
+     "to": 125.38,
+     "words": [
+      {
+       "w": "Nyika",
+       "from": 117.08,
+       "to": 117.42
+      },
+      {
+       "w": "yedu",
+       "from": 117.56,
+       "to": 117.88
+      },
+      {
+       "w": "yose",
+       "from": 117.98,
+       "to": 118.52
+      },
+      {
+       "w": "yava",
+       "from": 118.64,
+       "to": 119.4
+      },
+      {
+       "w": "nerunyararo",
+       "from": 122.3,
+       "to": 123.78
+      }
+     ]
+    },
+    {
+     "text": "Mumvuri wenyeredzi, simba remadzinde",
+     "translation": "In the shadow of stars, the strength of our roots",
+     "style": "display",
+     "from": 128.92,
+     "to": 134.24,
+     "words": [
+      {
+       "w": "Mumvuri",
+       "from": 129.04,
+       "to": 129.62
+      },
+      {
+       "w": "wenyeredzi,",
+       "from": 129.7,
+       "to": 131.6
+      },
+      {
+       "w": "simba",
+       "from": 131.68,
+       "to": 132.22
+      },
+      {
+       "w": "remadzinde",
+       "from": 132.34,
+       "to": 133.32
+      }
+     ]
+    },
+    {
+     "text": "Isizwe esihle, esilethemba",
+     "translation": "A beautiful nation filled with hope",
+     "style": "display",
+     "from": 134.26,
+     "to": 138.8,
+     "words": [
+      {
+       "w": "Isizwe",
+       "from": 134.32,
+       "to": 135.06
+      },
+      {
+       "w": "esihle,",
+       "from": 135.18,
+       "to": 135.92
+      },
+      {
+       "w": "esilethemba",
+       "from": 137.12,
+       "to": 138.52
+      }
+     ]
+    },
+    {
+     "text": "We trace the rivers that run to the sea",
+     "translation": "[Shona translation]",
+     "style": "display",
+     "from": 138.82,
+     "to": 144.78,
+     "words": [
+      {
+       "w": "We",
+       "from": 138.88,
+       "to": 138.98
+      },
+      {
+       "w": "trace",
+       "from": 139.26,
+       "to": 139.66
+      },
+      {
+       "w": "the",
+       "from": 140.38,
+       "to": 140.7
+      },
+      {
+       "w": "rivers",
+       "from": 140.8,
+       "to": 141.48
+      },
+      {
+       "w": "that",
+       "from": 141.48,
+       "to": 141.72
+      },
+      {
+       "w": "run",
+       "from": 141.88,
+       "to": 142.6
+      },
+      {
+       "w": "to",
+       "from": 142.72,
+       "to": 142.88
+      },
+      {
+       "w": "the",
+       "from": 142.96,
+       "to": 143.06
+      },
+      {
+       "w": "sea",
+       "from": 143.18,
+       "to": 143.98
+      }
+     ]
+    },
+    {
+     "text": "Carrying grace for the ages to be",
+     "translation": "[Shona translation]",
+     "style": "display",
+     "from": 144.8,
+     "to": 149.92,
+     "words": [
+      {
+       "w": "Carrying",
+       "from": 144.86,
+       "to": 145.52
+      },
+      {
+       "w": "grace",
+       "from": 145.58,
+       "to": 146.06
+      },
+      {
+       "w": "for",
+       "from": 146.44,
+       "to": 146.62
+      },
+      {
+       "w": "the",
+       "from": 146.68,
+       "to": 146.78
+      },
+      {
+       "w": "ages",
+       "from": 146.98,
+       "to": 147.84
+      },
+      {
+       "w": "to",
+       "from": 147.94,
+       "to": 148.06
+      },
+      {
+       "w": "be",
+       "from": 148.2,
+       "to": 148.32
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "verse3",
+   "label": "Verse 3",
+   "look": "walkers",
+   "start": 196,
+   "end": 259.61,
+   "lines": [
+    {
+     "text": "Lumina…",
+     "translation": "Shine…",
+     "style": "whisper",
+     "from": 196,
+     "to": 207
+    },
+    {
+     "text": "Vuka…",
+     "translation": "Awaken…",
+     "style": "whisper",
+     "from": 208,
+     "to": 219
+    },
+    {
+     "text": "Simuka…",
+     "translation": "Rise…",
+     "style": "whisper",
+     "from": 220,
+     "to": 230
+    },
+    {
+     "text": "In the quiet of dawn, a new land is born",
+     "translation": "[Shona translation]",
+     "style": "display",
+     "from": 231.86,
+     "to": 240.9,
+     "words": [
+      {
+       "w": "In",
+       "from": 231.98,
+       "to": 232.1
+      },
+      {
+       "w": "the",
+       "from": 232.1,
+       "to": 232.16
+      },
+      {
+       "w": "quiet",
+       "from": 232.28,
+       "to": 233.24
+      },
+      {
+       "w": "of",
+       "from": 233.34,
+       "to": 233.5
+      },
+      {
+       "w": "dawn,",
+       "from": 233.62,
+       "to": 234.02
+      },
+      {
+       "w": "a",
+       "from": 237.36,
+       "to": 237.38
+      },
+      {
+       "w": "new",
+       "from": 237.54,
+       "to": 237.78
+      },
+      {
+       "w": "land",
+       "from": 237.98,
+       "to": 238.44
+      },
+      {
+       "w": "is",
+       "from": 238.54,
+       "to": 238.74
+      },
+      {
+       "w": "born",
+       "from": 238.84,
+       "to": 239.3
+      }
+     ]
+    },
+    {
+     "text": "Guided by truth, by grace, by the light",
+     "translation": "[Shona translation]",
+     "style": "display",
+     "from": 242.64,
+     "to": 250.92,
+     "words": [
+      {
+       "w": "Guided",
+       "from": 242.76,
+       "to": 243.52
+      },
+      {
+       "w": "by",
+       "from": 243.62,
+       "to": 244.14
+      },
+      {
+       "w": "truth,",
+       "from": 244.4,
+       "to": 246.24
+      },
+      {
+       "w": "by",
+       "from": 246.24,
+       "to": 246.56
+      },
+      {
+       "w": "grace,",
+       "from": 246.7,
+       "to": 247.74
+      },
+      {
+       "w": "by",
+       "from": 247.84,
+       "to": 248.24
+      },
+      {
+       "w": "the",
+       "from": 248.36,
+       "to": 248.46
+      },
+      {
+       "w": "light",
+       "from": 248.56,
+       "to": 249.32
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
