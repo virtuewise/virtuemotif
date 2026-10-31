@@ -53,9 +53,8 @@ jobs:
 
       - name: Build public API reference
         run: |
-          modules=$(find tools -maxdepth 1 -type f -name '*.py' ! -name '_*.py' -printf '%f\n' | sed 's/\.py$//' | sort | sed 's/^/tools./' | tr '\n' ' ')
-          test -n "$modules"
-          python -m pdoc --skip-errors -o build/site $modules
+          # Keep this list aligned with the import-safe modules built in CI.
+          python -m pdoc -o build/site tools.make_video tools.make_tapsync tools.utils tools.effects
 
       - name: Check generated documentation links
         run: python .github/scripts/check_docs_links.py build/site
