@@ -51,8 +51,11 @@ jobs:
           mkdir -p build/site
           cp site/index.html build/site/index.html
 
-      - name: Build complete API reference
-        run: python -m pdoc --exclude 'tools._dbg_labels' --exclude 'tools._dl_model' -o build/site tools
+      - name: Build public API reference
+        run: |
+          modules=$(find tools -maxdepth 1 -type f -name '*.py' ! -name '_*.py' -printf '%f\n' | sed 's/\.py$//' | sort | sed 's/^/tools./' | tr '\n' ' ')
+          test -n "$modules"
+          python -m pdoc -o build/site $modules
 
       - name: Check generated documentation links
         run: python .github/scripts/check_docs_links.py build/site
