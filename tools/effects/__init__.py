@@ -8,7 +8,7 @@ EFFECT_REGISTRY: dict[str, type[VisualEffect]] = {
 }
 
 
-def register(name: str, cls: Type[VisualEffect]) -> None:
+def register(name: str, cls: type[VisualEffect]) -> None:
     """Register a new visual effect class."""
     EFFECT_REGISTRY[name] = cls
 
