@@ -51,7 +51,7 @@ def test_audio_loader_preserves_samples_when_frame_rate_does_not_divide_rate(
     sample_rate = 22_050
     audio_path = tmp_path / "fractional-frame.wav"
     samples = np.linspace(-1, 1, sample_rate, dtype=np.float32)
-    sf.write(audio_path, samples, sample_rate)
+    sf.write(audio_path, samples, sample_rate, subtype="FLOAT")
 
     chunks = utils.load_audio(audio_path, fps=24)
 
