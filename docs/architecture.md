@@ -36,13 +36,14 @@ flowchart TD
 - Keep rendered frames, encoded videos, build output, and generated cue JSON out of source control unless a specific reviewable artifact is required.
 - Validate FFmpeg output with `ffprobe` in integration tests, including stream presence, dimensions, frame rate, frame count, and duration.
 - Raise actionable errors for invalid render configuration and allow FFmpeg subprocess failures to surface; do not silently claim a video was created after a failed encode.
+- Keep animation driven by the composition's frame timestamp and versioned cue data. Avoid wall-clock time, unseeded randomness, and browser-persisted learning state as implicit production-render inputs.
 
 ## Known boundaries
 
 - The Python renderer and Remotion compositions are separate execution paths. A passing test of one does not validate the other; CI should retain checks for both.
 - Audio-intelligence tempo, phase, and four-beat grouping are heuristic. Human review remains necessary for timing-critical releases.
 - Asset provenance and redistribution rights must be documented separately; presence in the repository is not evidence of a license.
-
+- Smart Fur's default production mode uses a fixed action and ignores live pose streams. IndexedDB-backed Q-learning and live pose input require the explicit `adaptivePreview` opt-in; these preview features are not intended to make final renders history-dependent.
 
 ## Performance measurement
 
