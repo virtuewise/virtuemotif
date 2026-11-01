@@ -88,6 +88,8 @@ jobs:
           tests/test_ci_smoke.py
           tools/free_dataset_catalog.py
           tests/test_free_dataset_catalog.py
+          tools/acquire_mdc_dataset.py
+          tests/test_acquire_mdc_dataset.py
 
       - name: Run Python tests
         run: python -m pytest -q
