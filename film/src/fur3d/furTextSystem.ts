@@ -3,6 +3,7 @@ import { Font, FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { SHELL_VERTEX_SHADER, SHELL_FRAGMENT_SHADER } from "./furShaders";
+import { estimateLyricCharacterEquivalent, wrapWideScriptText } from "../typography";
 import helvetikerBoldJson from "../../public/fonts/helvetiker_bold.typeface.json";
 
 export interface FurParams {
@@ -122,7 +123,13 @@ export function balanceWrapText(str: string, maxCharsPerLine = 18): string[] {
   }
 
   const words = trimmed.split(/\s+/).filter(Boolean);
-  if (words.length <= 1 || trimmed.length <= maxCharsPerLine) {
+  const measure = (value: string) => estimateLyricCharacterEquivalent(value);
+
+  // CJK text commonly has no spaces; wrap it at character boundaries when needed.
+  const wideScriptLines = words.length === 1 ? wrapWideScriptText(trimmed, maxCharsPerLine) : null;
+  if (wideScriptLines) return wideScriptLines;
+
+  if (words.length <= 1 || measure(trimmed) <= maxCharsPerLine) {
     return [trimmed];
   }
 
@@ -134,8 +141,8 @@ export function balanceWrapText(str: string, maxCharsPerLine = 18): string[] {
     for (let i = 1; i < words.length; i++) {
       const line1 = words.slice(0, i).join(" ");
       const line2 = words.slice(i).join(" ");
-      const diff = Math.abs(line1.length - line2.length);
-      const penalty = Math.max(0, line1.length - maxCharsPerLine) + Math.max(0, line2.length - maxCharsPerLine);
+      const diff = Math.abs(measure(line1) - measure(line2));
+      const penalty = Math.max(0, measure(line1) - maxCharsPerLine) + Math.max(0, measure(line2) - maxCharsPerLine);
       const score = diff + penalty * 3;
       if (score < minDiff) {
         minDiff = score;
@@ -146,7 +153,7 @@ export function balanceWrapText(str: string, maxCharsPerLine = 18): string[] {
   }
 
   // For longer phrases: balance across lines
-  const totalChars = trimmed.length;
+  const totalChars = measure(trimmed);
   const numLines = Math.max(2, Math.ceil(totalChars / maxCharsPerLine));
   const targetChars = totalChars / numLines;
 
@@ -156,7 +163,7 @@ export function balanceWrapText(str: string, maxCharsPerLine = 18): string[] {
 
   for (let i = 0; i < words.length; i++) {
     const word = words[i];
-    const wordLen = word.length;
+    const wordLen = measure(word);
     const testLen = currentLen === 0 ? wordLen : currentLen + 1 + wordLen;
 
     const remainingWords = words.length - i;

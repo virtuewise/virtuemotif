@@ -11,6 +11,7 @@ import {
 } from "./furTextSystem";
 import { Song, Line } from "../HorizonFilm";
 import { FilmGrain, Vignette } from "../Backdrop";
+import { estimateLyricCharacterEquivalent } from "../typography";
 
 /**
  * Props for the furry lyric view.
@@ -183,7 +184,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       const maxFitWidth = frustumW * (isPortrait ? 0.80 : 0.82);
       const maxFitHeight = frustumH * (isPortrait ? 0.48 : 0.58);
 
-      const textLen = displayText.length;
+      const textLen = estimateLyricCharacterEquivalent(displayText);
       const sizeMultiplier = isPortrait ? Math.min(1.0, aspect * 1.35) : 1.0;
       const targetSize =
         (textLen > 36
