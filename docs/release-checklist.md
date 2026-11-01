@@ -10,12 +10,12 @@ This checklist defines observable release gates; passing a single CI workflow is
 - [ ] Review the pull request and require the current CI checks to pass.
 - [ ] Run Python tests, including the deterministic synthetic-audio end-to-end render and `ffprobe` output validation.
 - [ ] Run Remotion type-check, composition validation, and representative still renders for each maintained composition.
-- [ ] Inspect the `remotion-visual-review-frames` CI artifact: check both the generic AutoLyrics outputs and the audio-reactive scene captures at landscape, portrait, square, and 4K resolutions. Verify text fit, safe margins, contrast, translation readability, effect intensity, and visual continuity. Record the reviewed run and commit.
+- [ ] Inspect the `remotion-visual-review-frames` CI artifact: check both the generic AutoLyrics outputs and the audio-reactive scene captures at landscape, portrait, square, and 4K resolutions. Verify text fit, safe margins, contrast, translation readability, effect intensity, and visual continuity. Record the reviewed run and commit. Use `docs/release-evidence-record.md` to record the exact commit, workflow run, artifact, reviewer, findings, and disposition; a generated frame is not a human sign-off.
 - [ ] Compare against owner-approved reference frames when a baseline exists; do not treat unreviewed captures as golden references or claim automated visual-regression coverage before such baselines are approved.
-- [ ] Review audio/video stream presence, dimensions, frame rate, frame count, duration, and sync where applicable.
-- [ ] Review known audio-intelligence limitations and any manual timing corrections.
+- [ ] Review audio/video stream presence, dimensions, frame rate, frame count, duration, and sync where applicable. Record representative media checks in `docs/release-evidence-record.md` without publishing private consent documents or personal data.
+- [ ] Review known audio-intelligence limitations and any manual timing corrections. For each evaluated language and code-switch case, record annotation provenance, reviewer roles (pseudonymous IDs only), disagreement/adjudication outcome, word-boundary metrics, and known failure modes in the evidence record.
 - [ ] Update `CHANGELOG.md` with user-visible changes and known limitations.
-- [ ] Preserve CI run links and release commit SHA as provenance.
+- [ ] Preserve CI run links and release commit SHA as provenance. Keep the evidence record alongside the release artifacts and link only access-controlled rights/consent records by reference.
 
 ## Release and rollback
 
