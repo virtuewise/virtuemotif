@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,6 +45,109 @@ def probe_audio_duration(audio_path: Path) -> float:
         check=True, capture_output=True, text=True,
     )
     return parse_audio_duration(result.stdout)
+
+
+def _parse_frame_rate(value: Any) -> float:
+    """Parse ffprobe's rational frame-rate representation."""
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("rendered video is missing a valid average frame rate")
+    try:
+        if "/" in value:
+            numerator, denominator = value.split("/", maxsplit=1)
+            rate = float(numerator) / float(denominator)
+        else:
+            rate = float(value)
+    except (ValueError, ZeroDivisionError) as exc:
+        raise ValueError("rendered video is missing a valid average frame rate") from exc
+    if not math.isfinite(rate) or rate <= 0:
+        raise ValueError("rendered video is missing a valid average frame rate")
+    return rate
+
+
+def validate_rendered_video(
+    video_path: Path,
+    *,
+    expected_duration: float,
+    expected_width: int = 1920,
+    expected_height: int = 1080,
+    expected_fps: float = 30.0,
+    duration_tolerance: float = 0.5,
+    av_sync_tolerance: float = 0.25,
+) -> dict[str, float | int | str]:
+    """Fail closed when the rendered MP4 has invalid streams or unexpected metadata."""
+    path = Path(video_path)
+    if not path.is_file() or path.stat().st_size == 0:
+        raise FileNotFoundError(f"rendered video is missing or empty: {path}")
+    if not math.isfinite(expected_duration) or expected_duration <= 0:
+        raise ValueError("expected duration must be a finite positive number")
+    if expected_width <= 0 or expected_height <= 0:
+        raise ValueError("expected video dimensions must be positive integers")
+    if not math.isfinite(expected_fps) or expected_fps <= 0:
+        raise ValueError("expected frame rate must be a finite positive number")
+    if not math.isfinite(duration_tolerance) or duration_tolerance < 0:
+        raise ValueError("duration tolerance must be finite and non-negative")
+    if not math.isfinite(av_sync_tolerance) or av_sync_tolerance < 0:
+        raise ValueError("A/V sync tolerance must be finite and non-negative")
+
+    result = subprocess.run(
+        [
+            "ffprobe", "-v", "error", "-show_entries",
+            "format=duration:stream=codec_type,width,height,avg_frame_rate,duration",
+            "-of", "json", str(path),
+        ],
+        check=True, capture_output=True, text=True,
+    )
+    try:
+        metadata = json.loads(result.stdout)
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise ValueError("ffprobe returned invalid JSON for rendered video") from exc
+
+    streams = metadata.get("streams")
+    if not isinstance(streams, list):
+        raise ValueError("ffprobe metadata is missing a streams array")
+    video = next((stream for stream in streams if stream.get("codec_type") == "video"), None)
+    audio = next((stream for stream in streams if stream.get("codec_type") == "audio"), None)
+    if video is None:
+        raise ValueError("rendered video is missing a video stream")
+    if audio is None:
+        raise ValueError("rendered video is missing an audio stream")
+    if video.get("width") != expected_width or video.get("height") != expected_height:
+        raise ValueError(
+            f"unexpected video dimensions: {video.get('width')}x{video.get('height')}; "
+            f"expected {expected_width}x{expected_height}"
+        )
+
+    fps = _parse_frame_rate(video.get("avg_frame_rate"))
+    if not math.isclose(fps, expected_fps, rel_tol=0.001, abs_tol=0.01):
+        raise ValueError(f"unexpected video frame rate: {fps:g}; expected {expected_fps:g}")
+
+    format_data = metadata.get("format")
+    if not isinstance(format_data, dict) or format_data.get("duration") is None:
+        raise ValueError("ffprobe metadata is missing the container duration")
+    duration = parse_audio_duration(str(format_data["duration"]))
+    if abs(duration - expected_duration) > duration_tolerance:
+        raise ValueError(
+            f"rendered duration {duration:.3f}s differs from source duration "
+            f"{expected_duration:.3f}s by more than {duration_tolerance:.3f}s"
+        )
+
+    video_duration = parse_audio_duration(str(video["duration"])) if video.get("duration") is not None else duration
+    audio_duration = parse_audio_duration(str(audio["duration"])) if audio.get("duration") is not None else duration
+    if abs(video_duration - audio_duration) > av_sync_tolerance:
+        raise ValueError(
+            f"audio/video stream durations differ by {abs(video_duration - audio_duration):.3f}s; "
+            f"tolerance is {av_sync_tolerance:.3f}s"
+        )
+
+    return {
+        "path": str(path),
+        "duration": duration,
+        "video_duration": video_duration,
+        "audio_duration": audio_duration,
+        "width": expected_width,
+        "height": expected_height,
+        "fps": fps,
+    }
 
 
 def _rooted(path: Path) -> Path:
@@ -111,10 +216,15 @@ def main() -> int:
             str(output), "--props", str(props_output.relative_to(FILM)),
         ]
         subprocess.run(render, cwd=FILM, check=True)
+        validation = validate_rendered_video(output, expected_duration=duration)
     except (OSError, ValueError, subprocess.CalledProcessError) as exc:
         print(f"auto-lyrics-video: {exc}", file=sys.stderr)
         return 2
 
+    print(
+        f"Validated video: {validation['width']}x{validation['height']} at "
+        f"{validation['fps']:g} fps, {validation['duration']:.3f}s"
+    )
     print(f"Rendered lyric video: {output}")
     print(f"Review generated lyrics before publishing: {asr_output}")
     return 0
