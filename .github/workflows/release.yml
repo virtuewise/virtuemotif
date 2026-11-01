@@ -111,7 +111,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          git archive --format=tar.gz --prefix="virtuemotif-${RELEASE_TAG}/" "$RELEASE_TAG" > "dist/virtuemotif-${RELEASE_TAG}-source.tar.gz"
+          git archive --format=tar --prefix="virtuemotif-${RELEASE_TAG}/" "$RELEASE_TAG" | gzip -n > "dist/virtuemotif-${RELEASE_TAG}-source.tar.gz"
           (
             cd dist
             sha256sum "virtuemotif-${RELEASE_TAG}-source.tar.gz" > "SHA256SUMS.txt"
