@@ -58,9 +58,11 @@ def test_alignment_benchmark_reports_per_language_timing_error():
 
 
 def test_alignment_benchmark_fails_closed_for_smoke_data():
+    corpus = _corpus(SMOKE_STATUS)
+    for example in corpus["examples"]:
+        example["split"] = "smoke"
     with pytest.raises(ValueError, match="requires a reviewed rights-cleared corpus"):
-        evaluate_alignment(_corpus(SMOKE_STATUS), {"test-en": []})
-
+        evaluate_alignment(corpus, {"test-en": []})
 
 def test_alignment_benchmark_reports_unmatched_tokens_without_fake_timing():
     report = evaluate_alignment(_corpus(), {
