@@ -69,6 +69,7 @@ jobs:
           tools/make_video.py
           tools/audio_intelligence.py
           tools/lyrics_engine.py
+          tools/language_timeline.py
           tools/export_lyrics_song.py
           tools/benchmark_render.py
           tools/make_tapsync.py
@@ -77,6 +78,7 @@ jobs:
           tools/effects
           tests/test_audio_intelligence.py
           tests/test_lyrics_engine.py
+          tests/test_language_timeline.py
           tools/benchmark_language_id.py
           tests/test_benchmark_language_id.py
           tools/validate_language_dataset.py
@@ -95,7 +97,7 @@ jobs:
         run: python -m tools.benchmark_language_id --output build/benchmark/multilingual-language-id.json
 
       - name: Upload multilingual language-ID report
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: multilingual-language-id-smoke
           path: build/benchmark/multilingual-language-id.json
@@ -109,7 +111,7 @@ jobs:
         run: python -m tools.benchmark_render --duration-seconds 2 --width 160 --height 90 --fps 15 --output build/benchmark/render-baseline.json
 
       - name: Upload synthetic render benchmark report
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: synthetic-render-benchmark
           path: build/benchmark/render-baseline.json
@@ -120,7 +122,7 @@ jobs:
         run: python -m pdoc -o build/api-docs tools.make_video tools.make_tapsync tools.utils tools.effects tools.benchmark_render tools.export_lyrics_song
 
       - name: Upload API documentation artifact
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-documentation
           path: build/api-docs/
