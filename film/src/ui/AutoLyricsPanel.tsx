@@ -15,8 +15,8 @@ interface AutoLyricsPanelProps {
 
 export const AutoLyricsPanel: React.FC<AutoLyricsPanelProps> = ({
   song,
-  detectedLanguage = 'Multilingual (Auto-Detect)',
-  confidence = 0.96,
+  detectedLanguage = 'Awaiting transcription',
+  confidence = 0,
   audioFormat = 'M4A / AAC / MP3 / WAV',
   isTranslating = true,
 }) => {
@@ -51,8 +51,8 @@ export const AutoLyricsPanel: React.FC<AutoLyricsPanelProps> = ({
             width: 8,
             height: 8,
             borderRadius: '50%',
-            background: '#10b981',
-            boxShadow: '0 0 10px #10b981',
+            background: confidence > 0 ? '#10b981' : '#f59e0b',
+            boxShadow: confidence > 0 ? '0 0 10px #10b981' : '0 0 10px #f59e0b',
           }}
         />
         <span style={{ fontWeight: 700, textTransform: 'uppercase', color: '#fbbf24', letterSpacing: '0.08em' }}>
@@ -68,7 +68,7 @@ export const AutoLyricsPanel: React.FC<AutoLyricsPanelProps> = ({
           Language: <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{detectedLanguage}</span>
         </div>
         <div>
-          Confidence: <span style={{ color: '#34d399', fontWeight: 600 }}>{Math.round(confidence * 100)}%</span>
+          Confidence: <span style={{ color: confidence > 0 ? '#34d399' : '#fbbf24', fontWeight: 600 }}>{confidence > 0 ? `${Math.round(confidence * 100)}%` : 'Unavailable'}</span>
         </div>
       </div>
 
