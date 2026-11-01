@@ -1,6 +1,7 @@
 """Track language changes across timestamped lyric segments without hiding uncertainty."""
 from __future__ import annotations
 
+import math
 from collections.abc import Iterable, Mapping
 from typing import Any
 
@@ -17,8 +18,8 @@ def build_language_timeline(
     Confidence is treated as a heuristic/model signal, not a calibrated probability.
     Short/low-confidence or unknown segments are marked for review, not smoothed away.
     """
-    if not 0.0 <= min_confidence <= 1.0:
-        raise ValueError("min_confidence must be between 0 and 1")
+    if not math.isfinite(min_confidence) or not 0.0 <= min_confidence <= 1.0:
+        raise ValueError("min_confidence must be a finite number between 0 and 1")
 
     rows: list[dict[str, Any]] = []
     previous_end = -1.0
@@ -31,6 +32,8 @@ def build_language_timeline(
             end = float(segment["end"])
         except (KeyError, TypeError, ValueError) as exc:
             raise ValueError(f"segment {index} must contain numeric start and end") from exc
+        if not math.isfinite(start) or not math.isfinite(end):
+            raise ValueError(f"segment {index} timestamps must be finite numbers")
         if start < 0 or end < start:
             raise ValueError(f"segment {index} has invalid timestamp interval")
         if start < previous_end:
@@ -42,7 +45,9 @@ def build_language_timeline(
             confidence = float(confidence_value) if confidence_value is not None else None
         except (TypeError, ValueError):
             confidence = None
-        if confidence is not None and not 0.0 <= confidence <= 1.0:
+        if confidence is not None and (
+            not math.isfinite(confidence) or not 0.0 <= confidence <= 1.0
+        ):
             confidence = None
 
         text = str(segment.get("text") or "")
@@ -76,12 +81,13 @@ def build_language_timeline(
         rows.append(row)
 
         if previous_language is not None and language != previous_language:
+            previous_segment_uncertain = rows[-2]["review_required"]
             transitions.append({
                 "at": round(start, 3),
                 "from": previous_language,
                 "to": language,
                 "candidate": True,
-                "review_required": uncertain or language in {"und", "mul"},
+                "review_required": previous_segment_uncertain or row["review_required"],
             })
         previous_language = language
         previous_end = end
