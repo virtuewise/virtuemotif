@@ -3,7 +3,7 @@
 // accent confidence, and synchronized word-timing lyrics status.
 
 import React from 'react';
-import { Song } from '../HorizonFilm';
+import type { Song } from '../HorizonFilm';
 
 interface AutoLyricsPanelProps {
   song: Song;
@@ -11,6 +11,7 @@ interface AutoLyricsPanelProps {
   confidence?: number;
   audioFormat?: string;
   isTranslating?: boolean;
+  reviewRequired?: boolean;
 }
 
 export const AutoLyricsPanel: React.FC<AutoLyricsPanelProps> = ({
@@ -19,6 +20,7 @@ export const AutoLyricsPanel: React.FC<AutoLyricsPanelProps> = ({
   confidence = 0,
   audioFormat = 'M4A / AAC / MP3 / WAV',
   isTranslating = false,
+  reviewRequired = false,
 }) => {
   const totalLines = song.sections.reduce((acc, s) => acc + s.lines.length, 0);
 
@@ -71,6 +73,12 @@ export const AutoLyricsPanel: React.FC<AutoLyricsPanelProps> = ({
           Confidence: <span style={{ color: confidence > 0 ? '#34d399' : '#fbbf24', fontWeight: 600 }}>{confidence > 0 ? `${Math.round(confidence * 100)}%` : 'Unavailable'}</span>
         </div>
       </div>
+
+      {reviewRequired ? (
+        <div style={{ color: '#fbbf24', fontSize: 11, fontWeight: 700 }}>
+          Machine-generated draft · human review required
+        </div>
+      ) : null}
 
       <div style={{ display: 'flex', gap: 14, color: '#94a3b8', fontSize: 11 }}>
         <div>
