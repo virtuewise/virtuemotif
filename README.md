@@ -31,6 +31,7 @@ flowchart TD
 - **Plug-and-Play Effect Engine**: Subclass `VisualEffect` in `tools/effects/` and register custom visual effects with arbitrary parameters.
 - **Phoneme & Lyrical Alignment**: Automated speech-recognition (ASR) extraction, acoustic alignment, and manual tap-sync interface (`tools/make_tapsync.py`).
 - **Multilingual Auto-Lyrics Engine**: Optional multilingual ASR with timestamped segments, word timings, language metadata, and JSONL streaming output (`tools/lyrics_engine.py`); see [`docs/multilingual-auto-lyrics.md`](docs/multilingual-auto-lyrics.md).
+- **Audio Intelligence Engine**: Beat-grid estimation, energy contours, and timestamped onset/transition cues for future beat-aware typography and visual effects (`tools/audio_intelligence.py`); see [`docs/audio-intelligence.md`](docs/audio-intelligence.md).
 - **Procedural Texture Synthesis**: Dynamic film-grain, paper-fibre textures, and torn-paper alpha masks generated on-the-fly (`tools/make_textures.py`).
 - **Remotion React Lyric Frontend**: Interactive web-based rendering environment in `film/` powered by Remotion, React, and TypeScript.
 - **Inspection & Validation Suite**: Frame validation, RGB color balance checks, bounding box analysis, and audio stem correlation.
