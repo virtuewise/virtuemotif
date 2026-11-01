@@ -2,6 +2,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from tools.benchmark_language_id import evaluate
 from tools.validate_language_dataset import SMOKE_STATUS
 
@@ -103,6 +105,7 @@ def test_reviewed_benchmark_defaults_to_held_out_test_split() -> None:
     assert report["available_split_counts"] == {"test": 1, "train": 1}
     assert report["per_language"]["en"]["support"] == 0
     assert report["per_language"]["sn"]["support"] == 1
+    assert {"precision", "recall", "f1", "accuracy"} <= set(report["weighted_average"])
 
 
 def test_reviewed_benchmark_all_splits_requires_explicit_opt_in() -> None:
@@ -113,7 +116,5 @@ def test_reviewed_benchmark_all_splits_requires_explicit_opt_in() -> None:
 
 
 def test_benchmark_rejects_requested_split_without_examples() -> None:
-    import pytest
-
     with pytest.raises(ValueError, match="requested split 'dev' has no examples"):
         evaluate(_reviewed_split_corpus(), split="dev")
