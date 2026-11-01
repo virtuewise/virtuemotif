@@ -48,7 +48,7 @@ flowchart TD
 │   ├── public/           # Fonts, textures, and audio assets
 │   └── src/              # React components (Backdrop, Type, HorizonFilm)
 ├── lyrics/               # Structured lyric transcriptions (JSON)
-├── site/                 # Generated pdoc API documentation
+├── site/                 # API documentation landing pages and generated output
 ├── songs/                # Song configuration YAML files
 ├── timing/               # Lyrical timestamps, alignment data, and tap-sync tools
 └── tools/                # Python audio analysis, effects & video pipeline
@@ -68,7 +68,7 @@ Clone the repository and install developer dependencies:
 ```bash
 git clone https://github.com/virtuewise/virtuemotif.git
 cd virtuemotif
-pip install -r requirements-dev.txt
+python -m pip install -r requirements-dev.txt
 ```
 
 ### 2. Render a Video
@@ -97,6 +97,7 @@ Open `timing/tap-sync-<song_id>.html` in any modern web browser.
 
 - **Tool Guides**: Browse comprehensive guides for each tool in [`docs/tools/`](docs/tools/).
 - **API Reference**: Browse the [published API reference](https://virtuewise.github.io/virtuemotif/index.html). To build it locally, run `python -m pdoc -o build/api-docs tools`.
+- **Project planning**: See [`docs/project-management.md`](docs/project-management.md) for the board workflow, saved-view design, priorities, and contribution standards. Open the [GitHub Projects page](https://github.com/virtuewise/virtuemotif/projects) to view the live board.
 - **Contributing Guidelines**: See [`CONTRIBUTING.md`](CONTRIBUTING.md) for style and development practices.
 - **Release History**: See [`CHANGELOG.md`](CHANGELOG.md).
 
