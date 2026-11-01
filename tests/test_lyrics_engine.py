@@ -9,7 +9,7 @@ from tools.lyrics_engine import _normalise_segment, build_lyrics_document, detec
 @pytest.mark.parametrize(("text", "expected"), [
     ("I love you with all my heart", "en"),
     ("Ndinoda rudo rwako moyo wangu", "sn"),
-    ("Kakhulu kakhulu kakhulu", "zu"),
+    ("yami yakho yami", "zu"),
     ("Die liefde is vir ons", "af"),
     ("", "und"),
     ("123 !!!", "und"),
