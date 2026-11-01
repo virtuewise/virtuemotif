@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- Reject out-of-order word timestamps during AutoLyrics export instead of sorting malformed timing into an apparently valid karaoke sequence.
+
 ### Added
 - Extend conservative lexical lyric-language hints to Spanish, French, Portuguese, German, and Italian, while keeping uncertain text and code-switching reviewable.
 
