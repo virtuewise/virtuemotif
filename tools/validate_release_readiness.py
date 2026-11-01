@@ -62,7 +62,7 @@ def main() -> int:
             failures.append("release evidence decision must be explicitly APPROVED by the release owner")
 
         commit_match = re.search(
-            r"^\\s*-\\s*Release commit SHA:\\s*([0-9a-fA-F]{40})\\s*$",
+            r"^\s*-\s*Release commit SHA:\s*([0-9a-fA-F]{40})\s*$",
             evidence,
             re.MULTILINE,
         )
@@ -95,7 +95,7 @@ def main() -> int:
             "Release owner approved this exact commit.",
         )
         for signoff in required_signoffs:
-            pattern = r"^\\s*-\\s*\\[x\\]\\s+" + re.escape(signoff) + r"\\s*$"
+            pattern = r"^\s*-\s*\\[x\\]\s+" + re.escape(signoff) + r"\s*$"
             if not re.search(pattern, evidence, re.MULTILINE | re.IGNORECASE):
                 failures.append(f"release evidence sign-off is incomplete: {signoff}")
 
