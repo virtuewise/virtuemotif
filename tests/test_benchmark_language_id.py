@@ -118,3 +118,25 @@ def test_reviewed_benchmark_all_splits_requires_explicit_opt_in() -> None:
 def test_benchmark_rejects_requested_split_without_examples() -> None:
     with pytest.raises(ValueError, match="requested split 'development' has no examples"):
         evaluate(_reviewed_split_corpus(), split="development")
+
+
+def test_report_exposes_required_multilingual_cohort_coverage_without_claiming_representativeness():
+    report = evaluate(json.loads(CORPUS.read_text(encoding="utf-8")))
+    cohorts = report["required_multilingual_cohorts"]
+    assert set(cohorts) == {"sn", "nd", "zu", "en", "mul"}
+    assert all("support" in item and "represented" in item for item in cohorts.values())
+    assert report["cohort_coverage_complete"] is True
+    assert "not evidence of representative sampling" in report["cohort_coverage_warning"]
+
+
+def test_missing_required_cohort_is_reported_as_missing_not_zero_accuracy():
+    corpus = json.loads(CORPUS.read_text(encoding="utf-8"))
+    corpus["examples"] = [item for item in corpus["examples"] if item["language"] != "sn"]
+    corpus["labels"] = [label for label in corpus["labels"] if label != "sn"]
+    report = evaluate(corpus)
+    shona = report["required_multilingual_cohorts"]["sn"]
+    assert shona["support"] == 0
+    assert shona["represented"] is False
+    assert shona["accuracy"] == 0.0
+    assert report["cohort_coverage_complete"] is False
+    assert "not evidence of zero accuracy" in shona["note"]
