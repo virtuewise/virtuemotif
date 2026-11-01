@@ -131,11 +131,26 @@ def transcribe_live(model_name: str = "small", language: str | None = None,
         chunk_index += 1
 
 
-def build_lyrics_document(song_id: str, segments: list[dict[str, Any]]) -> dict[str, Any]:
-    """Create a versioned lyric document that requires human review."""
-    return {"schema_version": 1, "id": song_id, "source": "multilingual-auto-lyrics",
-        "language_mode": "auto", "segments": segments, "review_required": True,
-        "notes": "Machine lyrics may mishear singing, code-switching, names, and under-resourced languages. Review before publication."}
+def build_lyrics_document(
+    song_id: str,
+    segments: list[dict[str, Any]],
+    language_mode: str = "auto",
+) -> dict[str, Any]:
+    """Create a versioned lyric document with language provenance and review warnings."""
+    language_counts: dict[str, int] = {}
+    for segment in segments:
+        language = str(segment.get("language") or "und")
+        language_counts[language] = language_counts.get(language, 0) + 1
+    return {
+        "schema_version": 1,
+        "id": song_id,
+        "source": "multilingual-auto-lyrics",
+        "language_mode": language_mode,
+        "language_summary": dict(sorted(language_counts.items())),
+        "segments": segments,
+        "review_required": True,
+        "notes": "Machine lyrics may mishear singing, code-switching, names, and under-resourced languages. Review before publication.",
+    }
 
 
 def main() -> int:
@@ -171,7 +186,7 @@ def main() -> int:
         if args.output is not None:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(
-                json.dumps(build_lyrics_document(song_id, segments), ensure_ascii=False, indent=2) + "\n",
+                json.dumps(build_lyrics_document(song_id, segments, args.language or "auto"), ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
             )
             print(f"Wrote {len(segments)} lyric segments to {args.output}", file=sys.stderr)
