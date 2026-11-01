@@ -42,7 +42,9 @@ _SCRIPT_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 )
 
 
-def detect_code_switch_candidates(text: str) -> list[dict[str, Any]]:
+def detect_code_switch_candidates(
+    text: str, words: list[dict[str, Any]] | None = None
+) -> list[dict[str, Any]]:
     """Return conservative word-index spans for distinctive lexical code-switch evidence.
 
     These are review candidates, not word-level language predictions or timestamps.
@@ -82,22 +84,67 @@ def detect_code_switch_candidates(text: str) -> list[dict[str, Any]]:
                 "marker_count": 1,
             })
 
+    # Attach timing only when text tokens map one-to-one to valid word records.
+    aligned_words: list[dict[str, Any]] | None = None
+    if isinstance(words, list) and len(words) == len(tokens):
+        checked_words: list[dict[str, Any]] = []
+        previous_end = -1.0
+        for token, word in zip(tokens, words, strict=True):
+            if not isinstance(word, dict):
+                checked_words = []
+                break
+            word_tokens = _WORD_RE.findall(str(word.get("text", "")))
+            try:
+                word_start = float(word.get("start"))
+                word_end = float(word.get("end"))
+            except (TypeError, ValueError):
+                checked_words = []
+                break
+            if (
+                len(word_tokens) != 1
+                or word_tokens[0].casefold().replace("’", "'") != token.group(0).casefold().replace("’", "'")
+                or not math.isfinite(word_start)
+                or not math.isfinite(word_end)
+                or word_start < 0
+                or word_end <= word_start
+                or word_start < previous_end
+            ):
+                checked_words = []
+                break
+            checked_words.append({"start": word_start, "end": word_end})
+            previous_end = word_end
+        if checked_words:
+            aligned_words = checked_words
+
     candidates: list[dict[str, Any]] = []
     for left, right in itertools.pairwise(runs):
         if left["language"] == right["language"]:
             continue
         if left["marker_count"] < 2 or right["marker_count"] < 2:
             continue
-        candidates.append({
-            "after_word": left["end_word"] - 1,
-            "before_word": right["start_word"],
+        after_word = left["end_word"] - 1
+        before_word = right["start_word"]
+        candidate: dict[str, Any] = {
+            "after_word": after_word,
+            "before_word": before_word,
             "from": left["language"],
             "to": right["language"],
             "candidate": True,
             "review_required": True,
             "timing_available": False,
             "method": "exclusive-lexical-markers",
-        })
+        }
+        if aligned_words is not None:
+            boundary_start = aligned_words[after_word]["end"]
+            boundary_end = aligned_words[before_word]["start"]
+            if boundary_start <= boundary_end:
+                candidate["boundary_window"] = {
+                    "start": round(boundary_start, 3),
+                    "end": round(boundary_end, 3),
+                }
+                candidate["timing_available"] = True
+                candidate["method"] = "exclusive-lexical-markers+aligned-asr-words"
+        candidates.append(candidate)
     return candidates
 
 
@@ -222,7 +269,7 @@ def _normalise_segment(segment: Any, asr_language: str, asr_confidence: float) -
         "review_required": bool(review_reasons),
         "review_reasons": review_reasons,
         "words": words,
-        "code_switch_candidates": detect_code_switch_candidates(text),
+        "code_switch_candidates": detect_code_switch_candidates(text, words),
         "invalid_word_timing_count": invalid_word_timing_count,
     }
 
