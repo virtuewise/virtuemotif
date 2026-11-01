@@ -232,7 +232,8 @@ def main() -> int:
         "--split",
         choices=("all", "train", "dev", "test", "smoke"),
         help="Split to evaluate; reviewed datasets default to test, smoke datasets to all",
-    )\n    parser.add_argument("--output", type=Path, help="Optional JSON report path")
+    )
+    parser.add_argument("--output", type=Path, help="Optional JSON report path")
     args = parser.parse_args()
     try:
         corpus = json.loads(args.corpus.read_text(encoding="utf-8"))
