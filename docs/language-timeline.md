@@ -8,6 +8,10 @@ unknown/mixed, short, missing-confidence, or low-confidence segments for human
 review. It does not rewrite the underlying transcript or smooth away possible
 code-switch boundaries.
 
+Timestamp intervals and confidence thresholds must be finite numeric values.
+A transition is marked for review when either adjacent segment requires review,
+so a confident new label does not conceal uncertainty in the segment before it.
+
 Example integration:
 
 ```python
