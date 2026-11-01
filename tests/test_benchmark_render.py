@@ -1,7 +1,7 @@
 """Unit tests for render benchmark stream timing validation."""
 import pytest
 
-from tools.benchmark_render import _validate_av_sync
+from tools.benchmark_render import _validate_av_sync, _validate_render_metadata
 
 
 def test_av_sync_accepts_matching_stream_starts_and_durations():
@@ -37,3 +37,31 @@ def test_av_sync_rejects_non_positive_duration():
 
     with pytest.raises(RuntimeError, match="non-positive"):
         _validate_av_sync(video, audio, "2.000", 30)
+
+
+@pytest.mark.parametrize(
+    ("metadata", "message"),
+    [
+        ({"nb_read_frames": "89", "width": "320", "height": "180", "avg_frame_rate": "30/1"},
+         "expected 90 frames"),
+        ({"nb_read_frames": "90", "width": "640", "height": "180", "avg_frame_rate": "30/1"},
+         "encoded dimensions"),
+        ({"nb_read_frames": "90", "width": "320", "height": "180", "avg_frame_rate": "25/1"},
+         "unexpected frame rate"),
+        ({"width": "320", "height": "180", "avg_frame_rate": "30/1"},
+         "missing or invalid render metadata"),
+    ],
+)
+def test_render_metadata_rejects_frame_dimension_rate_or_missing_fields(metadata, message):
+    with pytest.raises(RuntimeError, match=message):
+        _validate_render_metadata(metadata, duration_seconds=3, width=320, height=180, fps=30)
+
+
+def test_render_metadata_accepts_exact_requested_output():
+    metadata = {
+        "nb_read_frames": "90",
+        "width": "320",
+        "height": "180",
+        "avg_frame_rate": "30/1",
+    }
+    assert _validate_render_metadata(metadata, 3, 320, 180, 30) == 90
