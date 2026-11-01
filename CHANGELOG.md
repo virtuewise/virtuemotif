@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- Require release-owner approval tied to the exact candidate commit, with explicit rights, multilingual evaluation, human review, reproducibility, and rollback sign-offs before automated publication.
+
 ### Fixed
 - Reject out-of-order word timestamps during AutoLyrics export instead of sorting malformed timing into an apparently valid karaoke sequence.
 
