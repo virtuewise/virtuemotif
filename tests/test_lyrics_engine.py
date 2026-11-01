@@ -7,6 +7,7 @@ import pytest
 from tools.lyrics_engine import (
     _normalise_segment,
     build_lyrics_document,
+    detect_code_switch_candidates,
     detect_text_language,
 )
 
@@ -343,3 +344,24 @@ def test_live_transcription_rejects_invalid_sample_rate(
 
     with pytest.raises(ValueError, match="sample_rate must be an integer"):
         next(transcribe_live(sample_rate=sample_rate))  # type: ignore[arg-type]
+
+def test_code_switch_candidates_require_distinctive_runs_and_are_review_only() -> None:
+    text = "I love you forever ndinoda rudo rwako"
+    candidates = detect_code_switch_candidates(text)
+    assert candidates
+    candidate = candidates[0]
+    assert (candidate["from"], candidate["to"]) == ("en", "sn")
+    assert candidate["candidate"] is True
+    assert candidate["review_required"] is True
+    assert candidate["timing_available"] is False
+    assert candidate["method"] == "exclusive-lexical-markers"
+
+
+def test_code_switch_candidates_do_not_infer_boundaries_from_shared_nguni_words() -> None:
+    assert detect_code_switch_candidates("mina wena thina uthando kakhulu") == []
+
+
+def test_code_switch_candidates_fail_closed_for_non_string_input() -> None:
+    assert detect_code_switch_candidates(None) == []  # type: ignore[arg-type]
+
+

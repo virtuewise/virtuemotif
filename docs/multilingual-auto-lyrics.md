@@ -59,8 +59,12 @@ for human review. Existing segment data is retained rather than smoothed or
 rewritten.
 
 In live mode, the JSONL stream also emits a `language_transition_candidate`
-event whenever adjacent segments change language. Consumers should treat this
-as a candidate boundary, not definitive proof of a code-switch. Confidence values
+event whenever adjacent segments change language. Normalized segments additionally
+include `code_switch_candidates`: conservative word-index boundaries only when
+exclusive lexical markers support distinct language runs. These candidates do not
+carry fabricated timestamps, require human review, and deliberately avoid inferring
+isiNdebele/isiZulu boundaries from shared Nguni words. Consumers should treat every
+boundary as a candidate, not definitive proof of a code-switch. Confidence values
 are model/heuristic signals, **not calibrated probabilities** unless separately
 validated. Incomplete legacy segment records remain supported but do not receive
 a fabricated timeline.
