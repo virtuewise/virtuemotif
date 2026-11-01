@@ -24,7 +24,7 @@ it does not require a heavyweight music-analysis model.
 From the repository root, run:
 
 ```bash
-python tools/export_audio_cues.py
+python -m tools.export_audio_cues
 ```
 
 This normalizes the bundled Horizon and Rise audio with FFmpeg, then writes
