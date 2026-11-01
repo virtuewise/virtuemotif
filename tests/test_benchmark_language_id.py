@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from tools.benchmark_language_id import evaluate
-from tools.validate_language_dataset import SMOKE_STATUS
+from tools.validate_language_dataset import REVIEWED_STATUS, SMOKE_STATUS
 
 CORPUS = Path("tests/fixtures/multilingual_language_smoke_v1.json")
 
@@ -71,7 +71,7 @@ def _reviewed_split_corpus() -> dict:
     return {
         "schema_version": 1,
         "dataset_id": "split-selection-test",
-        "status": "reviewed",
+        "status": REVIEWED_STATUS,
         "labels": ["en", "sn"],
         "governance": {
             "rights_status": "rights_cleared",
@@ -116,5 +116,5 @@ def test_reviewed_benchmark_all_splits_requires_explicit_opt_in() -> None:
 
 
 def test_benchmark_rejects_requested_split_without_examples() -> None:
-    with pytest.raises(ValueError, match="requested split 'dev' has no examples"):
-        evaluate(_reviewed_split_corpus(), split="dev")
+    with pytest.raises(ValueError, match="requested split 'development' has no examples"):
+        evaluate(_reviewed_split_corpus(), split="development")
