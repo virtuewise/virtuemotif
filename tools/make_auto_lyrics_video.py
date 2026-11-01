@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import math
 import re
 import shutil
 import subprocess
@@ -19,6 +20,29 @@ def safe_song_id(value: str) -> str:
     if not identifier:
         raise ValueError("song id must contain at least one letter or number")
     return identifier
+
+
+def parse_audio_duration(value: str) -> float:
+    """Parse and validate an ffprobe duration or an explicit duration value."""
+    try:
+        duration = float(value.strip())
+    except (AttributeError, ValueError) as exc:
+        raise ValueError("audio duration must be a finite positive number") from exc
+    if not math.isfinite(duration) or duration <= 0:
+        raise ValueError("audio duration must be a finite positive number")
+    return duration
+
+
+def probe_audio_duration(audio_path: Path) -> float:
+    """Read the full media duration, including instrumental intros and outros."""
+    result = subprocess.run(
+        [
+            "ffprobe", "-v", "error", "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path),
+        ],
+        check=True, capture_output=True, text=True,
+    )
+    return parse_audio_duration(result.stdout)
 
 
 def _rooted(path: Path) -> Path:
@@ -48,6 +72,7 @@ def main() -> int:
         output = _rooted(args.output)
         if output.exists() and not args.force:
             raise ValueError(f"output already exists: {output} (pass --force to replace it)")
+        duration = parse_audio_duration(str(args.duration)) if args.duration is not None else probe_audio_duration(source)
 
         audio_relative = Path("audio") / "auto-lyrics" / f"{song_id}{source.suffix.lower()}"
         audio_destination = FILM / "public" / audio_relative
@@ -77,8 +102,7 @@ def main() -> int:
             "--title", args.title or source.stem,
             "--artist", args.artist,
         ]
-        if args.duration is not None:
-            export.extend(["--duration", str(args.duration)])
+        export.extend(["--duration", str(duration)])
         subprocess.run(export, cwd=ROOT, check=True)
 
         output.parent.mkdir(parents=True, exist_ok=True)
