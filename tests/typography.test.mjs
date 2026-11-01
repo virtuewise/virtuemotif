@@ -46,6 +46,7 @@ test("word timings are accepted only when token text and chronology align", () =
   assert.equal(resolveWordTimings("Hello, world!", [{ ...valid[0], w: "Wrong" }, valid[1]]), null);
   assert.equal(resolveWordTimings("Hello, world!", [valid[1], valid[0]]), null);
   assert.equal(resolveWordTimings("Hello, world!", [{ ...valid[0], from: Number.NaN }, valid[1]]), null);
+  assert.equal(resolveWordTimings("Hello, world!", [{ ...valid[0], to: valid[0].from }, valid[1]]), null);
   assert.equal(resolveWordTimings("Hello, world!", [valid[0]]), null);
 });
 
