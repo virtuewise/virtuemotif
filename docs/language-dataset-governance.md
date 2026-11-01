@@ -45,6 +45,21 @@ documents, personal data, private contributor communications, and any
 restricted source material outside GitHub. Only add examples whose rights and
 permitted evaluation use are clear.
 
+## Benchmark interpretation: confidence and code-switching
+
+The language-ID report includes binary code-switch metrics for the reference
+mul label (precision, recall, F1, support, and confusion counts) and a
+10-bin top-label confidence diagnostic. The latter reports expected calibration
+error (ECE), a Brier score against whether each top prediction is correct, and
+per-bin mean confidence versus observed accuracy.
+
+These are diagnostic calculations, not a claim that the lexical detector's
+heuristic confidence is a calibrated probability. Empty bins are omitted. The
+metrics are only as representative as the reviewed corpus and must not be
+interpreted as real-world estimates when the dataset status is synthetic smoke.
+Code-switch precision/recall also depend on the annotation policy for mixed,
+short, ambiguous, and boundary-spanning examples.
+
 The validator cannot independently confirm consent, licensing, fluency, or that
 a review occurred. Required metadata can still be falsely asserted, so human
 stewardship and auditable records remain necessary. Never relabel the current
