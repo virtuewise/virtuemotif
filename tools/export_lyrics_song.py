@@ -8,8 +8,6 @@ import sys
 from collections import Counter
 from pathlib import Path
 from typing import Any
-
-
 _LANGUAGE_NAMES = {"en": "English", "sn": "Shona", "nd": "isiNdebele", "zu": "isiZulu", "xh": "isiXhosa", "af": "Afrikaans", "sw": "Swahili"}
 
 
