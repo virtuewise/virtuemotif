@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Added
+- Emit conservative, review-only word-index candidates for code-switch boundaries supported by exclusive lexical-marker runs; never fabricate timestamps.
+
+### Added
 - Extend conservative lexical lyric-language hints to Spanish, French, Portuguese, German, and Italian, while keeping uncertain text and code-switching reviewable.
 
 ### Fixed
