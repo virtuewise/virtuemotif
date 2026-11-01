@@ -1,5 +1,4 @@
 """Tests for multilingual auto-lyrics language hints and output contracts."""
-import re
 import sys
 from types import ModuleType, SimpleNamespace
 
