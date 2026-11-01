@@ -1,4 +1,14 @@
-import { FONT_DISPLAY, FONT_MONO, FONT_SERIF, PALETTE as P } from "./theme";
+// Kept self-contained so Node's type-stripping test runner can import the preset contract.
+const P = {
+  tealLight: "#2C7A74",
+  ochre: "#E8A33D",
+  amber: "#F2B24A",
+  cream: "#F6E7C8",
+  bone: "#FFF6E3",
+} as const;
+const FONT_DISPLAY = "'Anton', 'Arial Narrow', sans-serif";
+const FONT_SERIF = "'Instrument Serif', Georgia, serif";
+const FONT_MONO = "'Space Grotesk', 'Segoe UI', sans-serif";
 
 export type LyricTypographyPresetName = "display" | "whisper" | "neon" | "editorial";
 
