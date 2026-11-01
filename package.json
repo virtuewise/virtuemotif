@@ -10,5 +10,8 @@
   "dependencies": {
     "@remotion/renderer": "^4.0.539",
     "remotion": "^4.0.539"
+  },
+  "overrides": {
+    "zod": "4.6.7"
   }
 }
