@@ -59,17 +59,12 @@ def test_reviewed_corpus_requires_governance_and_per_example_provenance() -> Non
     errors = validate_corpus(corpus)
     assert any("governance object" in error for error in errors)
     assert any("consent_ref is required" in error for error in errors)
+    assert any("speaker_id is required" in error for error in errors)
     assert any("reviewer_ids" in error for error in errors)
 
 
-def test_reviewed_corpus_accepts_documented_governance_shape() -> None:
-    example_fields = {
-        "source_id": "source-anon-1",
-        "review_status": "native_speaker_reviewed",
-        "reviewer_ids": ["reviewer-pseudo-1"],
-        "consent_ref": "private-consent-record-001",
-    }
-    corpus = {
+def _valid_reviewed_corpus() -> dict[str, object]:
+    return {
         "schema_version": 1,
         "dataset_id": "reviewed-test",
         "status": REVIEWED_STATUS,
@@ -82,11 +77,45 @@ def test_reviewed_corpus_accepts_documented_governance_shape() -> None:
             "split_policy": "Source/song/speaker groups do not cross train and test.",
         },
         "examples": [
-            {"id": "train-1", "text": "sample phrase", "language": "en", "split": "train", **example_fields},
-            {"id": "test-1", "text": "held out phrase", "language": "en", "split": "test", **example_fields},
+            {
+                "id": "train-1",
+                "text": "sample phrase",
+                "language": "en",
+                "split": "train",
+                "source_id": "source-train",
+                "speaker_id": "speaker-train",
+                "review_status": "native_speaker_reviewed",
+                "reviewer_ids": ["reviewer-pseudo-1"],
+                "consent_ref": "private-consent-record-train",
+            },
+            {
+                "id": "test-1",
+                "text": "held out phrase",
+                "language": "en",
+                "split": "test",
+                "source_id": "source-test",
+                "speaker_id": "speaker-test",
+                "review_status": "native_speaker_reviewed",
+                "reviewer_ids": ["reviewer-pseudo-1"],
+                "consent_ref": "private-consent-record-test",
+            },
         ],
     }
-    assert validate_corpus(corpus) == []
+
+
+def test_reviewed_corpus_accepts_documented_governance_shape() -> None:
+    assert validate_corpus(_valid_reviewed_corpus()) == []
+
+
+def test_reviewed_corpus_rejects_source_or_speaker_leakage() -> None:
+    corpus = _valid_reviewed_corpus()
+    examples = corpus["examples"]
+    assert isinstance(examples, list)
+    examples[1]["source_id"] = examples[0]["source_id"]
+    examples[1]["speaker_id"] = examples[0]["speaker_id"]
+    errors = validate_corpus(corpus)
+    assert any("source_id" in error and "crosses dataset splits" in error for error in errors)
+    assert any("speaker_id" in error and "crosses dataset splits" in error for error in errors)
 
 
 def test_non_object_corpus_returns_actionable_error() -> None:
