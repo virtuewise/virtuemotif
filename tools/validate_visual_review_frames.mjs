@@ -12,6 +12,12 @@ export const VISUAL_REVIEW_FRAMES = {
   "smart-fur-4k.png": [3840, 2160],
   "smart-fur-portrait.png": [1080, 1920],
   "smart-fur-square.png": [1024, 1024],
+  "auto-lyrics-landscape.png": [1920, 1080],
+  "auto-lyrics-portrait.png": [1080, 1920],
+  "auto-lyrics-square.png": [1024, 1024],
+  "auto-lyrics-4k.png": [3840, 2160],
+  "particle-rainfall-smoke.png": [1920, 1080],
+  "glitch-distortion-smoke.png": [1920, 1080],
 };
 
 /** Read PNG dimensions from the signature and IHDR header without decoding image pixels. */
