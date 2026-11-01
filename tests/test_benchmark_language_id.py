@@ -33,6 +33,15 @@ def test_report_contains_per_language_metrics_and_predictions() -> None:
     assert report["unknown_behavior"]["reference_unknown"] == 2
     assert "predicted_unknown_rate" in report["unknown_behavior"]
 
+    assert report["code_switch_detection"]["positive_label"] == "mul"
+    assert report["code_switch_detection"]["support"] == 2
+    calibration = report["confidence_calibration"]
+    assert calibration["method"] == "top_label_confidence_vs_correctness"
+    assert 0.0 <= calibration["expected_calibration_error"] <= 1.0
+    assert 0.0 <= calibration["brier_score"] <= 1.0
+    assert calibration["bin_stats"]
+    assert "heuristic scores" in calibration["warning"]
+
 
 def test_metrics_handle_labels_never_predicted() -> None:
     corpus = {

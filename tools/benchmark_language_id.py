@@ -16,6 +16,76 @@ def _ratio(numerator: int, denominator: int) -> float:
     return round(numerator / denominator, 6) if denominator else 0.0
 
 
+def _confidence_calibration(predictions: list[dict[str, Any]], bins: int = 10) -> dict[str, Any]:
+    """Measure top-label confidence against correctness; not class-probability calibration."""
+    if not predictions:
+        return {
+            "method": "top_label_confidence_vs_correctness",
+            "bins": bins,
+            "expected_calibration_error": 0.0,
+            "brier_score": 0.0,
+            "bin_stats": [],
+        }
+
+    bucketed: list[list[dict[str, Any]]] = [[] for _ in range(bins)]
+    brier_total = 0.0
+    for item in predictions:
+        confidence = max(0.0, min(1.0, float(item["confidence"])))
+        bucket = min(int(confidence * bins), bins - 1)
+        bucketed[bucket].append({**item, "bounded_confidence": confidence})
+        brier_total += (confidence - float(bool(item["correct"]))) ** 2
+
+    bin_stats = []
+    ece = 0.0
+    total = len(predictions)
+    for index, items in enumerate(bucketed):
+        if not items:
+            continue
+        mean_confidence = sum(item["bounded_confidence"] for item in items) / len(items)
+        observed_accuracy = sum(bool(item["correct"]) for item in items) / len(items)
+        ece += len(items) / total * abs(mean_confidence - observed_accuracy)
+        bin_stats.append({
+            "lower_bound": round(index / bins, 6),
+            "upper_bound": round((index + 1) / bins, 6),
+            "count": len(items),
+            "mean_confidence": round(mean_confidence, 6),
+            "observed_accuracy": round(observed_accuracy, 6),
+        })
+    return {
+        "method": "top_label_confidence_vs_correctness",
+        "bins": bins,
+        "expected_calibration_error": round(ece, 6),
+        "brier_score": round(brier_total / total, 6),
+        "bin_stats": bin_stats,
+        "warning": (
+            "Diagnostic only: detector confidence values are heuristic scores, not "
+            "validated probabilities. Interpret only against rights-cleared, reviewed data."
+        ),
+    }
+
+
+def _code_switch_metrics(predictions: list[dict[str, Any]]) -> dict[str, Any]:
+    """Evaluate binary code-switch detection using the reference mul label."""
+    tp = sum(item["expected"] == "mul" and item["predicted"] == "mul" for item in predictions)
+    fp = sum(item["expected"] != "mul" and item["predicted"] == "mul" for item in predictions)
+    fn = sum(item["expected"] == "mul" and item["predicted"] != "mul" for item in predictions)
+    tn = sum(item["expected"] != "mul" and item["predicted"] != "mul" for item in predictions)
+    precision = _ratio(tp, tp + fp)
+    recall = _ratio(tp, tp + fn)
+    return {
+        "positive_label": "mul",
+        "true_positive": tp,
+        "false_positive": fp,
+        "false_negative": fn,
+        "true_negative": tn,
+        "precision": precision,
+        "recall": recall,
+        "f1": _ratio(2 * precision * recall, precision + recall),
+        "support": tp + fn,
+        "warning": "Binary code-switch metrics depend on reference labels and corpus coverage.",
+    }
+
+
 def evaluate(corpus: Any) -> dict[str, Any]:
     """Evaluate a validated corpus and clearly label its evidence status."""
     errors = validate_corpus(corpus)
@@ -104,6 +174,8 @@ def evaluate(corpus: Any) -> dict[str, Any]:
             "reference_unknown": expected_unknown,
             "unknown_recall": per_language.get("und", {}).get("recall", 0.0),
         },
+        "code_switch_detection": _code_switch_metrics(predictions),
+        "confidence_calibration": _confidence_calibration(predictions),
         "confusion": {
             language: dict(sorted(row.items()))
             for language, row in sorted(confusion.items())
