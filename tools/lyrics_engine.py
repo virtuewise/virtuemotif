@@ -47,9 +47,10 @@ def detect_code_switch_candidates(
 ) -> list[dict[str, Any]]:
     """Return conservative word-index spans for distinctive lexical code-switch evidence.
 
-    These are review candidates, not word-level language predictions or timestamps.
-    Only runs with at least two distinctive markers are reported, and shared words
-    cannot independently establish an isiNdebele/isiZulu boundary.
+    These are review candidates, not word-level language predictions. Word-index
+    boundaries are always emitted; ASR timing windows are attached only when every
+    token aligns exactly to valid, ordered word records. Shared words cannot
+    independently establish an isiNdebele/isiZulu boundary.
     """
     if not isinstance(text, str):
         return []
@@ -102,7 +103,8 @@ def detect_code_switch_candidates(
                 break
             if (
                 len(word_tokens) != 1
-                or word_tokens[0].casefold().replace("’", "'") != token.group(0).casefold().replace("’", "'")
+                or word_tokens[0].casefold().replace("’", "'")
+                != token.group(0).casefold().replace("’", "'")
                 or not math.isfinite(word_start)
                 or not math.isfinite(word_end)
                 or word_start < 0
