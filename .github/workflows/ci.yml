@@ -126,7 +126,7 @@ jobs:
         run: npx remotion compositions src/index.ts
 
       - name: Smoke-render audio-cue-driven Horizon composition
-        run: npx remotion render src/index.ts FurryHorizon /tmp/furry-horizon-smoke.png --frames=0 --codec=png
+        run: npx remotion still src/index.ts FurryHorizon /tmp/furry-horizon-smoke.png --frame=0
 
       - name: Smoke-render audio-cue-driven Rise composition
-        run: npx remotion render src/index.ts FurryRise /tmp/furry-rise-smoke.png --frames=0 --codec=png
+        run: npx remotion still src/index.ts FurryRise /tmp/furry-rise-smoke.png --frame=0
