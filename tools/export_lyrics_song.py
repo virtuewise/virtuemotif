@@ -46,7 +46,7 @@ def _segments(document: dict[str, Any], typography_preset: str) -> list[dict[str
         if not isinstance(words, list):
             raise TypeError(f"segment {index}: words must be an array")
         converted_words = []
-        previous_word_start = start
+        previous_word_end = start
         for word_index, word in enumerate(words):
             if not isinstance(word, dict) or not isinstance(word.get("text"), str) or not word["text"].strip():
                 raise ValueError(f"segment {index}, word {word_index}: invalid word record")
@@ -54,11 +54,11 @@ def _segments(document: dict[str, Any], typography_preset: str) -> list[dict[str
             word_end = _number(word.get("end"), "word.end", index)
             if word_start < start or word_end > end or word_end <= word_start:
                 raise ValueError(f"segment {index}, word {word_index}: timing outside segment")
-            if word_start < previous_word_start:
+            if word_start < previous_word_end:
                 raise ValueError(
-                    f"segment {index}, word {word_index}: word starts must be non-decreasing"
+                    f"segment {index}, word {word_index}: word timings must be ordered and non-overlapping"
                 )
-            previous_word_start = word_start
+            previous_word_end = word_end
             converted_words.append({"w": word["text"].strip(), "from": round(word_start, 3), "to": round(word_end, 3)})
         if converted_words:
             # Preserve validated source order; sorting malformed timing would hide ASR defects.
