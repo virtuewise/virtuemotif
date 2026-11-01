@@ -1,9 +1,10 @@
 // src/workers/whisper.worker.ts
-// Multilingual Speech-to-Text & VAD WebWorker
+// Browser-side voice-activity detection only. This worker does NOT run an ASR
+// model; it must never invent lyric text or claim a detected language.
 
 import { computeVoiceActivity } from '../lyrics/AudioProcessor';
 
-self.addEventListener('message', async (event: MessageEvent) => {
+self.addEventListener('message', (event: MessageEvent) => {
   const { id, payload } = event.data;
 
   try {
@@ -13,32 +14,37 @@ self.addEventListener('message', async (event: MessageEvent) => {
       language?: string;
     };
 
-    // 1. Detect vocal energy segments
-    const vocalSegments = computeVoiceActivity(pcm16k, sampleRate);
+    if (!(pcm16k instanceof Float32Array)) {
+      throw new TypeError('pcm16k must be a Float32Array');
+    }
+    if (!Number.isFinite(sampleRate) || sampleRate <= 0) {
+      throw new RangeError('sampleRate must be a positive finite number');
+    }
 
-    // 2. Generate time-aligned transcription segments
-    const segments = vocalSegments.map((seg, i) => {
-      return {
-        id: i,
-        start: seg.start,
-        end: seg.end,
-        text: `Vocal phrase ${i + 1}`,
-        confidence: 0.92,
-      };
-    });
+    const vocalSegments = computeVoiceActivity(pcm16k, sampleRate);
 
     self.postMessage({
       id,
       result: {
-        detectedLanguage: language !== 'auto' ? language : 'en',
-        languageConfidence: 0.96,
-        segments,
+        mode: 'vad-only',
+        transcriptionAvailable: false,
+        requestedLanguage: language,
+        detectedLanguage: 'und',
+        languageConfidence: 0,
+        segments: vocalSegments.map((segment, index) => ({
+          id: index,
+          start: segment.start,
+          end: segment.end,
+          energy: segment.energy,
+          kind: 'voice-activity',
+        })),
+        notice: 'Voice activity is detected, but lyric transcription and language identification require an ASR model.',
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     self.postMessage({
       id,
-      error: err.message || String(err),
+      error: err instanceof Error ? err.message : String(err),
     });
   }
 });
