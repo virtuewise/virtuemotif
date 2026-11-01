@@ -100,6 +100,7 @@ def _normalise_segment(segment: Any, asr_language: str, asr_confidence: float) -
 
     words: list[dict[str, Any]] = []
     invalid_word_timing_count = 0
+    previous_word_start = start
     for word in getattr(segment, "words", None) or []:
         try:
             word_start = float(word.start)
@@ -111,11 +112,13 @@ def _normalise_segment(segment: Any, asr_language: str, asr_confidence: float) -
             not math.isfinite(word_start)
             or not math.isfinite(word_end)
             or word_start < start
+            or word_start < previous_word_start
             or word_end < word_start
             or word_end > end + 0.05
         ):
             invalid_word_timing_count += 1
             continue
+        previous_word_start = word_start
         try:
             probability = float(getattr(word, "probability", 0.0) or 0.0)
         except (TypeError, ValueError):
