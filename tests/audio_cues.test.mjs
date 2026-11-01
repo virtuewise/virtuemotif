@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   audioReactiveGlitchIntensity,
+  audioReactiveParticleFallRate,
   audioReactiveWaveAmplitude,
   evaluateAudioCues,
   frameToTime,
@@ -83,6 +84,14 @@ test("glitch intensity is bounded and reacts to beats and transitions", () => {
     audioReactiveGlitchIntensity({ energy: 0.1, beatPulse: 0, transitionIntensity: 0 }));
   assert.equal(audioReactiveGlitchIntensity({ energy: 1, beatPulse: 1, transitionIntensity: 1 }), 1);
   assert.equal(audioReactiveGlitchIntensity({ energy: Number.NaN, beatPulse: -1, transitionIntensity: 2 }), 0.45);
+});
+
+test("particle fall rate is deterministic and responds to audio energy and beats", () => {
+  const quiet = audioReactiveParticleFallRate({ energy: 0, beatPulse: 0 });
+  const energetic = audioReactiveParticleFallRate({ energy: 1, beatPulse: 1 });
+  assert.equal(quiet, 0.8);
+  assert.equal(energetic, 1.4);
+  assert.equal(audioReactiveParticleFallRate({ energy: Number.NaN, beatPulse: -1 }), 0.8);
 });
 
 test("rainfall particle fields are reproducible for the same seed", () => {
