@@ -103,8 +103,8 @@ def test_reviewed_corpus_rejects_source_or_speaker_leakage() -> None:
     corpus = _valid_reviewed_corpus()
     examples = corpus["examples"]
     assert isinstance(examples, list)
-    examples[1]["source_id"] = examples[0]["source_id"]
-    examples[1]["speaker_id"] = examples[0]["speaker_id"]
+    examples[5]["source_id"] = examples[0]["source_id"]
+    examples[5]["speaker_id"] = examples[0]["speaker_id"]
     errors = validate_corpus(corpus)
     assert any("source_id" in error and "crosses dataset splits" in error for error in errors)
     assert any("speaker_id" in error and "crosses dataset splits" in error for error in errors)
