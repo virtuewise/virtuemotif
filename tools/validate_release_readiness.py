@@ -54,11 +54,12 @@ def main() -> int:
         failures.append("docs/release-evidence-record.md is missing")
     else:
         evidence = evidence_path.read_text(encoding="utf-8")
-        decision_line = next(
-            (line for line in evidence.splitlines() if line.strip().startswith("- Decision:")),
-            "",
+        decision_match = re.search(
+            r"^\s*-\s*Decision:\s*`([^`]+)`",
+            evidence,
+            re.MULTILINE,
         )
-        if decision_line.split("`")[-2:-1] != ["APPROVED"]:
+        if not decision_match or decision_match.group(1).strip().upper() != "APPROVED":
             failures.append("release evidence decision must be explicitly APPROVED by the release owner")
 
         commit_match = re.search(
