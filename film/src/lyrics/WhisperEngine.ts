@@ -9,7 +9,6 @@ import type {
   TranscriptionOptions,
   WordTiming,
 } from './types';
-import { decodeAudioInBrowser } from './AudioProcessor';
 
 // Map of common language codes to human-readable names
 export const LANGUAGE_NAMES: Record<string, string> = {
