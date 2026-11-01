@@ -1,6 +1,7 @@
-﻿import React from "react";
-import { AbsoluteFill, Audio, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+﻿import React, { useEffect, useMemo, useState } from "react";
+import { AbsoluteFill, Audio, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { PALETTE as P, clamp, rnd } from "./theme";
+import { evaluateAudioCues, parseAudioIntelligence, type AudioCueFrame, type AudioIntelligence, audioReactiveLightBoost, audioReactiveSceneScale } from "./fur3d/audioCues";
 import {
   Birds,
   Dust,
@@ -60,20 +61,21 @@ export type Song = {
 };
 
 /* --------------------------------------------------------------- scenery */
-export const Scenery: React.FC<{ t: number; st: number; look: Look; fade?: number }> = ({
+export const Scenery: React.FC<{ t: number; st: number; look: Look; fade?: number; cueFrame?: AudioCueFrame }> = ({
   t,
   st,
   look,
   fade = 1,
+  cueFrame,
 }) => {
-  const push = interpolate(clamp(st / 28), [0, 1], [look.camStart, look.camEnd]);
+  const push = interpolate(clamp(st / 28), [0, 1], [look.camStart, look.camEnd]) * (cueFrame ? audioReactiveSceneScale(cueFrame) : 1);
   const drift = (look.panX ?? 0) * Math.sin(st * 0.09);
   const night = look.variant === "night";
   return (
     <AbsoluteFill style={{ opacity: fade, background: P.night, overflow: "hidden" }}>
       <AbsoluteFill style={{ transform: `scale(${push}) translateX(${drift}px)` }}>
         <Sky t={t} sunY={clamp(1 - (look.sunY - 220) / 470)} warmth={look.warmth} night={night ? 1 : look.night} />
-        {night ? null : <HorizonGlow intensity={0.55 + look.warmth * 0.45} />}
+        {night ? null : <HorizonGlow intensity={0.55 + look.warmth * 0.45 + (cueFrame ? audioReactiveLightBoost(cueFrame) : 0)} />}
         <svg width={1920} height={1080} viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0 }}>
           {look.variant === "giant" ? (
             <>
@@ -240,6 +242,37 @@ export const Film: React.FC<{ song: Song }> = ({ song }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
+  const [audioCues, setAudioCues] = useState<AudioIntelligence | null>(null);
+  const cueRenderHandle = useMemo(() => delayRender(`Loading audio cues for ${song.id}`), [song.id]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let released = false;
+    const releaseRender = () => {
+      if (!released) {
+        released = true;
+        continueRender(cueRenderHandle);
+      }
+    };
+    setAudioCues(null);
+    fetch(staticFile(`audio-cues/${song.id}.audio-intelligence.json`))
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload: unknown) => {
+        if (!cancelled) setAudioCues(parseAudioIntelligence(payload));
+      })
+      .catch(() => {
+        if (!cancelled) setAudioCues(null);
+      })
+      .finally(() => {
+        if (!cancelled) releaseRender();
+      });
+    return () => {
+      cancelled = true;
+      releaseRender();
+    };
+  }, [song.id, cueRenderHandle]);
+
+  const cueFrame = audioCues ? evaluateAudioCues(frame, fps, audioCues) : undefined;
 
   const secs = song.sections;
   let active = secs[0];
@@ -263,9 +296,10 @@ export const Film: React.FC<{ song: Song }> = ({ song }) => {
           st={t - prev.start}
           look={LOOKS[prev.look] ?? LOOKS.wide}
           fade={1 - clamp(since / 1.1)}
+          cueFrame={cueFrame}
         />
       ) : null}
-      <Scenery t={t} st={since} look={look} />
+      <Scenery t={t} st={since} look={look} cueFrame={cueFrame} />
 
       {/* opening: fade up from black */}
       <div style={{ position: "absolute", inset: 0, background: P.night, opacity: clamp(1 - t / 2.2) }} />
@@ -301,6 +335,7 @@ export const Film: React.FC<{ song: Song }> = ({ song }) => {
           typographyPreset={ln.style}
           size={104}
           words={ln.words}
+          audioCueFrame={cueFrame}
           y={-18}
         />
       ))}
