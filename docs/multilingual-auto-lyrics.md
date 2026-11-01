@@ -35,8 +35,10 @@ estimates are visual guidance, not guaranteed beat or meter annotations.
 ## Language coverage and limits
 
 Initial lexical hints include English, Shona, isiNdebele, isiZulu, isiXhosa,
-Afrikaans, and Swahili, plus script-based hints for several non-Latin writing
-systems. The hints are intentionally conservative. Nguni languages overlap,
+Afrikaans, Swahili, Spanish, French, Portuguese, German, and Italian, plus
+script-based hints for several non-Latin writing systems. These lexical hints
+are deliberately small and conservative; they are not substitutes for a trained
+language-identification model or native-speaker evaluation. The hints are intentionally conservative. Nguni languages overlap,
 short phrases and code-switching can be ambiguous, and the engine falls back to
 the ASR language when text evidence is insufficient.
 
