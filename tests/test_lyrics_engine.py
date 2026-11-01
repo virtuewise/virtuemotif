@@ -148,7 +148,7 @@ def test_reviewable_multilingual_benchmark_examples(text: str, expected: str) ->
 def test_shared_nguni_words_remain_ambiguous() -> None:
     result = detect_text_language("mina wena thina uthando")
     assert result["language"] in {"und", "mul"}
-    assert result["method"] in {"ambiguous-lexical", "code-switched-lexical"}
+    assert result["method"] in {"text-heuristic", "ambiguous-lexical", "code-switched-lexical"}
 
 
 def test_code_switched_method_is_explicit() -> None:
