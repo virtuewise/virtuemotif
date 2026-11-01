@@ -84,6 +84,52 @@ def transcribe_audio(audio_path: str | Path, model_name: str = "small", language
         yield _normalise_segment(segment, asr_language, asr_confidence)
 
 
+
+def transcribe_live(model_name: str = "small", language: str | None = None,
+                    device: str = "auto", compute_type: str = "default",
+                    sample_rate: int = 16000, chunk_seconds: float = 5.0) -> Iterable[dict[str, Any]]:
+    """Yield low-latency lyric segments from the default microphone.
+
+    Requires optional sounddevice and faster-whisper packages. Language is
+    detected independently for each audio window when not explicitly supplied.
+    """
+    try:
+        import sounddevice as sd
+        from faster_whisper import WhisperModel
+    except ImportError as exc:
+        raise RuntimeError(
+            "Live capture needs optional packages: python -m pip install "
+            "'faster-whisper>=1.1' sounddevice"
+        ) from exc
+    if sample_rate < 8000:
+        raise ValueError("sample_rate must be at least 8000 Hz")
+    if chunk_seconds < 1.0 or chunk_seconds > 30.0:
+        raise ValueError("chunk_seconds must be between 1 and 30 seconds")
+    model = WhisperModel(model_name, device=device, compute_type=compute_type)
+    chunk_index = 0
+    print("Listening; press Ctrl+C to stop.", file=sys.stderr, flush=True)
+    while True:
+        samples = sd.rec(int(chunk_seconds * sample_rate), samplerate=sample_rate,
+                         channels=1, dtype="float32", blocking=True).reshape(-1)
+        segments, info = model.transcribe(
+            samples, language=language, word_timestamps=True, vad_filter=True,
+            condition_on_previous_text=False, beam_size=5,
+        )
+        asr_language = str(getattr(info, "language", "") or "und")
+        asr_confidence = float(getattr(info, "language_probability", 0.0) or 0.0)
+        offset = chunk_index * chunk_seconds
+        for segment in segments:
+            row = _normalise_segment(segment, asr_language, asr_confidence)
+            row["start"] = round(row["start"] + offset, 3)
+            row["end"] = round(row["end"] + offset, 3)
+            for word in row["words"]:
+                word["start"] = round(word["start"] + offset, 3)
+                word["end"] = round(word["end"] + offset, 3)
+            row["capture_mode"] = "microphone"
+            yield row
+        chunk_index += 1
+
+
 def build_lyrics_document(song_id: str, segments: list[dict[str, Any]]) -> dict[str, Any]:
     """Create a versioned lyric document that requires human review."""
     return {"schema_version": 1, "id": song_id, "source": "multilingual-auto-lyrics",
@@ -93,13 +139,15 @@ def build_lyrics_document(song_id: str, segments: list[dict[str, Any]]) -> dict[
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate timestamped multilingual lyrics from audio.")
-    parser.add_argument("audio", type=Path)
+    parser.add_argument("audio", type=Path, nargs="?")
     parser.add_argument("--song-id", default=None)
     parser.add_argument("--model", default="small")
     parser.add_argument("--language", default=None, help="Omit to enable backend language detection")
     parser.add_argument("--device", default="auto", choices=("auto", "cpu", "cuda"))
     parser.add_argument("--compute-type", default="default")
     parser.add_argument("--output", type=Path, default=None, help="Save complete JSON; otherwise stream JSONL events to stdout")
+    parser.add_argument("--live", action="store_true", help="Transcribe from the default microphone in rolling audio windows")
+    parser.add_argument("--chunk-seconds", type=float, default=5.0, help="Microphone window size (1-30 seconds)")
     args = parser.parse_args()
     song_id = args.song_id or args.audio.stem
     try:
