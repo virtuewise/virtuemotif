@@ -24,6 +24,86 @@ def test_default_config_is_valid_yaml() -> None:
     assert "waveform" in config["visual_effects"]
 
 
+
+@pytest.mark.parametrize("fps", [0, -1, 29.97, True, "30", None])
+def test_render_config_rejects_invalid_fps(fps: object) -> None:
+    from tools.make_video import validate_render_config
+
+    with pytest.raises(ValueError, match="fps must be a positive integer"):
+        validate_render_config({"song_id": "test", "fps": fps})
+
+
+@pytest.mark.parametrize(
+    "resolution",
+    [
+        "",
+        "1920",
+        "1920x",
+        "x1080",
+        "1920x1080x3",
+        "1920x-1080",
+        "wide x tall",
+        (1920,),
+        (1920, 1080, 3),
+        (1920, 0),
+        (1920, True),
+        None,
+    ],
+)
+def test_render_config_rejects_invalid_resolution(resolution: object) -> None:
+    from tools.make_video import validate_render_config
+
+    with pytest.raises(ValueError, match="resolution"):
+        validate_render_config({"song_id": "test", "resolution": resolution})
+
+
+@pytest.mark.parametrize(
+    ("resolution", "expected"),
+    [
+        ("1920x1080", (30, 1920, 1080)),
+        (" 640 X 360 ", (30, 640, 360)),
+        ((640, 360), (30, 640, 360)),
+        ([320, 180], (30, 320, 180)),
+        ("1x1", (30, 1, 1)),
+    ],
+)
+def test_render_config_accepts_valid_settings(
+    resolution: object, expected: tuple[int, int, int]
+) -> None:
+    from tools.make_video import validate_render_config
+
+    assert validate_render_config(
+        {"song_id": "test", "resolution": resolution}
+    ) == expected
+
+
+@pytest.mark.parametrize("song_id", ["", "  ", None, 12])
+def test_render_config_rejects_missing_song_id(song_id: object) -> None:
+    from tools.make_video import validate_render_config
+
+    with pytest.raises(ValueError, match="song_id must be a non-empty string"):
+        validate_render_config({"song_id": song_id})
+
+
+def test_invalid_render_config_does_not_create_output_directory(
+    tmp_path: Path,
+) -> None:
+    from tools.make_video import render_frames
+
+    output_dir = tmp_path / "output"
+    with pytest.raises(ValueError, match="fps must be a positive integer"):
+        render_frames(
+            {
+                "song_id": "test",
+                "fps": 0,
+                "resolution": "64x36",
+                "output_dir": str(output_dir),
+            }
+        )
+
+    assert not output_dir.exists()
+
+
 def test_waveform_effect_is_registered_and_renders_deterministically() -> None:
     assert "waveform" in EFFECT_REGISTRY
 
