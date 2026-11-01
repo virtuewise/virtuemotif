@@ -128,3 +128,31 @@ import or a hand-edited `Root.tsx` entry.
 The composition duration is derived from the supplied song's duration. Generated
 lyrics still require human review; this automation does not create translations
 or certify transcription accuracy.
+
+
+## Repeatable language-identification smoke benchmark
+
+Run the deterministic text-only smoke benchmark from the repository root:
+
+```bash
+python -m tools.benchmark_language_id
+python -m tools.benchmark_language_id --output build/benchmark/multilingual-language-id.json
+python -m pytest -q tests/test_benchmark_language_id.py tests/test_lyrics_engine.py
+```
+
+The starter fixture at `tests/fixtures/multilingual_language_smoke_v1.json` covers
+Shona (`sn`), isiNdebele (`nd`), isiZulu (`zu`), English (`en`), mixed text
+(`mul`), and uncertain text (`und`). The benchmark reports overall and
+per-label accuracy, a confusion matrix, and example-level predictions. CI runs it
+on every qualifying build and uploads the JSON report as an artifact.
+
+**Important dataset status:** this first fixture is a synthetic regression smoke
+set, not a native-speaker-reviewed benchmark and not an audio/ASR evaluation.
+It exists to make changes repeatable and expose regressions, not to claim
+real-world accuracy. Before publishing quality claims, replace or supplement it
+with consented, rights-cleared lyrics reviewed by fluent speakers of Shona,
+isiNdebele, and isiZulu; include naturally occurring code-switching, short and
+ambiguous spans, spelling variants, dialects, and difficult sung audio. Keep
+train/tuning examples separate from a held-out test set and report per-language
+precision/recall as well as accuracy. Unknown or mixed predictions should remain
+visible in the confusion report rather than being silently discarded.
