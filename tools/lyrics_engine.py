@@ -183,6 +183,10 @@ def transcribe_live(model_name: str = "small", language: str | None = None,
     Requires optional sounddevice and faster-whisper packages. Language is
     detected independently for each audio window when not explicitly supplied.
     """
+    if isinstance(sample_rate, bool) or not isinstance(sample_rate, int) or sample_rate < 8000:
+        raise ValueError("sample_rate must be an integer of at least 8000 Hz")
+    if not math.isfinite(chunk_seconds) or chunk_seconds < 1.0 or chunk_seconds > 30.0:
+        raise ValueError("chunk_seconds must be between 1 and 30 seconds")
     try:
         import sounddevice as sd
         from faster_whisper import WhisperModel
@@ -191,10 +195,6 @@ def transcribe_live(model_name: str = "small", language: str | None = None,
             "Live capture needs optional packages: python -m pip install "
             "'faster-whisper>=1.1' sounddevice"
         ) from exc
-    if isinstance(sample_rate, bool) or not isinstance(sample_rate, int) or sample_rate < 8000:
-        raise ValueError("sample_rate must be an integer of at least 8000 Hz")
-    if not math.isfinite(chunk_seconds) or chunk_seconds < 1.0 or chunk_seconds > 30.0:
-        raise ValueError("chunk_seconds must be between 1 and 30 seconds")
     model = WhisperModel(model_name, device=device, compute_type=compute_type)
     chunk_index = 0
     print("Listening; press Ctrl+C to stop.", file=sys.stderr, flush=True)
