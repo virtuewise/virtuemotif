@@ -226,6 +226,19 @@ export const RemotionRoot: React.FC = () => {
         width={1280}
         height={720}
       />
+      {/* Generic composition for any Song JSON exported by the auto-lyrics engine. */}
+      <Composition
+        id="AutoLyrics"
+        component={Film}
+        defaultProps={{ song: HORIZON }}
+        durationInFrames={Math.ceil(HORIZON.duration * 30)}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: Math.max(1, Math.ceil(props.song.duration * 30)),
+        })}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
     </>
   );
 };
