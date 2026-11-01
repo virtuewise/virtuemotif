@@ -36,6 +36,8 @@ _SCRIPT_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 
 def detect_text_language(text: str) -> dict[str, Any]:
     """Guess a language conservatively from a text span; not a full language model."""
+    if not isinstance(text, str):
+        return {"language": "und", "confidence": 0.0, "method": "invalid-text-input"}
     words = [w.casefold().replace("’", "'") for w in _WORD_RE.findall(text)]
     if not words:
         return {"language": "und", "confidence": 0.0, "method": "text-heuristic"}
@@ -97,6 +99,8 @@ def _normalise_segment(segment: Any, asr_language: str, asr_confidence: float) -
     if not math.isfinite(confidence) or not 0.0 <= confidence <= 1.0:
         confidence = 0.0
         review_reasons.append("invalid_asr_confidence")
+    elif confidence < 0.55:
+        review_reasons.append("low_asr_confidence")
 
     words: list[dict[str, Any]] = []
     invalid_word_timing_count = 0
@@ -179,6 +183,10 @@ def transcribe_live(model_name: str = "small", language: str | None = None,
     Requires optional sounddevice and faster-whisper packages. Language is
     detected independently for each audio window when not explicitly supplied.
     """
+    if isinstance(sample_rate, bool) or not isinstance(sample_rate, int) or sample_rate < 8000:
+        raise ValueError("sample_rate must be an integer of at least 8000 Hz")
+    if not math.isfinite(chunk_seconds) or chunk_seconds < 1.0 or chunk_seconds > 30.0:
+        raise ValueError("chunk_seconds must be between 1 and 30 seconds")
     try:
         import sounddevice as sd
         from faster_whisper import WhisperModel
@@ -187,10 +195,6 @@ def transcribe_live(model_name: str = "small", language: str | None = None,
             "Live capture needs optional packages: python -m pip install "
             "'faster-whisper>=1.1' sounddevice"
         ) from exc
-    if sample_rate < 8000:
-        raise ValueError("sample_rate must be at least 8000 Hz")
-    if chunk_seconds < 1.0 or chunk_seconds > 30.0:
-        raise ValueError("chunk_seconds must be between 1 and 30 seconds")
     model = WhisperModel(model_name, device=device, compute_type=compute_type)
     chunk_index = 0
     print("Listening; press Ctrl+C to stop.", file=sys.stderr, flush=True)

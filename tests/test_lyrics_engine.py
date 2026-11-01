@@ -283,3 +283,58 @@ def test_normalizer_drops_out_of_order_word_timestamps() -> None:
     assert result["invalid_word_timing_count"] == 1
     assert result["review_required"] is True
     assert "invalid_word_timing" in result["review_reasons"]
+
+
+
+def test_low_asr_confidence_requires_review_even_when_in_range() -> None:
+    segment = SimpleNamespace(
+        start=0.0,
+        end=2.0,
+        text="xylophone glimmer through the valley",
+        words=[],
+    )
+    result = _normalise_segment(segment, "en", 0.42)
+    assert result["language"] == "en"
+    assert result["language_evidence"]["asr_confidence"] == 0.42
+    assert result["review_required"] is True
+    assert "low_asr_confidence" in result["review_reasons"]
+
+
+def test_asr_confidence_at_review_threshold_is_not_flagged_by_threshold() -> None:
+    segment = SimpleNamespace(
+        start=0.0,
+        end=2.0,
+        text="I love you with all my heart",
+        words=[],
+    )
+    result = _normalise_segment(segment, "en", 0.55)
+    assert "low_asr_confidence" not in result["review_reasons"]
+
+
+def test_text_language_detector_fails_closed_for_non_string_input() -> None:
+    result = detect_text_language(None)  # type: ignore[arg-type]
+    assert result == {
+        "language": "und",
+        "confidence": 0.0,
+        "method": "invalid-text-input",
+    }
+
+
+@pytest.mark.parametrize("chunk_seconds", [float("nan"), float("inf"), float("-inf"), 0.5, 31.0])
+def test_live_transcription_rejects_invalid_chunk_duration(
+    monkeypatch: pytest.MonkeyPatch, chunk_seconds: float
+) -> None:
+    from tools.lyrics_engine import transcribe_live
+
+    with pytest.raises(ValueError, match="chunk_seconds must be between 1 and 30 seconds"):
+        next(transcribe_live(chunk_seconds=chunk_seconds))
+
+
+@pytest.mark.parametrize("sample_rate", [True, 7999, 16000.5])
+def test_live_transcription_rejects_invalid_sample_rate(
+    monkeypatch: pytest.MonkeyPatch, sample_rate: object
+) -> None:
+    from tools.lyrics_engine import transcribe_live
+
+    with pytest.raises(ValueError, match="sample_rate must be an integer"):
+        next(transcribe_live(sample_rate=sample_rate))  # type: ignore[arg-type]
