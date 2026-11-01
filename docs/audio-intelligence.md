@@ -16,8 +16,32 @@ python -m tools.audio_intelligence path/to/song.wav --output timing/song.audio-i
 ```
 
 The output is versioned JSON designed to become a shared input for typography,
-camera motion, transitions, and effect intensity. It uses NumPy and the existing
-SoundFile dependency; it does not require a heavyweight music-analysis model.
+camera motion, transitions, and effect intensity. It uses NumPy and SoundFile;
+it does not require a heavyweight music-analysis model.
+
+### Export cues for Remotion
+
+From the repository root, run:
+
+```bash
+python tools/export_audio_cues.py
+```
+
+This normalizes the bundled Horizon and Rise audio with FFmpeg, then writes
+`film/public/audio-cues/horizon.audio-intelligence.json` and
+`film/public/audio-cues/rise.audio-intelligence.json`. Remotion loads the
+matching file by song ID and evaluates it at each zero-based frame timestamp.
+The files are generated assets and should be regenerated whenever their source
+audio changes.
+
+The furry lyric director uses the real beat grid to snap lyric entrances when a
+beat is within 180 ms, the energy curve to shape displacement, and onset/energy
+events to raise transition and typography intensity. Invalid or missing cue
+files use deterministic frame-derived motion instead of failing a render.
+
+Cue loading and the frame-time utilities are covered by
+`node --experimental-strip-types --test tests/audio_cues.test.mjs`; the CI
+workflow also generates the Remotion cue assets before composition validation.
 
 ## Limitations
 
