@@ -64,11 +64,27 @@ def test_reviewed_corpus_requires_governance_and_per_example_provenance() -> Non
 
 
 def _valid_reviewed_corpus() -> dict[str, object]:
+    languages = ["sn", "nd", "zu", "en", "mul"]
+    examples = []
+    for split in ("train", "test"):
+        for language in languages:
+            example_id = f"{split}-{language}"
+            examples.append({
+                "id": example_id,
+                "text": f"reviewed {language} sample phrase",
+                "language": language,
+                "split": split,
+                "source_id": f"source-{example_id}",
+                "speaker_id": f"speaker-{example_id}",
+                "review_status": "native_speaker_reviewed",
+                "reviewer_ids": ["reviewer-pseudo-1"],
+                "consent_ref": f"private-consent-record-{example_id}",
+            })
     return {
         "schema_version": 1,
         "dataset_id": "reviewed-test",
         "status": REVIEWED_STATUS,
-        "labels": ["en"],
+        "labels": languages,
         "governance": {
             "rights_status": "rights_cleared",
             "consent_status": "documented",
@@ -76,32 +92,8 @@ def _valid_reviewed_corpus() -> dict[str, object]:
             "adjudication_policy": "Two independent annotations; disagreements adjudicated.",
             "split_policy": "Source/song/speaker groups do not cross train and test.",
         },
-        "examples": [
-            {
-                "id": "train-1",
-                "text": "sample phrase",
-                "language": "en",
-                "split": "train",
-                "source_id": "source-train",
-                "speaker_id": "speaker-train",
-                "review_status": "native_speaker_reviewed",
-                "reviewer_ids": ["reviewer-pseudo-1"],
-                "consent_ref": "private-consent-record-train",
-            },
-            {
-                "id": "test-1",
-                "text": "held out phrase",
-                "language": "en",
-                "split": "test",
-                "source_id": "source-test",
-                "speaker_id": "speaker-test",
-                "review_status": "native_speaker_reviewed",
-                "reviewer_ids": ["reviewer-pseudo-1"],
-                "consent_ref": "private-consent-record-test",
-            },
-        ],
+        "examples": examples,
     }
-
 
 def test_reviewed_corpus_accepts_documented_governance_shape() -> None:
     assert validate_corpus(_valid_reviewed_corpus()) == []
@@ -120,3 +112,16 @@ def test_reviewed_corpus_rejects_source_or_speaker_leakage() -> None:
 
 def test_non_object_corpus_returns_actionable_error() -> None:
     assert validate_corpus([]) == ["corpus must be a JSON object"]
+
+
+
+def test_reviewed_corpus_requires_each_release_language_in_held_out_test() -> None:
+    corpus = _valid_reviewed_corpus()
+    examples = corpus["examples"]
+    assert isinstance(examples, list)
+    corpus["examples"] = [
+        example for example in examples
+        if not (example["split"] == "test" and example["language"] == "nd")
+    ]
+    errors = validate_corpus(corpus)
+    assert any("missing required release cohorts: nd" in error for error in errors)
