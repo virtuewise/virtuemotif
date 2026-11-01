@@ -50,7 +50,12 @@ def test_acquisition_writes_hash_manifest(tmp_path: Path, monkeypatch) -> None:
     payload.write_text("sentence\nexample\n", encoding="utf-8")
 
     sdk = ModuleType("datacollective")
-    sdk.download_dataset = lambda provider_id: downloaded
+
+    def fake_download(provider_id: str) -> Path:
+        assert provider_id == "cmu610aue00jtnq07hnb00xio"
+        return downloaded
+
+    sdk.download_dataset = fake_download
     monkeypatch.setitem(sys.modules, "datacollective", sdk)
     provenance = tmp_path / "provenance"
 
