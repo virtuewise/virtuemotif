@@ -74,7 +74,7 @@ export const resolveWordTimings = (
   if (!wordTimes || wordTimes.length !== words.length || words.length === 0) return null;
 
   const normalizeWord = (word: string): string =>
-    word.normalize("NFC").toLocaleLowerCase().replace(/[\p{P}\p{S}]/gu, "");
+    word.normalize("NFC").toLowerCase().replace(/[\p{P}\p{S}]/gu, "");
 
   let previousFrom = -Infinity;
   for (let index = 0; index < words.length; index += 1) {
