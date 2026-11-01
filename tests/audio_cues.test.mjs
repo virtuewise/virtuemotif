@@ -17,6 +17,7 @@ test("validates schema version and malformed cue data", () => {
   assert.equal(parseAudioIntelligence(valid)?.schema_version, 1);
   assert.equal(parseAudioIntelligence({ ...valid, schema_version: 2 }), null);
   assert.equal(parseAudioIntelligence({ ...valid, beats: [1, 0] }), null);
+  assert.equal(parseAudioIntelligence({ ...valid, beats: [4.1] }), null);
   assert.equal(parseAudioIntelligence({ ...valid, events: [{ time: -1, type: "onset", strength: 1 }] }), null);
 });
 
@@ -47,5 +48,7 @@ test("missing or invalid cue data uses deterministic fallback", () => {
   const missing = evaluateAudioCues(15, 30, null);
   assert.equal(missing.hasAudioCues, false);
   assert.deepEqual(evaluateAudioCues(15, 30, undefined), missing);
+  assert.equal(missing.time, 0.5);
+  assert.notEqual(evaluateAudioCues(0, 30, null).beatPulse, missing.beatPulse);
   assert.equal(parseAudioIntelligence(null), null);
 });
