@@ -2,8 +2,10 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from tools.benchmark_language_id import evaluate
-from tools.validate_language_dataset import SMOKE_STATUS
+from tools.validate_language_dataset import REVIEWED_STATUS, SMOKE_STATUS
 
 CORPUS = Path("tests/fixtures/multilingual_language_smoke_v1.json")
 
@@ -62,3 +64,57 @@ def test_metrics_handle_labels_never_predicted() -> None:
     assert report["per_language"]["xx"]["recall"] == 0.0
     assert report["per_language"]["xx"]["f1"] == 0.0
     assert report["per_language"]["en"]["support"] == 0
+
+
+
+def _reviewed_split_corpus() -> dict:
+    return {
+        "schema_version": 1,
+        "dataset_id": "split-selection-test",
+        "status": REVIEWED_STATUS,
+        "labels": ["en", "sn"],
+        "governance": {
+            "rights_status": "rights_cleared",
+            "consent_status": "documented",
+            "review_status": "native_speaker_reviewed",
+            "adjudication_policy": "Two independent labels; disagreements adjudicated.",
+            "split_policy": "Group by source and speaker before assigning splits.",
+        },
+        "examples": [
+            {
+                "id": "train-en", "text": "Good morning everyone", "language": "en",
+                "split": "train", "source_id": "source-train", "speaker_id": "speaker-train",
+                "review_status": "native_speaker_reviewed", "consent_ref": "ledger:train",
+                "reviewer_ids": ["reviewer-a", "reviewer-b"],
+            },
+            {
+                "id": "test-sn", "text": "Mangwanani mose", "language": "sn",
+                "split": "test", "source_id": "source-test", "speaker_id": "speaker-test",
+                "review_status": "native_speaker_reviewed", "consent_ref": "ledger:test",
+                "reviewer_ids": ["reviewer-a", "reviewer-b"],
+            },
+        ],
+    }
+
+
+def test_reviewed_benchmark_defaults_to_held_out_test_split() -> None:
+    report = evaluate(_reviewed_split_corpus())
+    assert report["evaluated_split"] == "test"
+    assert report["examples"] == 1
+    assert [item["id"] for item in report["predictions"]] == ["test-sn"]
+    assert report["available_split_counts"] == {"test": 1, "train": 1}
+    assert report["per_language"]["en"]["support"] == 0
+    assert report["per_language"]["sn"]["support"] == 1
+    assert {"precision", "recall", "f1", "accuracy"} <= set(report["weighted_average"])
+
+
+def test_reviewed_benchmark_all_splits_requires_explicit_opt_in() -> None:
+    report = evaluate(_reviewed_split_corpus(), split="all")
+    assert report["evaluated_split"] == "all"
+    assert report["examples"] == 2
+    assert {item["split"] for item in report["predictions"]} == {"train", "test"}
+
+
+def test_benchmark_rejects_requested_split_without_examples() -> None:
+    with pytest.raises(ValueError, match="requested split 'development' has no examples"):
+        evaluate(_reviewed_split_corpus(), split="development")
