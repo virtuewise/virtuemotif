@@ -96,3 +96,17 @@ test("unspaced wide-script lyrics wrap deterministically at character boundaries
   assert.equal(wrapWideScriptText("Shona lyrics", 4), null);
   assert.deepEqual(wrapWideScriptText("漢字仮名交じり文", 4).slice(0, 2), ["漢字", "仮名"]);
 });
+
+
+test("grapheme-aware widths preserve combining marks and emoji sequences", () => {
+  assert.equal(estimateLyricWidthUnits("café"), estimateLyricWidthUnits("cafe\u0301"));
+  assert.equal(estimateLyricWidthUnits("👨‍👩‍👧‍👦"), estimateLyricWidthUnits("😀"));
+  assert.equal(estimateLyricWidthUnits("🇿🇼"), estimateLyricWidthUnits("😀"));
+});
+
+test("wide-script wrapping never splits a combining grapheme or emoji sequence", () => {
+  const wrapped = wrapWideScriptText("漢字👨‍👩‍👧‍👦仮名", 3);
+  assert.ok(wrapped);
+  assert.equal(wrapped.join(""), "漢字👨‍👩‍👧‍👦仮名");
+  assert.ok(wrapped.every((line) => !line.startsWith("\u200d") && !line.endsWith("\u200d")));
+});
