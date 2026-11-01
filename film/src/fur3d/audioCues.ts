@@ -166,6 +166,8 @@ export function evaluateAudioCues(
   };
 }
 
+const unitInterval = (value: number): number =>
+  Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
 
 /**
  * Map normalized audio cues to a bounded wave displacement amplitude.
@@ -174,10 +176,20 @@ export function evaluateAudioCues(
 export function audioReactiveWaveAmplitude(
   cue: Pick<AudioCueFrame, "energy" | "beatPulse" | "transitionIntensity">,
 ): number {
-  const unit = (value: number): number =>
-    Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
   return 0.025 +
-    unit(cue.energy) * 0.075 +
-    unit(cue.beatPulse) * 0.12 +
-    unit(cue.transitionIntensity) * 0.08;
+    unitInterval(cue.energy) * 0.075 +
+    unitInterval(cue.beatPulse) * 0.12 +
+    unitInterval(cue.transitionIntensity) * 0.08;
+}
+
+/** Map beat, transition, and energy cues to a stable, bounded glitch intensity. */
+export function audioReactiveGlitchIntensity(
+  cue: Pick<AudioCueFrame, "energy" | "beatPulse" | "transitionIntensity">,
+): number {
+  return Math.min(
+    1,
+    unitInterval(cue.beatPulse) * 0.7 +
+      unitInterval(cue.transitionIntensity) * 0.45 +
+      unitInterval(cue.energy) * 0.08,
+  );
 }
