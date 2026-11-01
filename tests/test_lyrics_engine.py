@@ -393,7 +393,7 @@ def test_code_switch_candidate_word_indices_are_monotonic_with_punctuation() -> 
     candidates = detect_code_switch_candidates(text)
     assert len(candidates) == 1
     candidate = candidates[0]
-    tokens = re.findall(r"[\\w’']+", text, re.UNICODE)
+    tokens = ["I", "love", "you", "forever", "ndinoda", "rudo", "rwangu"]
     assert 0 <= candidate["after_word"] < candidate["before_word"] < len(tokens)
     assert tokens[candidate["after_word"]].casefold() == "forever"
     assert tokens[candidate["before_word"]].casefold() == "ndinoda"
