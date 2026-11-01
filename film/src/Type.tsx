@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AbsoluteFill, continueRender, delayRender, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { FONT_DISPLAY, FONT_MONO, FONT_SERIF, PALETTE as P, clamp, easeOut, rnd } from "./theme";
+import { calculateLyricFontSize, resolveWordTimings } from "./typography";
 
 /* ------------------------------------------------------------ font load */
 const FACES = [
@@ -28,14 +29,7 @@ export const useFilmFonts = () => {
 };
 
 /* ------------------------------------------------------------- fit size */
-const fitSize = (text: string, base = 104) => {
-  const n = text.length;
-  if (n <= 22) return base;
-  if (n <= 30) return base * 0.86;
-  if (n <= 40) return base * 0.72;
-  if (n <= 52) return base * 0.6;
-  return base * 0.52;
-};
+// Layout sizing lives in typography.ts so it can be tested without a browser.
 
 /* ------------------------------------------------------------ lyric line */
 export type WordTime = { w: string; from: number; to: number };
@@ -52,23 +46,22 @@ export const LyricLine: React.FC<{
   y?: number;
 }> = ({ text, translation, from, to, offset = 0, size = 104, whisper = false, words: wordTimes, y = 0 }) => {
   const frame = useCurrentFrame();
-  const { fps, width } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
   const t = frame / fps + offset;
 
   if (t < from - 0.2 || t > to + 0.6) return null;
 
-  const words = text.split(" ");
-  const wt = wordTimes && wordTimes.length === words.length ? wordTimes : null;
+  const words = text.trim().split(/\\s+/u).filter(Boolean);
+  const wordStarts = resolveWordTimings(text, wordTimes);
   const stagger = Math.min(0.14, 1.6 / Math.max(words.length, 1));
-  const lastStart = wt ? wt[wt.length - 1].from : from + (words.length - 1) * stagger;
-  const inEnd = wt ? lastStart + 0.9 : from + 0.9 + words.length * stagger;
+  const lastStart = wordStarts ? wordStarts[wordStarts.length - 1] : from + (words.length - 1) * stagger;
+  const inEnd = wordStarts ? lastStart + 0.9 : from + 0.9 + words.length * stagger;
   const outStart = to - 0.75;
   const exit = clamp((t - outStart) / 0.75);
 
-  const isPortrait = width < 1080;
-  const fs = whisper
-    ? (isPortrait ? size * 0.75 : size)
-    : Math.min(isPortrait ? 84 : 116, Math.max(isPortrait ? 42 : 58, (width * 0.74) / (Math.max(text.length, 1) * 0.37)));
+  const isPortrait = width < height;
+  const requestedSize = whisper && isPortrait ? size * 0.75 : size;
+  const fs = calculateLyricFontSize(text, width, height, requestedSize);
   const lineOpacity = 1 - exit;
   const enterP = clamp((t - from) / 0.65);
   const fallY = (1 - easeOut(enterP)) * -32;
@@ -83,9 +76,9 @@ export const LyricLine: React.FC<{
         style={{
           position: "absolute",
           width: Math.min(1900, width * 0.98),
-          height: 640,
+          height: Math.min(height * 0.62, 640 * (width < height ? width / 1080 : width === height ? width / 1024 : width / 1920)),
           top: "50%",
-          marginTop: -320,
+          marginTop: -Math.min(height * 0.62, 640 * (width < height ? width / 1080 : width === height ? width / 1024 : width / 1920)) / 2,
           background: "radial-gradient(closest-side, rgba(3,6,12,0.62), rgba(3,6,12,0.34) 55%, transparent 78%)",
           filter: "blur(14px)",
           opacity: 0.9 * lineOpacity,
@@ -120,7 +113,7 @@ export const LyricLine: React.FC<{
           }}
         >
           {words.map((w, i) => {
-            const start = wt ? wt[i].from - 0.06 : from + i * stagger;
+            const start = wordStarts ? wordStarts[i] - 0.06 : from + i * stagger;
             const pr = spring({
               frame: Math.round((t - start) * fps),
               fps,
@@ -142,7 +135,9 @@ export const LyricLine: React.FC<{
                   transform: `translateY(${dy}px) rotate(${rot}deg)`,
                   filter: blurW > 0.1 ? `blur(${blurW}px)` : undefined,
                   color,
-                  whiteSpace: "pre",
+                  whiteSpace: "pre-wrap",
+                  maxWidth: "100%",
+                  overflowWrap: "anywhere",
                 }}
               >
                 {w}
@@ -156,7 +151,7 @@ export const LyricLine: React.FC<{
           style={{
             height: 3,
             margin: "26px auto 0",
-            width: 1500 * clamp((t - from - 0.25) / 0.9) * (1 - exit),
+            width: Math.min(width * 0.72, 1500 * (width < height ? width / 1080 : width === height ? width / 1024 : width / 1920)) * clamp((t - from - 0.25) / 0.9) * (1 - exit),
             background: `linear-gradient(90deg, transparent, ${P.ochre} 12%, ${P.amber} 50%, ${P.ochre} 88%, transparent)`,
             opacity: 0.85 * (1 - exit),
             transform: `scaleY(${Math.max(1, 0.4 + Math.sin(t * 2) * 0.05)})`,
@@ -169,7 +164,11 @@ export const LyricLine: React.FC<{
               marginTop: 22,
               fontFamily: FONT_SERIF,
               fontStyle: "italic",
-              fontSize: 44,
+              fontSize: Math.min(isPortrait ? 34 : 44, width * 0.035),
+              maxWidth: width * 0.82,
+              marginLeft: "auto",
+              marginRight: "auto",
+              overflowWrap: "anywhere",
               color: P.ochre,
               letterSpacing: "0.01em",
               opacity: clamp((t - inEnd) / 0.7) * (1 - exit),
