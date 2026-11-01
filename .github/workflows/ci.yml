@@ -180,7 +180,7 @@ jobs:
           python -m tools.export_audio_cues
 
       - name: Test frame-time and audio-cue utilities
-        run: node --experimental-strip-types --test ../tests/audio_cues.test.mjs ../tests/typography.test.mjs ../tests/smart_fur_render_mode.test.mjs ../tests/visual_review_frames.test.mjs ../tests/visual_regression.test.mjs ../tests/audio_reactive_motion.test.mjs
+        run: node --experimental-strip-types --test ../tests/audio_cues.test.mjs ../tests/typography.test.mjs ../tests/smart_fur_render_mode.test.mjs ../tests/visual_review_frames.test.mjs ../tests/visual_regression.test.mjs ../tests/audio_reactive_motion.test.mjs ../tests/text_fit.test.mjs
 
       - name: Type-check Remotion project
         run: npx tsc --noEmit
