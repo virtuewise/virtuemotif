@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import {
   calculateLyricFontSize,
   estimateLyricWidthUnits,
+  estimateLyricCharacterEquivalent,
   resolveWordTimings,
+  wrapWideScriptText,
 } from "../film/src/typography.ts";
 
 test("long lyrics shrink while short lyrics retain the configured design size", () => {
@@ -65,4 +67,17 @@ test("lyric typography presets are configurable and unknown names fall back safe
     assert.ok(preset.highlightColor.length > 0);
     assert.ok(preset.translationScale > 0 && preset.translationScale <= 1);
   }
+});
+
+
+test("3D line sizing treats wide-script glyphs as wider than Latin characters", () => {
+  assert.equal(estimateLyricCharacterEquivalent("abcd"), 4);
+  assert.ok(estimateLyricCharacterEquivalent("你好世界") > estimateLyricCharacterEquivalent("abcd"));
+});
+
+test("unspaced wide-script lyrics wrap deterministically at character boundaries", () => {
+  assert.deepEqual(wrapWideScriptText("你好世界", 4), ["你好", "世界"]);
+  assert.equal(wrapWideScriptText("你好", 4), null);
+  assert.equal(wrapWideScriptText("Shona lyrics", 4), null);
+  assert.deepEqual(wrapWideScriptText("漢字仮名交じり文", 4).slice(0, 2), ["漢字", "仮名"]);
 });
