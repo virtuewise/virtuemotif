@@ -11,7 +11,7 @@ with a confidence-aware language timeline.
 Install ASR separately so the video renderer stays lightweight:
 
 ```bash
-python -m pip install "faster-whisper>=1.1" sounddevice
+python -m pip install "faster-whisper>=1.1" numpy soundfile sounddevice
 python -m tools.lyrics_engine path/to/song.wav --model small
 python -m tools.lyrics_engine path/to/song.wav --output lyrics/song.auto.json
 python -m tools.lyrics_engine --live --model small --chunk-seconds 5
@@ -23,6 +23,14 @@ and a confidence/method field. Saved JSON records whether language detection was
 or a language was explicitly forced with `--language`, and includes `language_summary`
 (segment counts by detected language, including `und` for unknown segments). The summary
 is diagnostic rather than a claim that every word in a segment uses that language.
+
+The end-to-end `make_auto_lyrics_video` command also analyzes the copied
+audio and writes `film/public/audio-cues/<song-id>.audio-intelligence.json`.
+The sanitized song ID is passed consistently through transcription, Song export,
+and cue generation so the Remotion composition can find the correct cue file.
+This step requires NumPy, SoundFile, and FFmpeg; it uses the same versioned,
+deterministic audio-intelligence contract as the classic compositions. Cue
+estimates are visual guidance, not guaranteed beat or meter annotations.
 
 ## Language coverage and limits
 

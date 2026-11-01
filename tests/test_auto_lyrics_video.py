@@ -1,10 +1,12 @@
 """Tests for the end-to-end auto-lyrics CLI helpers."""
 import json
-from types import SimpleNamespace
+import sys
+from types import ModuleType, SimpleNamespace
 
 import pytest
 
 from tools.make_auto_lyrics_video import (
+    export_song_audio_cues,
     parse_audio_duration,
     resolve_output_format,
     safe_song_id,
@@ -162,3 +164,32 @@ def test_validate_rendered_video_rejects_audio_video_duration_drift(tmp_path, mo
 def test_validate_rendered_video_rejects_missing_output(tmp_path) -> None:
     with pytest.raises(FileNotFoundError, match="missing or empty"):
         validate_rendered_video(tmp_path / "missing.mp4", expected_duration=12.5)
+
+
+def test_export_song_audio_cues_uses_the_song_id_expected_by_film(monkeypatch, tmp_path) -> None:
+    source = tmp_path / "song.m4a"
+    fake_exporter = ModuleType("tools.export_audio_cues")
+    calls = {}
+
+    def fake_export_audio_cues(output_dir, songs):
+        calls["output_dir"] = output_dir
+        calls["songs"] = songs
+        return [output_dir / "shona-night.audio-intelligence.json"]
+
+    fake_exporter.export_audio_cues = fake_export_audio_cues
+    monkeypatch.setitem(sys.modules, "tools.export_audio_cues", fake_exporter)
+
+    result = export_song_audio_cues(source, "shona-night")
+
+    assert result == calls["output_dir"] / "shona-night.audio-intelligence.json"
+    assert calls["output_dir"].name == "audio-cues"
+    assert calls["songs"] == {"shona-night": source}
+
+
+def test_export_song_audio_cues_rejects_missing_output(monkeypatch, tmp_path) -> None:
+    fake_exporter = ModuleType("tools.export_audio_cues")
+    fake_exporter.export_audio_cues = lambda *_args, **_kwargs: []
+    monkeypatch.setitem(sys.modules, "tools.export_audio_cues", fake_exporter)
+
+    with pytest.raises(RuntimeError, match="expected one audio-cue file"):
+        export_song_audio_cues(tmp_path / "song.wav", "song")
