@@ -228,3 +228,39 @@ def test_normalised_segment_does_not_flag_agreeing_asr_and_lexical_evidence() ->
     assert result["language_evidence"]["disagreement"] is False
     assert result["review_required"] is False
     assert result["review_reasons"] == []
+
+
+
+def test_normalizer_rejects_non_finite_or_reversed_segment_timestamps() -> None:
+    for start, end in [(float("nan"), 1), (0, float("inf")), (2, 1), (-0.1, 1)]:
+        segment = SimpleNamespace(start=start, end=end, text="I love you", words=[])
+        with pytest.raises(ValueError, match="invalid timestamp interval"):
+            _normalise_segment(segment, "en", 0.9)
+
+
+def test_normalizer_drops_invalid_word_timings_and_requires_review() -> None:
+    segment = SimpleNamespace(
+        start=1.0,
+        end=2.0,
+        text="I love you with all my heart",
+        words=[
+            SimpleNamespace(word=" I", start=1.0, end=1.2, probability=0.9),
+            SimpleNamespace(word=" broken", start=float("nan"), end=1.5, probability=0.9),
+            SimpleNamespace(word=" outside", start=1.5, end=2.2, probability=0.9),
+            SimpleNamespace(word=" reversed", start=1.8, end=1.7, probability=0.9),
+        ],
+    )
+    result = _normalise_segment(segment, "en", 0.9)
+    assert [word["text"] for word in result["words"]] == ["I"]
+    assert result["invalid_word_timing_count"] == 3
+    assert result["review_required"] is True
+    assert "invalid_word_timing" in result["review_reasons"]
+
+
+@pytest.mark.parametrize("confidence", [float("nan"), float("inf"), -0.1, 1.1, "bad"])
+def test_normalizer_sanitizes_invalid_asr_confidence(confidence: object) -> None:
+    segment = SimpleNamespace(start=0.0, end=1.4, text="xylophone glimmer", words=[])
+    result = _normalise_segment(segment, "fr", confidence)  # type: ignore[arg-type]
+    assert result["language_evidence"]["asr_confidence"] == 0.0
+    assert result["review_required"] is True
+    assert "invalid_asr_confidence" in result["review_reasons"]
