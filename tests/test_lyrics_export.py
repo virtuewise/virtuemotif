@@ -137,7 +137,7 @@ def test_export_rejects_out_of_order_word_timestamps() -> None:
             ],
         }],
     }
-    with pytest.raises(ValueError, match="word starts must be non-decreasing"):
+    with pytest.raises(ValueError, match="ordered and non-overlapping"):
         convert_lyrics_document(document, audio="audio/test.wav")
 
 
@@ -156,3 +156,34 @@ def test_export_preserves_valid_word_timestamp_order() -> None:
     words = song["sections"][0]["lines"][0]["words"]
     assert [word["w"] for word in words] == ["hello", "world"]
     assert [word["from"] for word in words] == [0.1, 0.6]
+
+
+def test_export_rejects_overlapping_word_timestamps() -> None:
+    document = {
+        "schema_version": 1,
+        "segments": [{
+            "start": 0, "end": 2, "text": "hello world", "language": "en",
+            "words": [
+                {"text": "hello", "start": 0.1, "end": 0.8},
+                {"text": "world", "start": 0.7, "end": 1.0},
+            ],
+        }],
+    }
+    with pytest.raises(ValueError, match="ordered and non-overlapping"):
+        convert_lyrics_document(document, audio="audio/test.wav")
+
+
+def test_export_accepts_adjacent_word_boundaries() -> None:
+    document = {
+        "schema_version": 1,
+        "segments": [{
+            "start": 0, "end": 1, "text": "hello world", "language": "en",
+            "words": [
+                {"text": "hello", "start": 0.0, "end": 0.5},
+                {"text": "world", "start": 0.5, "end": 1.0},
+            ],
+        }],
+    }
+    song = convert_lyrics_document(document, audio="audio/test.wav")
+    words = song["sections"][0]["lines"][0]["words"]
+    assert [word["from"] for word in words] == [0.0, 0.5]

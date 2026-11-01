@@ -47,3 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI pipeline workflow via GitHub Actions (`.github/workflows/ci.yml`) for linting and doc generation.
 - Developer setup guidelines in `CONTRIBUTING.md` and `requirements-dev.txt`.
 - Enhanced `README.md` with system architecture, usage instructions, and quick start guides.
+
+
+## Unreleased
+
+- Reject overlapping word intervals during lyric export while preserving valid adjacent boundaries and pauses.

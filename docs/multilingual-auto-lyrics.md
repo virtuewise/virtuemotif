@@ -221,3 +221,13 @@ ambiguous spans, spelling variants, dialects, and difficult sung audio. Keep
 train/tuning examples separate from a held-out test set and report per-language
 precision/recall as well as accuracy. Unknown or mixed predictions should remain
 visible in the confusion report rather than being silently discarded.
+
+
+### Word-alignment integrity at export
+
+The Song exporter preserves input word order and rejects word intervals that are
+out of order or overlap the previous word. Adjacent boundaries are valid, and
+positive gaps are retained as pauses. This is a structural integrity check, not
+proof that a recognizer or forced aligner placed the words on the correct audio
+frames; alignment quality still requires listening review against rights-cleared
+audio and representative language coverage.
