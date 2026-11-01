@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AbsoluteFill, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { evaluateAudioCues, parseAudioIntelligence, snapEntranceTime, type AudioIntelligence } from "./audioCues";
+import { evaluateAudioCues, parseAudioIntelligence, snapEntranceTime, type AudioCueFrame, type AudioIntelligence } from "./audioCues";
 import * as THREE from "three";
 import {
   createFurryTextMesh,
@@ -25,6 +25,8 @@ export interface FurryLyricViewProps {
   onSceneReady?: (scene: THREE.Scene) => void;
   /** Called after the furry mesh group has been created. */
   onMeshReady?: (mesh: FurMeshGroup) => void;
+  /** Supplies the frame-synchronous audio cues to effects hosted in the same composition. */
+  onAudioCueFrame?: (cueFrame: AudioCueFrame) => void;
 }
 
 export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
@@ -33,6 +35,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
   presetBg = true,
   onSceneReady,
   onMeshReady,
+  onAudioCueFrame,
 }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
@@ -262,9 +265,13 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       mesh.update(currentTime, audioDisplacement);
     }
 
+    // Publish the exact same frame cues used for the typography and scene motion.
+    // Consumers can update their own shader uniforms before this frame is rendered.
+    onAudioCueFrame?.(cueFrame);
+
     // Render the frame
     renderer.render(scene, camera);
-  }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady, cueFrame.beatPulse, cueFrame.energy, cueFrame.transitionIntensity]);
+  }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady, onAudioCueFrame, cueFrame.time, cueFrame.beatPulse, cueFrame.energy, cueFrame.transitionIntensity]);
 
   // Fade in/out based on lyric line progress or title entrance
   const lineProgress = activeLine
