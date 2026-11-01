@@ -22,3 +22,21 @@ def test_report_contains_per_language_metrics_and_predictions() -> None:
     assert {"sn", "nd", "zu", "en", "mul", "und"} <= set(report["per_language"])
     assert len(report["predictions"]) == report["examples"]
     assert all("correct" in item and "method" in item for item in report["predictions"])
+    assert all(
+        {"support", "precision", "recall", "f1", "accuracy"} <= set(metrics)
+        for metrics in report["per_language"].values()
+    )
+    assert {"precision", "recall", "f1", "accuracy"} <= set(report["macro_average"])
+    assert report["unknown_behavior"]["reference_unknown"] == 2
+    assert "predicted_unknown_rate" in report["unknown_behavior"]
+
+
+def test_metrics_handle_labels_never_predicted() -> None:
+    corpus = {
+        "schema_version": 1,
+        "examples": [{"id": "e1", "text": "I love you forever", "language": "xx"}],
+    }
+    report = evaluate(corpus)
+    assert report["per_language"]["xx"]["recall"] == 0.0
+    assert report["per_language"]["xx"]["f1"] == 0.0
+    assert report["per_language"]["en"]["support"] == 0
