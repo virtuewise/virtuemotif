@@ -230,7 +230,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--split",
-        choices=("all", "train", "dev", "test", "smoke"),
+        choices=("all", "train", "validation", "development", "test", "smoke"),
         help="Split to evaluate; reviewed datasets default to test, smoke datasets to all",
     )
     parser.add_argument("--output", type=Path, help="Optional JSON report path")
