@@ -49,6 +49,21 @@ test("word timings are accepted only when token text and chronology align", () =
   assert.equal(resolveWordTimings("Hello, world!", [valid[0]]), null);
 });
 
+test("word timings must remain inside the lyric line interval", () => {
+  const valid = [
+    { w: "Hello", from: 1.1, to: 1.4 },
+    { w: "world", from: 1.5, to: 1.9 },
+  ];
+  assert.deepEqual(resolveWordTimings("Hello world", valid, 1, 2), [1.1, 1.5]);
+  assert.equal(resolveWordTimings("Hello world", valid, 1.2, 2), null);
+  assert.equal(resolveWordTimings("Hello world", valid, 1, 1.8), null);
+  assert.equal(resolveWordTimings("Hello world", valid, 2, 1), null);
+});
+
+test("word matching preserves meaningful symbols rather than stripping them all", () => {
+  assert.equal(resolveWordTimings("🔥", [{ w: "✨", from: 0.1, to: 0.4 }], 0, 1), null);
+  assert.deepEqual(resolveWordTimings("Hello!", [{ w: "hello", from: 0.1, to: 0.4 }], 0, 1), [0.1]);
+});
 
 test("lyric typography presets are configurable and unknown names fall back safely", async () => {
   const { LYRIC_TYPOGRAPHY_PRESETS, resolveLyricTypographyPreset } =
@@ -68,7 +83,6 @@ test("lyric typography presets are configurable and unknown names fall back safe
     assert.ok(preset.translationScale > 0 && preset.translationScale <= 1);
   }
 });
-
 
 test("3D line sizing treats wide-script glyphs as wider than Latin characters", () => {
   assert.equal(estimateLyricCharacterEquivalent("abcd"), 4);
