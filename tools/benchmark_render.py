@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import platform
 import resource
 import subprocess
@@ -29,7 +30,7 @@ def _probe_video(path: Path) -> dict[str, Any]:
         [
             "ffprobe", "-v", "error", "-count_frames",
             "-show_entries",
-            "stream=codec_name,codec_type,width,height,avg_frame_rate,nb_read_frames,duration",
+            "stream=codec_name,codec_type,width,height,avg_frame_rate,nb_read_frames,duration,start_time",
             "-show_entries", "format=duration,size",
             "-of", "json", str(path),
         ],
@@ -39,6 +40,32 @@ def _probe_video(path: Path) -> dict[str, Any]:
     )
     return json.loads(result.stdout)
 
+
+def _validate_av_sync(
+    video: dict[str, Any], audio: dict[str, Any], format_duration: Any, fps: int
+) -> tuple[float, float, float]:
+    """Validate stream durations and start-time alignment; return durations and start delta."""
+    try:
+        fallback_duration = float(format_duration)
+        video_duration = float(video.get("duration") or fallback_duration)
+        audio_duration = float(audio.get("duration") or fallback_duration)
+        video_start = float(video.get("start_time") or 0.0)
+        audio_start = float(audio.get("start_time") or 0.0)
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError("ffprobe returned missing or invalid audio/video timing metadata") from exc
+    values = (fallback_duration, video_duration, audio_duration, video_start, audio_start)
+    if not all(math.isfinite(value) for value in values):
+        raise RuntimeError("ffprobe returned non-finite audio/video timing metadata")
+    if fallback_duration <= 0 or video_duration <= 0 or audio_duration <= 0:
+        raise RuntimeError("ffprobe returned non-positive audio/video duration")
+    tolerance = max(0.15, 2 / fps)
+    duration_delta = abs(video_duration - audio_duration)
+    start_delta = abs(video_start - audio_start)
+    if duration_delta > tolerance:
+        raise RuntimeError(f"audio/video duration delta exceeds tolerance: {duration_delta:.3f}s")
+    if start_delta > tolerance:
+        raise RuntimeError(f"audio/video start-time delta exceeds tolerance: {start_delta:.3f}s")
+    return video_duration, audio_duration, start_delta
 
 def run_benchmark(duration_seconds: int, width: int, height: int, fps: int) -> dict[str, Any]:
     """Render deterministic synthetic audio and return measurements with metadata."""
@@ -79,8 +106,9 @@ def run_benchmark(duration_seconds: int, width: int, height: int, fps: int) -> d
         if video is None or audio is None:
             raise RuntimeError("benchmark output must contain both video and audio streams")
 
-        video_duration = float(video.get("duration") or metadata["format"]["duration"])
-        audio_duration = float(audio.get("duration") or metadata["format"]["duration"])
+        video_duration, audio_duration, av_start_delta = _validate_av_sync(
+            video, audio, metadata["format"]["duration"], fps
+        )
         frame_count = int(video["nb_read_frames"])
         if frame_count != duration_seconds * fps:
             raise RuntimeError(
@@ -90,11 +118,6 @@ def run_benchmark(duration_seconds: int, width: int, height: int, fps: int) -> d
             raise RuntimeError("encoded dimensions do not match the benchmark configuration")
         if video["avg_frame_rate"] != f"{fps}/1":
             raise RuntimeError(f"unexpected frame rate: {video['avg_frame_rate']}")
-        if abs(video_duration - audio_duration) > max(0.15, 2 / fps):
-            raise RuntimeError(
-                f"audio/video duration delta exceeds tolerance: {abs(video_duration - audio_duration):.3f}s"
-            )
-
         ffmpeg_version = subprocess.run(
             ["ffmpeg", "-version"], check=True, capture_output=True, text=True
         ).stdout.splitlines()[0]
@@ -126,6 +149,7 @@ def run_benchmark(duration_seconds: int, width: int, height: int, fps: int) -> d
                 "video_duration_seconds": round(video_duration, 4),
                 "audio_duration_seconds": round(audio_duration, 4),
                 "av_duration_delta_seconds": round(abs(video_duration - audio_duration), 4),
+                "av_start_delta_seconds": round(av_start_delta, 4),
                 "video_codec": video.get("codec_name"),
                 "audio_codec": audio.get("codec_name"),
             },
