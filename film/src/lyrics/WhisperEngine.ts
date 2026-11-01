@@ -33,6 +33,22 @@ export const LANGUAGE_NAMES: Record<string, string> = {
   ig: 'Igbo',
 };
 
+const LANGUAGE_ALIASES: Record<string, string> = {
+  english: 'en', shona: 'sn', ndebele: 'nd', 'north ndebele': 'nd',
+  zulu: 'zu', 'isizulu': 'zu', xhosa: 'xh', 'isixhosa': 'xh',
+  swahili: 'sw', afrikaans: 'af', spanish: 'es', french: 'fr',
+  portuguese: 'pt', arabic: 'ar', hindi: 'hi', japanese: 'ja',
+  chinese: 'zh', mandarin: 'zh', german: 'de', italian: 'it',
+  russian: 'ru', korean: 'ko', yoruba: 'yo', igbo: 'ig',
+};
+
+/** Normalize API language names and codes to stable base language codes. */
+export function normalizeLanguageCode(value: unknown): string {
+  if (typeof value !== 'string' || !value.trim()) return 'und';
+  const lower = value.trim().toLowerCase();
+  return LANGUAGE_ALIASES[lower] || (LANGUAGE_NAMES[lower] ? lower : lower.split(/[-_]/)[0]);
+}
+
 /**
  * Intelligent section classifier that groups lyric lines into musical sections
  * (Intro, Verse 1, Chorus 1, Verse 2, Chorus 2, Bridge, Outro) based on
@@ -226,7 +242,7 @@ export async function generateAutoLyrics(
 
       if (apiRes.ok) {
         const data = await apiRes.json();
-        detectedLang = data.language || detectedLang;
+        detectedLang = normalizeLanguageCode(data.language || detectedLang);
         audioDuration = data.duration || audioDuration;
 
         if (Array.isArray(data.segments)) {
@@ -253,6 +269,9 @@ export async function generateAutoLyrics(
               words: segWords.length > 0 ? segWords : undefined,
             };
           });
+          if (audioDuration <= 0 && lines.length > 0) {
+            audioDuration = lines[lines.length - 1].to;
+          }
         }
       }
     } catch (cloudErr) {
