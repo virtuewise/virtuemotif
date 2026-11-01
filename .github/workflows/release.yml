@@ -1,0 +1,154 @@
+name: Verified source release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to validate and release (for example v0.2.0)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verified-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate release gates and build source bundle
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: Resolve release tag
+        id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            tag="$INPUT_TAG"
+          else
+            tag="$REF_NAME"
+          fi
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Expected a semantic version tag such as v0.2.0; got: $tag" >&2
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Check out tagged source without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ steps.version.outputs.tag }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements-dev.txt
+            requirements-ci.txt
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt -c requirements-ci.txt
+          python -m pip check
+
+      - name: Enforce release evidence gate
+        run: python tools/validate_release_readiness.py
+
+      - name: Run Python test suite
+        run: python -m pytest -q
+
+      - name: Validate multilingual dataset governance
+        run: python -m tools.validate_language_dataset
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: film/package-lock.json
+
+      - name: Install Remotion dependencies
+        working-directory: film
+        run: npm ci
+
+      - name: Audit Remotion dependencies
+        working-directory: film
+        run: npm audit --package-lock-only --audit-level=high
+
+      - name: Type-check Remotion
+        working-directory: film
+        run: npx tsc --noEmit
+
+      - name: Validate Remotion compositions
+        working-directory: film
+        run: npx remotion compositions src/index.ts
+
+      - name: Build source archive and checksums
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          git archive --format=tar --prefix="virtuemotif-${RELEASE_TAG}/" "$RELEASE_TAG" | gzip -n > "dist/virtuemotif-${RELEASE_TAG}-source.tar.gz"
+          (
+            cd dist
+            sha256sum "virtuemotif-${RELEASE_TAG}-source.tar.gz" > "SHA256SUMS.txt"
+          )
+          printf 'Release tag: %s\nCommit: %s\n' "$RELEASE_TAG" "$(git rev-parse "$RELEASE_TAG^{commit}")" > dist/BUILD-INFO.txt
+          cat dist/BUILD-INFO.txt
+
+      - name: Upload candidate release artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: virtuemotif-release-candidate
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish verified source bundle
+    needs: validate
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download validated artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: virtuemotif-release-candidate
+          path: dist
+
+      - name: Create GitHub Release with checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.validate.outputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "VirtueMotif $RELEASE_TAG" \
+            --generate-notes
