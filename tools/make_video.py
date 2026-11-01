@@ -40,18 +40,53 @@ def load_config(song_id: str) -> dict[str, Any]:
     return cfg
 
 
+def validate_render_config(cfg: dict[str, Any]) -> tuple[int, int, int]:
+    """Validate required render settings before creating output or processing media.
+
+    Returns (fps, width, height). Raises ValueError with an actionable message
+    when a setting is malformed or outside the supported positive-integer domain.
+    """
+    song_id = cfg.get("song_id")
+    if not isinstance(song_id, str) or not song_id.strip():
+        raise ValueError("song_id must be a non-empty string")
+
+    fps = cfg.get("fps", 30)
+    if isinstance(fps, bool) or not isinstance(fps, int) or fps <= 0:
+        raise ValueError("fps must be a positive integer")
+
+    resolution = cfg.get("resolution", "1920x1080")
+    if isinstance(resolution, str):
+        parts = resolution.lower().split("x")
+        if len(parts) != 2 or not all(part.strip().isdigit() for part in parts):
+            raise ValueError(
+                "resolution must be formatted as 'WIDTHxHEIGHT' with positive integers"
+            )
+        width, height = (int(part.strip()) for part in parts)
+    elif isinstance(resolution, (tuple, list)) and len(resolution) == 2:
+        width, height = resolution
+    else:
+        raise ValueError(
+            "resolution must be formatted as 'WIDTHxHEIGHT' or a two-item sequence"
+        )
+
+    for dimension_name, dimension in (("width", width), ("height", height)):
+        if (
+            isinstance(dimension, bool)
+            or not isinstance(dimension, int)
+            or dimension <= 0
+        ):
+            raise ValueError(f"resolution {dimension_name} must be a positive integer")
+
+    return fps, width, height
+
+
 def render_frames(cfg: dict[str, Any]) -> Path:
     """Render each frame according to active effects and audio."""
+    fps, width, height = validate_render_config(cfg)
     output_dir = Path(cfg.get("output_dir", "out")) / cfg["song_id"]
     output_dir.mkdir(parents=True, exist_ok=True)
 
     audio_path = cfg.get("audio_path")
-    fps = cfg.get("fps", 30)
-    res_str = cfg.get("resolution", "1920x1080")
-    if isinstance(res_str, str):
-        width, height = map(int, res_str.split("x"))
-    else:
-        width, height = res_str
 
     effects = []
     for name in cfg.get("visual_effects", []):
@@ -90,10 +125,10 @@ def render_frames(cfg: dict[str, Any]) -> Path:
 
 def encode_video(frames_dir: Path, cfg: dict[str, Any]) -> Path:
     """Encode rendered frames into an MP4 video using ffmpeg."""
+    fps, _, _ = validate_render_config(cfg)
     out_dir = Path(cfg.get("output_dir", "out"))
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{cfg['song_id']}.mp4"
-    fps = cfg.get("fps", 30)
 
     cmd = [
         "ffmpeg",
