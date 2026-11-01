@@ -186,9 +186,10 @@ export async function generateAutoLyrics(
   } = options;
 
   let lines: LyricLineSegment[] = [];
-  let detectedLang = language !== 'auto' ? language : 'en';
-  let langConfidence = 0.95;
-  let audioDuration = 180.0;
+  let detectedLang = language !== 'auto' ? language : 'und';
+  // The transcription API does not expose a calibrated confidence value here.
+  let langConfidence = 0;
+  let audioDuration = 0;
 
   // 1. Check for Cloud Whisper API (Groq / OpenAI / Custom Serverless)
   const resolvedKey = apiKey || (typeof process !== 'undefined' ? process.env?.WHISPER_API_KEY || process.env?.GROQ_API_KEY || process.env?.OPENAI_API_KEY : '');
@@ -260,41 +261,22 @@ export async function generateAutoLyrics(
     }
   }
 
-  // 2. If no cloud lines were generated, use AudioProcessor decoding & VAD vocal alignment
+  // Do not manufacture placeholder lyric text from vocal activity. VAD can find
+  // sound, but it cannot identify the words being sung. Fail clearly so the UI
+  // can ask the user to configure a transcription provider instead of publishing
+  // fabricated lyrics or placeholder translations.
   if (lines.length === 0) {
-    try {
-      if (typeof window !== 'undefined' || typeof fetch !== 'undefined') {
-        const audioData = await decodeAudioInBrowser(audioPath);
-        audioDuration = audioData.duration;
-
-        // Create time-aligned lyric lines from vocal energy segments
-        lines = audioData.vocalSegments.map((seg, i) => {
-          const wordsInSeg = [
-            { w: 'Vocal', from: seg.start, to: seg.start + (seg.end - seg.start) * 0.4 },
-            { w: 'Phrase', from: seg.start + (seg.end - seg.start) * 0.45, to: seg.end },
-          ];
-          return {
-            text: `Vocal Phrase ${i + 1}`,
-            translation: '',
-            style: 'display',
-            from: seg.start,
-            to: seg.end,
-            words: wordsInSeg,
-          };
-        });
-      }
-    } catch (procErr) {
-      console.warn('Local audio decoding fallback:', procErr);
-    }
+    throw new Error(
+      'No lyric transcription was returned. Configure a valid Whisper-compatible API key/endpoint, check the audio URL, and try again. Local voice-activity detection cannot recover lyric words.'
+    );
   }
 
-  // 3. Automatic secondary English translation for non-English songs
+  // Whisper transcription is not translation. Do not display a fake translated
+  // subtitle; a translation provider must be added before this option can be
+  // advertised as supported.
   if (translateToEnglish && detectedLang !== 'en') {
-    // If lyrics are in Shona, Ndebele, Spanish, French, etc., mark language badge
     for (const line of lines) {
-      if (!line.translation && line.text) {
-        line.translation = `[${LANGUAGE_NAMES[detectedLang] || detectedLang.toUpperCase()} translated subtitle]`;
-      }
+      line.translation = '';
     }
   }
 
