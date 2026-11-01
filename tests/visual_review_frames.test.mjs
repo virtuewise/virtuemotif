@@ -39,8 +39,11 @@ test("visual review validation requires every expected composition dimension", (
       writeFileSync(join(directory, name), makePngHeader(width, height));
     }
     const validated = validateVisualReviewFrames(directory);
-    assert.equal(Object.keys(validated).length, 6);
+    assert.equal(Object.keys(validated).length, Object.keys(VISUAL_REVIEW_FRAMES).length);
     assert.deepEqual(validated["smart-fur-4k.png"], [3840, 2160]);
+    assert.deepEqual(validated["auto-lyrics-portrait.png"], [1080, 1920]);
+    assert.deepEqual(validated["auto-lyrics-square.png"], [1024, 1024]);
+    assert.deepEqual(validated["auto-lyrics-4k.png"], [3840, 2160]);
 
     writeFileSync(join(directory, "smart-fur-square.png"), makePngHeader(1920, 1080));
     assert.throws(() => validateVisualReviewFrames(directory), /Unexpected dimensions.*smart-fur-square/);
