@@ -202,8 +202,6 @@ export async function generateAutoLyrics(
 
   let lines: LyricLineSegment[] = [];
   let detectedLang = language !== 'auto' ? language : 'und';
-  // The transcription API does not expose a calibrated confidence value here.
-  let langConfidence = 0;
   let audioDuration = 0;
 
   // 1. Check for Cloud Whisper API (Groq / OpenAI / Custom Serverless)
@@ -312,7 +310,6 @@ export async function generateAutoLyrics(
     duration: parseFloat(audioDuration.toFixed(2)),
     palette: 'dusk',
     detectedLanguage: LANGUAGE_NAMES[detectedLang] || detectedLang,
-    languageConfidence: langConfidence,
     sections,
   };
 }
