@@ -3,7 +3,7 @@
 // accent confidence, and synchronized word-timing lyrics status.
 
 import React from 'react';
-import { Song } from '../HorizonFilm';
+import type { Song } from '../HorizonFilm';
 
 interface AutoLyricsPanelProps {
   song: Song;
