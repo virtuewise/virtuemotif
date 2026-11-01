@@ -119,3 +119,65 @@ def test_segment_review_policy_handles_shared_nguni_words_conservatively() -> No
 
     assert segment_requires_review({"language": "und", "text": "mina wena", "language_confidence": 0.25})
     assert segment_requires_review({"language": "mul", "text": "ngiyabonga kakhulu", "language_confidence": 0.45})
+
+
+
+def test_review_reasons_string_is_one_reason_not_characters() -> None:
+    row = build_language_timeline([
+        {
+            "start": 0,
+            "end": 1,
+            "text": "A longer English lyric",
+            "language": "en",
+            "language_confidence": 0.9,
+            "review_reasons": "manual_check",
+        }
+    ])["segments"][0]
+    assert row["review_required"] is True
+    assert row["uncertainty_reasons"] == ["manual_check"]
+
+
+def test_review_reasons_are_trimmed_deduplicated_and_preserved() -> None:
+    row = build_language_timeline([
+        {
+            "start": 0,
+            "end": 1,
+            "text": "A longer English lyric",
+            "language": "en",
+            "language_confidence": 0.9,
+            "review_reasons": [" needs_translation ", "needs_translation", " "],
+        }
+    ])["segments"][0]
+    assert row["uncertainty_reasons"] == ["needs_translation"]
+
+
+@pytest.mark.parametrize("reasons", [42, {"unexpected": "mapping"}, [None]])
+def test_malformed_review_reasons_fail_safe_to_review(reasons: object) -> None:
+    row = build_language_timeline([
+        {
+            "start": 0,
+            "end": 1,
+            "text": "A longer English lyric",
+            "language": "en",
+            "language_confidence": 0.9,
+            "review_reasons": reasons,
+        }
+    ])["segments"][0]
+    assert row["review_required"] is True
+    assert "invalid_review_reasons_metadata" in row["uncertainty_reasons"]
+    assert "upstream_review_metadata_invalid" in row["uncertainty_reasons"]
+
+
+def test_upstream_review_flag_without_reason_is_explained() -> None:
+    row = build_language_timeline([
+        {
+            "start": 0,
+            "end": 1,
+            "text": "A longer English lyric",
+            "language": "en",
+            "language_confidence": 0.9,
+            "review_required": True,
+        }
+    ])["segments"][0]
+    assert row["review_required"] is True
+    assert row["uncertainty_reasons"] == ["upstream_review_required"]
