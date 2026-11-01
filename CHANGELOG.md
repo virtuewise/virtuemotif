@@ -3,11 +3,13 @@
 ## [Unreleased]
 
 ### Fixed
+- Preserve the viewport-safe 3D lyric geometry fit scale while applying deterministic beat/transition motion, preventing animation from discarding the calculated fit.
 - Replace unseeded randomness in the Neon-Pulse Cityscape with repeatable procedural building geometry for stable stills and full renders.
 - Place FFmpeg audio inputs before output options so end-to-end video encoding with audio works reliably.
 - Validate lyric word-timing tokens and timestamp order before karaoke animation; mismatched timings fall back to deterministic staggered entrances.
 
 ### Added
+- Generate versioned audio-intelligence cues as part of end-to-end AutoLyrics rendering, with one sanitized song ID shared by ASR output, Remotion props, and cue lookup.
 - Connect validated beat, energy, and event cues to restrained 2D lyric scaling, scenic camera motion, and horizon lighting; missing cue files retain non-audio-reactive defaults.
 - Deterministic Unicode-aware lyric sizing for long lines and CJK-width characters, scaled for landscape, portrait, square, and 4K compositions.
 - Named display, whisper, neon, and editorial motion-typography presets with configurable emphasis, spacing, rule, and translation styling.
