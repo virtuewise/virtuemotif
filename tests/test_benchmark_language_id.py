@@ -140,3 +140,21 @@ def test_missing_required_cohort_is_reported_as_missing_not_zero_accuracy():
     assert shona["accuracy"] == 0.0
     assert report["cohort_coverage_complete"] is False
     assert "not evidence of zero accuracy" in shona["note"]
+
+
+def test_report_exposes_provenance_without_claiming_external_verification() -> None:
+    smoke = evaluate(json.loads(CORPUS.read_text(encoding="utf-8")))
+    smoke_provenance = smoke["evaluation_provenance"]
+    assert smoke_provenance["evidence_level"] == "synthetic_smoke_only"
+    assert smoke_provenance["claims_independently_verified"] is False
+    assert smoke_provenance["unique_source_ids_in_evaluated_split"] is None
+
+    reviewed = evaluate(_reviewed_split_corpus())
+    provenance = reviewed["evaluation_provenance"]
+    assert provenance["evaluated_split"] == "test"
+    assert provenance["evaluated_examples"] == 1
+    assert provenance["unique_source_ids_in_evaluated_split"] == 1
+    assert provenance["unique_speaker_ids_in_evaluated_split"] == 1
+    assert provenance["source_split_isolation_structurally_validated"] is True
+    assert provenance["claims_independently_verified"] is False
+    assert "cannot prove" in provenance["warning"]

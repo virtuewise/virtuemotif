@@ -200,11 +200,43 @@ def evaluate(corpus: Any, split: str | None = None) -> dict[str, Any]:
         if corpus["status"] == REVIEWED_STATUS
         else "synthetic_smoke_only"
     )
+    selected_sources = {
+        example.get("source_id") for example in examples
+        if isinstance(example.get("source_id"), str) and example["source_id"].strip()
+    }
+    selected_speakers = {
+        example.get("speaker_id") for example in examples
+        if isinstance(example.get("speaker_id"), str) and example["speaker_id"].strip()
+    }
+    governance = corpus.get("governance", {})
+    evaluation_provenance = {
+        "dataset_id": corpus["dataset_id"],
+        "dataset_status": corpus["status"],
+        "evidence_level": evidence_level,
+        "evaluated_split": selected_split,
+        "evaluated_examples": total,
+        "unique_source_ids_in_evaluated_split": (
+            len(selected_sources) if corpus["status"] == REVIEWED_STATUS else None
+        ),
+        "unique_speaker_ids_in_evaluated_split": (
+            len(selected_speakers) if corpus["status"] == REVIEWED_STATUS else None
+        ),
+        "source_split_isolation_structurally_validated": corpus["status"] == REVIEWED_STATUS,
+        "declared_rights_status": governance.get("rights_status") if isinstance(governance, dict) else None,
+        "declared_consent_status": governance.get("consent_status") if isinstance(governance, dict) else None,
+        "declared_review_status": governance.get("review_status") if isinstance(governance, dict) else None,
+        "claims_independently_verified": False,
+        "warning": (
+            "Metadata and split-isolation checks are structural only; they cannot prove that "
+            "consent, rights clearance, native-speaker review, or speaker identities are genuine."
+        ),
+    }
     return {
         "schema_version": 1,
         "dataset_id": corpus["dataset_id"],
         "dataset_status": corpus["status"],
         "evidence_level": evidence_level,
+        "evaluation_provenance": evaluation_provenance,
         "evaluated_split": selected_split,
         "available_split_counts": {
             name: sum(example["split"] == name for example in all_examples)

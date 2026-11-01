@@ -7,8 +7,15 @@
 
 export type LyricWordTime = { w: string; from: number; to: number };
 
+const segmentGraphemes = (text: string): string[] =>
+  Array.from(new Intl.Segmenter("und", { granularity: "grapheme" }).segment(text), (item) => item.segment);
+
 const glyphWidth = (glyph: string): number => {
   if (/^\p{Mark}$/u.test(glyph)) return 0;
+  // Emoji ZWJ sequences, flags, and pictographs are a single visual unit.
+  if (/\p{Extended_Pictographic}/u.test(glyph) || glyph.includes("\u200d") || /\p{Regional_Indicator}/u.test(glyph)) {
+    return 1;
+  }
   if (/^\s$/u.test(glyph)) return 0.32;
   if (/^[\p{P}\p{S}]$/u.test(glyph)) return 0.34;
 
@@ -31,7 +38,7 @@ const glyphWidth = (glyph: string): number => {
 export const estimateLyricWidthUnits = (text: string): number => {
   const normalized = text.normalize("NFC").trim();
   if (!normalized) return 0;
-  const glyphUnits = Array.from(normalized).reduce((sum, glyph) => sum + glyphWidth(glyph), 0);
+  const glyphUnits = segmentGraphemes(normalized).reduce((sum, glyph) => sum + glyphWidth(glyph), 0);
   const wordCount = normalized.split(/\s+/u).filter(Boolean).length;
   // LyricLine uses a small flex gap between independently animated words.
   return glyphUnits + Math.max(0, wordCount - 1) * 0.26;
@@ -139,7 +146,7 @@ export const wrapWideScriptText = (text: string, maxWidth: number): string[] | n
 
   const lines: string[] = [];
   let currentLine = "";
-  for (const glyph of Array.from(normalized)) {
+  for (const glyph of segmentGraphemes(normalized)) {
     const candidate = currentLine + glyph;
     if (currentLine && estimateLyricCharacterEquivalent(candidate) > maxWidth) {
       lines.push(currentLine);
