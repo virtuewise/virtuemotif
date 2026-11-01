@@ -38,6 +38,12 @@ def _estimate_tempo(onset: np.ndarray, frame_rate: float) -> tuple[float | None,
     if max_lag < min_lag:
         return None, 0.0, None
     lag = min_lag + int(np.argmax(autocorr[min_lag : max_lag + 1]))
+    # Resolve common half-time bias: when the shorter (double-tempo) period is
+    # almost as strongly supported, prefer it. This is intentionally a modest
+    # heuristic; ambiguous real music can still need a human tempo correction.
+    half_lag = lag // 2
+    if half_lag >= min_lag and autocorr[half_lag] >= autocorr[lag] * 0.75:
+        lag = half_lag
     confidence = float(np.clip(autocorr[lag], 0.0, 1.0))
     if confidence < 0.02:
         return None, round(confidence, 3), None
