@@ -1,0 +1,41 @@
+name: Semgrep
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "23 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: Semgrep SAST
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Semgrep
+        run: python3 -m pip install --user semgrep==1.175.0
+
+      - name: Scan source code
+        run: semgrep scan --config p/default --metrics=off --sarif --output=semgrep.sarif
+        continue-on-error: true
+
+      - name: Upload Semgrep results to GitHub code scanning
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
