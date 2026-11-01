@@ -12,7 +12,7 @@ from typing import Any, Iterable
 _LANGUAGE_MARKERS: dict[str, set[str]] = {
     "en": {"the", "and", "you", "your", "with", "love", "heart", "we", "are", "is", "my"},
     "sn": {"ndiri", "uri", "iwe", "isu", "rudo", "wangu", "wako", "moyo", "zvino", "kwete", "hongu", "ndinoda"},
-    "nd": {"mina", "wena", "thina", "lami", "lakho", "uthando", "ngiyabonga", "yebo", "cha", "khona", "ngikhona", "kakhulu"},
+    "nd": {"mina", "wena", "thina", "lami", "lakho", "uthando", "ngiyabonga", "yebo", "cha", "khona", "ngikhona"},
     "zu": {"mina", "wena", "thina", "yami", "yakho", "uthando", "ngiyabonga", "yebo", "cha", "kakhulu"},
     "xh": {"mna", "yam", "uthando", "enkosi", "ewe", "hayi", "ndiyakuthanda"},
     "af": {"die", "en", "ek", "jy", "liefde", "hart", "vir", "met", "ons", "nie"},
