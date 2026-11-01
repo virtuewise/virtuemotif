@@ -36,10 +36,17 @@ audio changes.
 
 The furry lyric director uses the real beat grid to snap lyric entrances when a
 beat is within 180 ms, the energy curve to shape displacement, and onset/energy
-events to raise transition and typography intensity. Invalid or missing cue
-files use deterministic frame-derived motion instead of failing a render.
+events to raise transition and typography intensity. The wave and glitch
+compositions map these same frame-synchronous cues into bounded shader
+parameters. Procedural rainfall particle positions and speeds use a stable seed.
+Avoid wall-clock time, unseeded randomness, or browser-persisted learning state
+as inputs to production-rendered frames: the same input and frame should produce
+the same visual state on every render worker.
 
-Cue loading and the frame-time utilities are covered by
+Invalid or missing cue files use deterministic frame-derived motion instead of
+failing a render.
+
+Cue loading and frame-time utilities are covered by
 `node --experimental-strip-types --test tests/audio_cues.test.mjs`; the CI
 workflow also generates the Remotion cue assets before composition validation.
 
@@ -49,4 +56,5 @@ Tempo estimation is an estimate and can select half-time/double-time on ambiguou
 material. The downbeat list assumes a four-beat grouping for convenience; it is
 not a true time-signature detector. The current engine does not separate vocals
 from instruments, identify chords, or infer emotion. Review cues before using
-them as authoritative musical annotations.
+them as authoritative musical annotations. Deterministic animation makes renders
+repeatable; it does not by itself prove that motion is musically well synchronized.
