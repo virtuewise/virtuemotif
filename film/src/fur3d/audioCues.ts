@@ -60,12 +60,15 @@ export function parseAudioIntelligence(value: unknown): AudioIntelligence | null
       isFiniteNumber(event.strength) && event.strength >= 0)
   ) return null;
 
+  // Capture the validated property so TypeScript keeps its narrowed number type in callbacks.
+  const duration = data.duration;
+  if (!isFiniteNumber(duration)) return null;
   if (
-    data.beats.some((time) => time > data.duration) ||
-    data.downbeats.some((time) => time > data.duration) ||
-    data.energy_curve.some((point, index) => point.time > data.duration ||
+    data.beats.some((time) => time > duration) ||
+    data.downbeats.some((time) => time > duration) ||
+    data.energy_curve.some((point, index) => point.time > duration ||
       (index > 0 && point.time < data.energy_curve![index - 1].time)) ||
-    data.events.some((event, index) => event.time > data.duration ||
+    data.events.some((event, index) => event.time > duration ||
       (index > 0 && event.time < data.events![index - 1].time))
   ) return null;
 
