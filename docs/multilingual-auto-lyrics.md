@@ -105,7 +105,7 @@ After installing the optional ASR dependencies and the Node dependencies in
 Remotion Song JSON, writes the props wrapper, and renders the video:
 
 ```bash
-python -m pip install "faster-whisper>=1.1"
+python -m pip install "faster-whisper>=1.1" numpy soundfile
 cd film && npm ci && cd ..
 python -m tools.make_auto_lyrics_video "path/to/song.m4a" \
   --output out/song.mp4 --title "My Song" --artist "Artist"
