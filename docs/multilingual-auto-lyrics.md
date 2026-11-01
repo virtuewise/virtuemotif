@@ -57,6 +57,6 @@ python -m tools.lyrics_engine path/to/song.wav --output timing/song.auto.json --
 python -m tools.export_lyrics_song timing/song.auto.json --audio audio/song.m4a --output film/src/data/song.auto.json --title "My Song" --artist "Artist"
 ```
 
-The `--audio` value is a path relative to `film/public/`. You can pass `--duration` when you know the full audio duration, including an instrumental outro; otherwise the exporter uses the final recognized lyric end time or the input document's duration. Import the generated JSON into `film/src/Root.tsx` and register a composition to render it. Existing song files are not overwritten by default.
+The `--audio` value is a path relative to `film/public/`. You can pass `--duration` when you know the full audio duration, including an instrumental outro; otherwise the exporter uses the final recognized lyric end time or the input document's duration. Import the generated JSON into `film/src/Root.tsx` and register a composition to render it. Choose a new output path when you want to preserve an existing song file; the converter writes to the exact path you specify.
 
 The exported document preserves per-segment language and confidence, word timings when the ASR backend supplied them, and sets `reviewRequired: true` unless the input explicitly says otherwise. Generated lyric films show the detected language/confidence and a visible human-review warning. The exporter never invents word timings or translated subtitles.
