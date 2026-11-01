@@ -23,6 +23,13 @@ _LANGUAGE_MARKERS: dict[str, set[str]] = {
     "xh": {"mna", "yam", "enkosi", "ewe", "hayi", "ndiyakuthanda", "ndiyahamba", "ndiyazi", "ndiyabona", "ndifuna", "ndiyaphila", "ndikhumbula", "ndiza", "ndithetha"},
     "af": {"die", "en", "ek", "jy", "liefde", "hart", "vir", "met", "ons", "nie", "baie", "vandag", "saam", "altyd"},
     "sw": {"mimi", "wewe", "upendo", "ndiyo", "hapana", "asante", "sana", "yangu", "ninakupenda", "habari", "rafiki", "maisha", "kesho", "karibu"},
+    # High-signal lexical hints for common Latin-script languages. These remain
+    # heuristics: shared function words alone are deliberately not enough.
+    "es": {"hola", "gracias", "quiero", "corazon", "corazón", "vida", "noche", "siempre", "estoy", "eres", "quieres", "bailar", "suenos", "sueños"},
+    "fr": {"bonjour", "merci", "amour", "coeur", "cœur", "avec", "toujours", "nuit", "je", "suis", "aime", "monde"},
+    "pt": {"obrigado", "obrigada", "saudade", "coracao", "coração", "voce", "você", "quero", "minha", "meu", "noite", "estou", "amanha", "amanhã"},
+    "de": {"ich", "nicht", "heute", "nacht", "immer", "mein", "dein", "liebe", "herz", "möchte", "danke", "bitte", "leben"},
+    "it": {"ciao", "grazie", "amore", "cuore", "sempre", "notte", "voglio", "sono", "perche", "perché", "bacio", "stelle", "vita"},
 }
 _WORD_RE = re.compile(r"[\w’']+", re.UNICODE)
 _SCRIPT_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
