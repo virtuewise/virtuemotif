@@ -68,5 +68,5 @@ test("audio-reactive wave amplitude responds deterministically to beat and energ
     audioReactiveWaveAmplitude({ energy: 0.8, beatPulse: 1, transitionIntensity: 0.9 }),
     energetic,
   );
-  assert.equal(audioReactiveWaveAmplitude({ energy: Number.NaN, beatPulse: -1, transitionIntensity: 2 }), 0.105);
+  assert.ok(Math.abs(audioReactiveWaveAmplitude({ energy: Number.NaN, beatPulse: -1, transitionIntensity: 2 }) - 0.105) < 1e-12);
 });
