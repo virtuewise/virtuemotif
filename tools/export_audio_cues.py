@@ -8,7 +8,6 @@ from pathlib import Path
 
 from tools.audio_intelligence import analyze_file
 
-
 DEFAULT_SONGS = {
     "horizon": Path("film/public/audio/horizon.m4a"),
     "rise": Path("film/public/audio/rise.m4a"),
