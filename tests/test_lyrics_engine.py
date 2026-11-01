@@ -132,3 +132,26 @@ def test_live_transcription_offsets_each_microphone_chunk(monkeypatch: pytest.Mo
     assert all(call["language"] is None for call in model.transcribe_calls)
     assert all(call["word_timestamps"] is True for call in model.transcribe_calls)
 
+
+
+@pytest.mark.parametrize(("text", "expected"), [
+    ("Mangwanani shamwari yangu, ndinoda rudo rwako", "sn"),
+    ("Lami lakho ngikhona ngiyahamba", "nd"),
+    ("Yami yakho ngiyacula kakhulu", "zu"),
+    ("I love you forever, we are together", "en"),
+    ("I love you, ndinoda rudo rwako", "mul"),
+])
+def test_reviewable_multilingual_benchmark_examples(text: str, expected: str) -> None:
+    assert detect_text_language(text)["language"] == expected
+
+
+def test_shared_nguni_words_remain_ambiguous() -> None:
+    result = detect_text_language("mina wena thina uthando")
+    assert result["language"] in {"und", "mul"}
+    assert result["method"] in {"ambiguous-lexical", "code-switched-lexical"}
+
+
+def test_code_switched_method_is_explicit() -> None:
+    result = detect_text_language("I love you ndinoda rudo rwako")
+    assert result["language"] == "mul"
+    assert result["method"] == "code-switched-lexical"
