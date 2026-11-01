@@ -42,7 +42,7 @@ def json_dumps(value: object) -> str:
     """Serialize JSON consistently for reproducible commits and CI artifacts."""
     import json
 
-    return json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\\n"
+    return json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + chr(10)
 
 
 def main() -> int:
