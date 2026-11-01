@@ -149,22 +149,37 @@ def main() -> int:
     parser.add_argument("--live", action="store_true", help="Transcribe from the default microphone in rolling audio windows")
     parser.add_argument("--chunk-seconds", type=float, default=5.0, help="Microphone window size (1-30 seconds)")
     args = parser.parse_args()
-    song_id = args.song_id or args.audio.stem
+    if args.live and args.audio is not None:
+        parser.error("do not provide an audio path with --live")
+    if not args.live and args.audio is None:
+        parser.error("provide an audio path or use --live")
+    if args.live and args.output is not None:
+        parser.error("--output is only supported for audio-file transcription")
+    song_id = args.song_id or (args.audio.stem if args.audio is not None else "live-capture")
     try:
         segments: list[dict[str, Any]] = []
-        for segment in transcribe_audio(args.audio, args.model, args.language, args.device, args.compute_type):
+        stream = (
+            transcribe_live(args.model, args.language, args.device, args.compute_type,
+                            chunk_seconds=args.chunk_seconds)
+            if args.live else transcribe_audio(args.audio, args.model, args.language,
+                                               args.device, args.compute_type)
+        )
+        for segment in stream:
             segments.append(segment)
-            if args.output is None:
-                print(json.dumps({"event": "lyric_segment", **segment}, ensure_ascii=False), flush=True)
+            print(json.dumps({"event": "lyric_segment", **segment}, ensure_ascii=False), flush=True)
         if args.output is not None:
             args.output.parent.mkdir(parents=True, exist_ok=True)
-            args.output.write_text(json.dumps(build_lyrics_document(song_id, segments), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            args.output.write_text(
+                json.dumps(build_lyrics_document(song_id, segments), ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
             print(f"Wrote {len(segments)} lyric segments to {args.output}", file=sys.stderr)
+    except KeyboardInterrupt:
+        print("Stopped live transcription.", file=sys.stderr)
     except (RuntimeError, OSError, ValueError) as exc:
         print(f"lyrics-engine: {exc}", file=sys.stderr)
         return 2
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())
