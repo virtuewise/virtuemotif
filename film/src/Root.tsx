@@ -5,7 +5,6 @@ import { Thumb } from "./Thumb";
 import { FurryFilm } from "./fur3d/FurryFilm";
 import horizon from "./data/horizon.json";
 import rise from "./data/rise.json";
-// New 3D scene imports
 import { FurWaveSynth } from "./fur3d/FurWaveSynth";
 import { NeonPulseCityscape } from "./fur3d/NeonPulseCityscape";
 import { DynamicLightRim } from "./fur3d/DynamicLightRim";
@@ -47,7 +46,7 @@ export const RemotionRoot: React.FC = () => {
         id="FurryProof"
         component={FurryFilm as React.FC}
         defaultProps={{ song: HORIZON, presetName: "goldenHorizon" }}
-        durationInFrames={30 * 30} // 30 seconds preview
+        durationInFrames={30 * 30}
         fps={30}
         width={1920}
         height={1080}
@@ -226,7 +225,8 @@ export const RemotionRoot: React.FC = () => {
         width={1280}
         height={720}
       />
-      {/* Generic composition for any Song JSON exported by the auto-lyrics engine. */}
+
+      {/* Generic, duration-aware 2D compositions for the auto-lyrics engine. */}
       <Composition
         id="AutoLyrics"
         component={Film}
@@ -238,6 +238,42 @@ export const RemotionRoot: React.FC = () => {
         fps={30}
         width={1920}
         height={1080}
+      />
+      <Composition
+        id="AutoLyricsPortrait"
+        component={Film}
+        defaultProps={{ song: HORIZON }}
+        durationInFrames={Math.ceil(HORIZON.duration * 30)}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: Math.max(1, Math.ceil(props.song.duration * 30)),
+        })}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="AutoLyricsSquare"
+        component={Film}
+        defaultProps={{ song: HORIZON }}
+        durationInFrames={Math.ceil(HORIZON.duration * 30)}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: Math.max(1, Math.ceil(props.song.duration * 30)),
+        })}
+        fps={30}
+        width={1024}
+        height={1024}
+      />
+      <Composition
+        id="AutoLyrics4K"
+        component={Film}
+        defaultProps={{ song: HORIZON }}
+        durationInFrames={Math.ceil(HORIZON.duration * 30)}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: Math.max(1, Math.ceil(props.song.duration * 30)),
+        })}
+        fps={30}
+        width={3840}
+        height={2160}
       />
     </>
   );

@@ -103,21 +103,32 @@ python -m tools.make_auto_lyrics_video "path/to/song.m4a" \
   --output out/song.mp4 --title "My Song" --artist "Artist"
 ```
 
+Use `--format landscape` (the default), `--format portrait`,
+`--format square`, or `--format 4k` to choose the output size. These map to
+1920×1080, 1080×1920, 1024×1024, and 3840×2160 at 30 fps respectively. For
+example, render a vertical social-video version with:
+
+```bash
+python -m tools.make_auto_lyrics_video "path/to/song.m4a" \
+  --format portrait --output out/song-portrait.mp4
+```
+
 Omit `--language` to let the multilingual ASR model detect the language, or
 supply a language code to force one. The command copies the source audio into
 `film/public/audio/auto-lyrics/`, writes reviewable intermediate JSON under
-`timing/` and `film/src/data/`, and renders through the generic `AutoLyrics`
+`timing/` and `film/src/data/`, and selects the matching generic Remotion
 composition. It probes the full media duration with `ffprobe` by default, so
 instrumental intros and outros are retained; pass `--duration` to override the
 probe when needed. It refuses to replace an existing output video unless
 `--force` is supplied.
 
 After rendering, the command probes the MP4 again and fails if the output is
-missing or empty, lacks either an audio or video stream, has unexpected 1920×1080
-dimensions or a non-30 fps rate, differs from the source duration by more than
-the configured tolerance, or has audio/video stream durations that drift beyond
-the sync tolerance. This metadata gate catches structural output failures; it
-does not replace listening to the result or reviewing lyric timing and visuals.
+missing or empty, lacks either an audio or video stream, does not match the
+selected format's dimensions or 30 fps rate, differs from the source duration
+by more than the configured tolerance, or has audio/video stream durations that
+drift beyond the sync tolerance. This metadata gate catches structural output
+failures; it does not replace listening to the result or reviewing lyric timing
+and visuals.
 
 Use only audio you have permission to process and redistribute; review
 machine-generated lyrics before publishing.
@@ -137,18 +148,27 @@ The exported document preserves per-segment language and confidence, word timing
 
 ## Render generated lyrics without editing the React registry
 
-The Remotion root includes a generic `AutoLyrics` composition. The optional
-`--props-output` writes a wrapper JSON file with the exact `{ "song": ... }`
-shape that composition expects, so a newly generated song does not need a new
-import or a hand-edited `Root.tsx` entry.
+The Remotion root provides four generic, duration-aware compositions for any
+Song JSON exported by the auto-lyrics engine:
+
+| Format | Composition | Output dimensions |
+|---|---|---:|
+| Landscape | `AutoLyrics` | 1920×1080 |
+| Portrait | `AutoLyricsPortrait` | 1080×1920 |
+| Square | `AutoLyricsSquare` | 1024×1024 |
+| 4K | `AutoLyrics4K` | 3840×2160 |
+
+The optional `--props-output` writes a wrapper JSON file with the exact
+`{ "song": ... }` shape that these compositions expect, so a newly generated
+song does not need a new import or a hand-edited `Root.tsx` entry.
 
 1. Put the source audio at the path used by `--audio` under `film/public/`
    (for example, `film/public/audio/song.m4a` for `--audio audio/song.m4a`).
 2. Generate the Song JSON and props wrapper with the command above.
-3. From the `film/` directory, render it:
+3. From the `film/` directory, render a chosen format, for example:
 
    ```bash
-   npx remotion render src/index.ts AutoLyrics out/song.auto.mp4 --props src/data/song.auto.props.json
+   npx remotion render src/index.ts AutoLyricsPortrait out/song.auto.mp4 --props src/data/song.auto.props.json
    ```
 
 The composition duration is derived from the supplied song's duration. Generated
