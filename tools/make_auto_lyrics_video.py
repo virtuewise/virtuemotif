@@ -14,6 +14,21 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 FILM = ROOT / "film"
 
+OUTPUT_FORMATS: dict[str, dict[str, str | int]] = {
+    "landscape": {"composition": "AutoLyrics", "width": 1920, "height": 1080, "fps": 30},
+    "portrait": {"composition": "AutoLyricsPortrait", "width": 1080, "height": 1920, "fps": 30},
+    "square": {"composition": "AutoLyricsSquare", "width": 1024, "height": 1024, "fps": 30},
+    "4k": {"composition": "AutoLyrics4K", "width": 3840, "height": 2160, "fps": 30},
+}
+
+
+def resolve_output_format(value: str) -> dict[str, str | int]:
+    """Resolve a supported render format to its composition and output dimensions."""
+    try:
+        return dict(OUTPUT_FORMATS[value])
+    except KeyError as exc:
+        raise ValueError(f"unsupported output format: {value}") from exc
+
 
 def safe_song_id(value: str) -> str:
     """Convert a filename/title into a portable identifier for generated artifacts."""
@@ -167,6 +182,12 @@ def main() -> int:
     parser.add_argument("--model", default="small", help="faster-whisper model size/name")
     parser.add_argument("--language", help="Force an ASR language code; omit for auto-detection")
     parser.add_argument("--duration", type=float, help="Full audio duration in seconds")
+    parser.add_argument(
+        "--format",
+        choices=tuple(OUTPUT_FORMATS),
+        default="landscape",
+        help="Output format: landscape (1920x1080), portrait (1080x1920), square (1024x1024), or 4k (3840x2160)",
+    )
     parser.add_argument("--force", action="store_true", help="Allow replacing an existing video")
     args = parser.parse_args()
 
@@ -179,6 +200,7 @@ def main() -> int:
         if output.exists() and not args.force:
             raise ValueError(f"output already exists: {output} (pass --force to replace it)")
         duration = parse_audio_duration(str(args.duration)) if args.duration is not None else probe_audio_duration(source)
+        output_format = resolve_output_format(args.format)
 
         audio_relative = Path("audio") / "auto-lyrics" / f"{song_id}{source.suffix.lower()}"
         audio_destination = FILM / "public" / audio_relative
@@ -213,11 +235,17 @@ def main() -> int:
 
         output.parent.mkdir(parents=True, exist_ok=True)
         render = [
-            "npx", "remotion", "render", "src/index.ts", "AutoLyrics",
+            "npx", "remotion", "render", "src/index.ts", str(output_format["composition"]),
             str(output), "--props", str(props_output.relative_to(FILM)),
         ]
         subprocess.run(render, cwd=FILM, check=True)
-        validation = validate_rendered_video(output, expected_duration=duration)
+        validation = validate_rendered_video(
+            output,
+            expected_duration=duration,
+            expected_width=int(output_format["width"]),
+            expected_height=int(output_format["height"]),
+            expected_fps=float(output_format["fps"]),
+        )
     except (OSError, TypeError, ValueError, subprocess.CalledProcessError) as exc:
         print(f"auto-lyrics-video: {exc}", file=sys.stderr)
         return 2
