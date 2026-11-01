@@ -30,3 +30,10 @@ The live JSONL event stream uses the same segment-review policy for both sides o
 candidate transition. This avoids a high-confidence new segment masking an uncertain
 preceding segment. Every observed label change remains a candidate; rapid changes are
 not silently smoothed away. Long timestamp gaps are preserved as gaps, not interpolated.
+
+
+Segments retain separate ASR and lexical language evidence. When both signals name a
+known but different language, the engine preserves both values and adds the
+`asr_lexical_disagreement` review reason instead of silently choosing one as certain.
+The disagreement may reflect code-switching or an error in either signal; it is a
+review trigger, not a claim that either detector is correct.
