@@ -37,6 +37,15 @@ export const estimateLyricWidthUnits = (text: string): number => {
   return glyphUnits + Math.max(0, wordCount - 1) * 0.26;
 };
 
+/** Convert estimated glyph width to Latin-character-equivalent units for line wrapping. */
+export const estimateLyricCharacterEquivalent = (text: string): number => {
+  const normalized = text.normalize("NFC").trim();
+  if (!normalized) return 0;
+  const wordCount = normalized.split(/\s+/u).filter(Boolean).length;
+  const glyphUnits = estimateLyricWidthUnits(normalized) - Math.max(0, wordCount - 1) * 0.26;
+  return Math.max(0, glyphUnits / 0.54);
+};
+
 /**
  * Calculate a deterministic font size for landscape, portrait, square, and 4K.
  * baseSize is the design size at the composition's reference resolution.
