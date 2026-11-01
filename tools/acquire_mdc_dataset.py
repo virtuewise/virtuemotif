@@ -6,7 +6,7 @@ import hashlib
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -90,7 +90,7 @@ def acquire_dataset(
         "license": dataset["license"],
         "source_url": dataset["source_url"],
         "source_verified_date": dataset["source_verified_date"],
-        "retrieved_at_utc": datetime.now(timezone.utc).isoformat(),
+        "retrieved_at_utc": datetime.now(UTC).isoformat(),
         "local_path": str(dataset_path),
         "files": _inventory(dataset_path),
         "restrictions": dataset["restrictions"],
