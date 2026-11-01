@@ -1,4 +1,4 @@
-""""Repeatable lexical language-ID smoke benchmark (not an ASR/audio benchmark)."""
+"""Repeatable lexical language-ID smoke benchmark (not an ASR/audio benchmark)."""
 from __future__ import annotations
 
 import argparse
