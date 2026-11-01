@@ -19,7 +19,7 @@ export const ParticleRainfall: React.FC<FurryLyricViewProps> = (props) => {
         vec3 pos = position;
         pos.y -= aSpeed * uTime * 60.0 * uFallRate;
         // Wrap particles in a stable time-derived cycle.
-        float span = 8.0;
+        float span = 10.0;
         pos.y = mod(pos.y + 2.0, span) - 2.0;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
         gl_PointSize = 2.0;
