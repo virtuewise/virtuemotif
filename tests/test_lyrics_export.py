@@ -137,7 +137,7 @@ def test_export_rejects_out_of_order_word_timestamps() -> None:
             ],
         }],
     }
-    with pytest.raises(ValueError, match="word starts must be non-decreasing"):
+    with pytest.raises(ValueError, match="ordered and non-overlapping"):
         convert_lyrics_document(document, audio="audio/test.wav")
 
 
