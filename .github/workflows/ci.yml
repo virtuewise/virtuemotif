@@ -83,6 +83,8 @@ jobs:
           tests/test_language_timeline.py
           tools/benchmark_language_id.py
           tests/test_benchmark_language_id.py
+          tools/benchmark_word_alignment.py
+          tests/test_benchmark_word_alignment.py
           tools/validate_language_dataset.py
           tests/test_validate_language_dataset.py
           tests/test_benchmark_governance_gate.py
