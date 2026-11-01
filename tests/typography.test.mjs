@@ -46,3 +46,23 @@ test("word timings are accepted only when token text and chronology align", () =
   assert.equal(resolveWordTimings("Hello, world!", [{ ...valid[0], from: Number.NaN }, valid[1]]), null);
   assert.equal(resolveWordTimings("Hello, world!", [valid[0]]), null);
 });
+
+
+test("lyric typography presets are configurable and unknown names fall back safely", async () => {
+  const { LYRIC_TYPOGRAPHY_PRESETS, resolveLyricTypographyPreset } =
+    await import("../film/src/lyricTypographyPresets.ts");
+  assert.deepEqual(
+    Object.keys(LYRIC_TYPOGRAPHY_PRESETS).sort(),
+    ["display", "editorial", "neon", "whisper"],
+  );
+  assert.equal(resolveLyricTypographyPreset("neon"), "neon");
+  assert.equal(resolveLyricTypographyPreset("editorial"), "editorial");
+  assert.equal(resolveLyricTypographyPreset("zoom", "whisper"), "whisper");
+  assert.equal(resolveLyricTypographyPreset(undefined), "display");
+  for (const preset of Object.values(LYRIC_TYPOGRAPHY_PRESETS)) {
+    assert.ok(preset.fontFamily.length > 0);
+    assert.ok(preset.ruleColor.length > 0);
+    assert.ok(preset.highlightColor.length > 0);
+    assert.ok(preset.translationScale > 0 && preset.translationScale <= 1);
+  }
+});

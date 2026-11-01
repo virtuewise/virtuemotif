@@ -298,7 +298,8 @@ export const Film: React.FC<{ song: Song }> = ({ song }) => {
           from={ln.from}
           to={ln.to}
           whisper={ln.style === "whisper"}
-          size={ln.style === "whisper" ? 104 : 104}
+          typographyPreset={ln.style}
+          size={104}
           words={ln.words}
           y={-18}
         />
