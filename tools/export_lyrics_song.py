@@ -183,11 +183,11 @@ def main() -> int:
             document, audio=args.audio, title=args.title, subtitle=args.subtitle,
             artist=args.artist, song_id=args.song_id, duration=args.duration,
         )
+        if args.props_output is not None and args.props_output.resolve() == args.output.resolve():
+            raise ValueError("--props-output must differ from --output")
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(song, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         if args.props_output is not None:
-            if args.props_output.resolve() == args.output.resolve():
-                raise ValueError("--props-output must differ from --output")
             args.props_output.parent.mkdir(parents=True, exist_ok=True)
             props = build_remotion_props(song)
             args.props_output.write_text(json.dumps(props, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
