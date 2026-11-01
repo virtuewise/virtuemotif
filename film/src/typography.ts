@@ -102,3 +102,36 @@ export const resolveWordTimings = (
   }
   return wordTimes.map(({ from }) => from);
 };
+
+
+/**
+ * Wrap unspaced wide-script text at character boundaries when its estimated
+ * width exceeds the limit. Returns null for text that does not need this path.
+ */
+export const wrapWideScriptText = (text: string, maxWidth: number): string[] | null => {
+  const normalized = text.normalize("NFC").trim();
+  const hasWideGlyphs = /[\u2e80-\u9fff\uac00-\ud7af\uf900-\ufaff\uff01-\uff60]/u.test(normalized);
+  if (
+    !normalized ||
+    !hasWideGlyphs ||
+    !Number.isFinite(maxWidth) ||
+    maxWidth <= 0 ||
+    estimateLyricCharacterEquivalent(normalized) <= maxWidth
+  ) {
+    return null;
+  }
+
+  const lines: string[] = [];
+  let currentLine = "";
+  for (const glyph of Array.from(normalized)) {
+    const candidate = currentLine + glyph;
+    if (currentLine && estimateLyricCharacterEquivalent(candidate) > maxWidth) {
+      lines.push(currentLine);
+      currentLine = glyph;
+    } else {
+      currentLine = candidate;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+  return lines;
+};
