@@ -27,12 +27,15 @@ The pipeline and CI use FFmpeg/ffprobe for media processing. Install FFmpeg for 
 
 ### Remotion application
 
-Install Node.js 22 and npm. From the repository root, install the locked dependencies:
+Use Node.js 24 (the same major version as CI) and npm. From the repository root, install the locked dependencies:
 
 ```bash
 cd film
+node --version
 npm ci
 ```
+
+The Node version check in CI deliberately fails if the runtime is not Node.js 24, so local and CI environments stay aligned.
 
 ## Validate your changes
 
@@ -59,6 +62,8 @@ python -m pdoc -o site tools.make_video tools.make_tapsync tools.utils tools.eff
 From the `film/` directory:
 
 ```bash
+node --version
+npm ci
 npx tsc --noEmit
 npx remotion browser ensure
 npx remotion compositions src/index.ts
@@ -92,4 +97,4 @@ Keep pull requests focused and use a descriptive title, such as `Fix tap-sync pa
 
 ## Review and release
 
-Maintainers may request changes, additional tests, or clarification before merging. Keep discussion constructive and respond to review feedback with follow-up commits. Merging does not guarantee an immediate release; release timing is determined by the maintainers.
+Maintainers may request changes or clarification before merging. Keep discussion constructive and respond to review feedback with follow-up commits. Merging does not guarantee an immediate release; release timing is determined by the maintainers.
