@@ -10,6 +10,9 @@ from pathlib import Path
 from typing import Any
 
 
+_LANGUAGE_NAMES = {"en": "English", "sn": "Shona", "nd": "isiNdebele", "zu": "isiZulu", "xh": "isiXhosa", "af": "Afrikaans", "sw": "Swahili"}
+
+
 def _number(value: Any, field: str, index: int) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
         raise ValueError(f"segment {index}: {field} must be a finite number")
@@ -150,7 +153,8 @@ def convert_lyrics_document(
         "audio": audio.strip().lstrip("/"),
         "duration": round(duration, 3),
         "palette": "dusk",
-        "detectedLanguage": detected_language,
+        "detectedLanguage": _LANGUAGE_NAMES.get(detected_language, detected_language if detected_language != "und" else "Unknown / undetected"),
+        "detectedLanguageCode": detected_language,
         "languageConfidence": round(confidence, 3),
         "reviewRequired": bool(document.get("review_required", True)),
         "sections": sections,
