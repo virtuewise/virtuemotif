@@ -252,13 +252,15 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       // otherwise text falls into place from above (+1.45 world units down to 0)
       if (isZoomMotion) {
         const zoomScale = (0.35 + 0.65 * eased) * (1 + beatPulse * 0.025 + cueFrame.transitionIntensity * 0.04);
-        mesh.group.scale.set(zoomScale, zoomScale, zoomScale);
+        const scale = mesh.fitScale * zoomScale;
+        mesh.group.scale.set(scale, scale, scale);
         mesh.group.position.y = Math.sin(currentTime * 1.1) * 0.08;
       } else {
         const fallY = (1.0 - eased) * 1.45; // Smoothly drops and settles into screen center
         mesh.group.position.y = fallY + Math.sin(currentTime * 1.1) * 0.08;
         const beatScale = 1 + beatPulse * 0.025 + cueFrame.transitionIntensity * 0.04;
-        mesh.group.scale.set(beatScale, beatScale, beatScale);
+        const scale = mesh.fitScale * beatScale;
+        mesh.group.scale.set(scale, scale, scale);
       }
 
       mesh.group.rotation.y = Math.sin(currentTime * 0.5) * 0.09;
