@@ -7,6 +7,7 @@ export interface LyricTypographyPreset {
   fontStyle: "normal" | "italic";
   textTransform: "uppercase" | "none";
   color: string;
+  highlightColor: string;
   letterSpacing: string;
   textShadow: string;
   wordGap: string;
@@ -28,6 +29,7 @@ export const LYRIC_TYPOGRAPHY_PRESETS: Record<LyricTypographyPresetName, LyricTy
     fontStyle: "normal",
     textTransform: "uppercase",
     color: P.bone,
+    highlightColor: P.amber,
     letterSpacing: "-0.005em",
     textShadow: "0 3px 0 #2A140F, 0 20px 44px rgba(0,0,0,0.55)",
     wordGap: "0 0.26em",
@@ -43,6 +45,7 @@ export const LYRIC_TYPOGRAPHY_PRESETS: Record<LyricTypographyPresetName, LyricTy
     fontStyle: "italic",
     textTransform: "none",
     color: P.bone,
+    highlightColor: P.cream,
     letterSpacing: "0.01em",
     textShadow: "0 6px 26px rgba(0,0,0,0.75)",
     wordGap: "0 0.18em",
@@ -58,6 +61,7 @@ export const LYRIC_TYPOGRAPHY_PRESETS: Record<LyricTypographyPresetName, LyricTy
     fontStyle: "normal",
     textTransform: "uppercase",
     color: "#C8FFF6",
+    highlightColor: "#FFFFFF",
     letterSpacing: "0.035em",
     textShadow: "0 0 10px rgba(45,212,191,0.8), 0 4px 24px rgba(0,0,0,0.8)",
     wordGap: "0 0.2em",
@@ -73,6 +77,7 @@ export const LYRIC_TYPOGRAPHY_PRESETS: Record<LyricTypographyPresetName, LyricTy
     fontStyle: "normal",
     textTransform: "none",
     color: P.cream,
+    highlightColor: P.ochre,
     letterSpacing: "0.01em",
     textShadow: "0 6px 28px rgba(0,0,0,0.72)",
     wordGap: "0 0.2em",
