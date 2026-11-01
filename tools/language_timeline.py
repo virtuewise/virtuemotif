@@ -20,6 +20,23 @@ def _normalise_confidence(value: Any) -> float | None:
     return confidence
 
 
+def _normalise_review_reasons(value: Any) -> list[str]:
+    """Normalise caller-supplied review reasons without splitting strings into characters."""
+    if value is None:
+        return []
+    values = [value] if isinstance(value, str) else value
+    if not isinstance(values, Iterable) or isinstance(values, Mapping):
+        return ["invalid_review_reasons_metadata"]
+    reasons: list[str] = []
+    for item in values:
+        if not isinstance(item, str):
+            return ["invalid_review_reasons_metadata"]
+        reason = item.strip()
+        if reason and reason not in reasons:
+            reasons.append(reason)
+    return reasons
+
+
 def segment_requires_review(
     segment: Mapping[str, Any], *, min_confidence: float = DEFAULT_MIN_CONFIDENCE
 ) -> bool:
@@ -29,7 +46,8 @@ def segment_requires_review(
     language = str(segment.get("language") or "und")
     confidence = _normalise_confidence(segment.get("language_confidence"))
     short = len(str(segment.get("text") or "").split()) <= 2
-    return bool(segment.get("review_required", False) or segment.get("review_reasons")) or (
+    reasons = _normalise_review_reasons(segment.get("review_reasons"))
+    return bool(segment.get("review_required", False) or reasons) or (
         language in {"und", "mul"}
         or confidence is None
         or confidence < min_confidence
@@ -72,10 +90,29 @@ def build_language_timeline(
         confidence = _normalise_confidence(segment.get("language_confidence"))
         text = str(segment.get("text") or "")
         is_short = len(text.split()) <= 2
-        uncertain = segment_requires_review(
-            {**segment, "language": language, "text": text, "language_confidence": confidence},
-            min_confidence=min_confidence,
-        )
+        supplied_reasons = _normalise_review_reasons(segment.get("review_reasons"))
+        generated_reasons = [
+            reason
+            for reason, condition in (
+                ("unknown_or_mixed_language", language in {"und", "mul"}),
+                ("confidence_missing", confidence is None),
+                ("low_confidence", confidence is not None and confidence < min_confidence),
+                ("short_segment", is_short),
+            )
+            if condition
+        ]
+        uncertainty_reasons = list(dict.fromkeys([*supplied_reasons, *generated_reasons]))
+        if segment.get("review_required", False) and not uncertainty_reasons:
+            uncertainty_reasons.append("upstream_review_required")
+        if "invalid_review_reasons_metadata" in uncertainty_reasons:
+            # Malformed upstream metadata must not silently erase a review signal.
+            uncertainty_reasons = [
+                *uncertainty_reasons,
+                "upstream_review_metadata_invalid",
+            ]
+            uncertainty_reasons = list(dict.fromkeys(uncertainty_reasons))
+
+        uncertain = bool(uncertainty_reasons)
         row = {
             "index": index,
             "start": round(start, 3),
@@ -84,20 +121,8 @@ def build_language_timeline(
             "language_confidence": confidence,
             "language_method": segment.get("language_method", "unknown"),
             "text": text,
-            "review_required": bool(segment.get("review_required", False)) or uncertain,
-            "uncertainty_reasons": [
-                *list(segment.get("review_reasons") or []),
-                *[
-                    reason
-                    for reason, condition in (
-                        ("unknown_or_mixed_language", language in {"und", "mul"}),
-                        ("confidence_missing", confidence is None),
-                        ("low_confidence", confidence is not None and confidence < min_confidence),
-                        ("short_segment", is_short),
-                    )
-                    if condition
-                ],
-            ],
+            "review_required": uncertain,
+            "uncertainty_reasons": uncertainty_reasons,
         }
         rows.append(row)
 

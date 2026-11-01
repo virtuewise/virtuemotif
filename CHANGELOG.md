@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Fixed
+- Normalize upstream language-timeline review reasons, deduplicate them, and fail safely to human review when reason metadata is malformed.
 - Reject invalid ASR segment intervals, sanitize out-of-range confidence, and exclude malformed word timestamps while marking affected lyrics for human review. Reject out-of-order word starts as well.
 - Document NumPy and SoundFile as required dependencies for the end-to-end AutoLyrics audio-cue export, avoiding a late render-time dependency failure.
 - Preserve the viewport-safe 3D lyric geometry fit scale while applying deterministic beat/transition motion, preventing animation from discarding the calculated fit.
