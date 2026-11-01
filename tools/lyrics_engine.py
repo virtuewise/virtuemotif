@@ -50,11 +50,9 @@ def detect_text_language(text: str) -> dict[str, Any]:
     _, second = ranked[1]
     if score == 0:
         return {"language": "und", "confidence": 0.0, "method": "text-heuristic"}
-    # Nguni varieties share substantial vocabulary. Do not force a language when
-    # evidence is tied; expose mixed-language evidence instead of hiding it.
+    # A score tie is ambiguous evidence, not proof of code-switching. This is
+    # especially important for shared isiNdebele/isiZulu markers.
     if score == second:
-        if score > 0 and len(words) >= 4:
-            return {"language": "mul", "confidence": 0.4, "method": "code-switched-lexical"}
         return {"language": "und", "confidence": 0.25, "method": "ambiguous-lexical"}
     # A text span with substantial evidence for two languages is code-switched.
     if second >= 1 and score >= 1 and len(words) >= 5 and score <= second * 2:
