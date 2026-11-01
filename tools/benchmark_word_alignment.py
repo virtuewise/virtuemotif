@@ -38,7 +38,7 @@ def evaluate_alignment(corpus: Any, predictions: Any, split: str = "test") -> di
     if split not in {"test", "validation", "development", "all"}:
         raise ValueError("split must be test, validation, development, or all")
     if not isinstance(predictions, dict):
-        raise ValueError("predictions must be an object keyed by example id")
+        raise TypeError("predictions must be an object keyed by example id")
 
     selected = [
         item for item in corpus["examples"]
@@ -57,7 +57,7 @@ def evaluate_alignment(corpus: Any, predictions: Any, split: str = "test") -> di
         if not isinstance(reference, list) or not reference:
             raise ValueError(f"example {example['id']!r} requires reference words")
         if not isinstance(predicted, list):
-            raise ValueError(f"missing predicted word list for {example['id']!r}")
+            raise TypeError(f"missing predicted word list for {example['id']!r}")
 
         bucket = metrics.setdefault(language, {
             "examples": 0, "reference_words": 0, "predicted_words": 0, "matched_words": 0,
@@ -72,7 +72,7 @@ def evaluate_alignment(corpus: Any, predictions: Any, split: str = "test") -> di
 
         for index, (ref_word, pred_word) in enumerate(zip(reference, predicted)):
             if not isinstance(ref_word, dict) or not isinstance(pred_word, dict):
-                raise ValueError(f"example {example['id']!r} word {index} must be an object")
+                raise TypeError(f"example {example['id']!r} word {index} must be an object")
             if _normalise_token(ref_word.get("text", "")) != _normalise_token(pred_word.get("text", "")):
                 continue
             try:
