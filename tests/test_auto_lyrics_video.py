@@ -22,7 +22,7 @@ def test_safe_song_id_rejects_empty_identifiers(value: str) -> None:
         safe_song_id(value)
 
 
-@pytest.mark.parametrize(("value", "expected"), [("12.5\\n", 12.5), ("0.25", 0.25)])
+@pytest.mark.parametrize(("value", "expected"), [(" 12.5 ", 12.5), ("0.25", 0.25)])
 def test_parse_audio_duration_accepts_positive_finite_values(value: str, expected: float) -> None:
     assert parse_audio_duration(value) == expected
 
