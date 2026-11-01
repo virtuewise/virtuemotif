@@ -169,6 +169,14 @@ def evaluate(corpus: Any, split: str | None = None) -> dict[str, Any]:
         metric: _ratio(sum(item[metric] for item in supported), len(supported))
         for metric in ("precision", "recall", "f1", "accuracy")
     }
+    support_total = sum(item["support"] for item in supported)
+    weighted = {
+        metric: _ratio(
+            sum(item[metric] * item["support"] for item in supported),
+            support_total,
+        )
+        for metric in ("precision", "recall", "f1", "accuracy")
+    }
     unknown_count = sum(item["predicted"] == "und" for item in predictions)
     expected_unknown = sum(item["expected"] == "und" for item in predictions)
     evidence_level = (
@@ -191,6 +199,7 @@ def evaluate(corpus: Any, split: str | None = None) -> dict[str, Any]:
         "accuracy": _ratio(correct, total),
         "per_language": per_language,
         "macro_average": macro,
+        "weighted_average": weighted,
         "unknown_behavior": {
             "predicted_unknown": unknown_count,
             "predicted_unknown_rate": _ratio(unknown_count, total),
