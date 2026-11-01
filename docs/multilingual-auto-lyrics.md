@@ -105,13 +105,19 @@ python -m tools.make_auto_lyrics_video "path/to/song.m4a" \
 
 Use `--format landscape` (the default), `--format portrait`,
 `--format square`, or `--format 4k` to choose the output size. These map to
-1920×1080, 1080×1920, 1024×1024, and 3840×2160 at 30 fps respectively. For
-example, render a vertical social-video version with:
+1920×1080, 1080×1920, 1024×1024, and 3840×2160 at 30 fps respectively. Choose
+a visual treatment with `--typography-preset display` (default),
+`--typography-preset editorial`, `--typography-preset neon`, or
+`--typography-preset whisper`. For example, render a vertical neon treatment:
 
 ```bash
 python -m tools.make_auto_lyrics_video "path/to/song.m4a" \
-  --format portrait --output out/song-portrait.mp4
+  --format portrait --typography-preset neon --output out/song-portrait-neon.mp4
 ```
+
+The presets change the font treatment, color, spacing, highlight, and translation
+styling without requiring edits to the Remotion components. They are visual
+treatments, not translations or claims about the language of the lyrics.
 
 Omit `--language` to let the multilingual ASR model detect the language, or
 supply a language code to force one. The command copies the source audio into
@@ -139,10 +145,10 @@ Generate a versioned ASR document, then convert it into the exact Song JSON shap
 
 ```bash
 python -m tools.lyrics_engine path/to/song.wav --output timing/song.auto.json --model small
-python -m tools.export_lyrics_song timing/song.auto.json --audio audio/song.m4a --output film/src/data/song.auto.json --props-output film/src/data/song.auto.props.json --title "My Song" --artist "Artist"
+python -m tools.export_lyrics_song timing/song.auto.json --audio audio/song.m4a --output film/src/data/song.auto.json --props-output film/src/data/song.auto.props.json --title "My Song" --artist "Artist" --typography-preset neon
 ```
 
-The `--audio` value is a path relative to `film/public/`. You can pass `--duration` when you know the full audio duration, including an instrumental outro; otherwise the exporter uses the final recognized lyric end time or the input document's duration. Import the generated JSON into `film/src/Root.tsx` and register a composition to render it. Choose a new output path when you want to preserve an existing song file; the converter writes to the exact path you specify.
+The `--audio` value is a path relative to `film/public/`. You can pass `--duration` when you know the full audio duration, including an instrumental outro; otherwise the exporter uses the final recognized lyric end time or the input document's duration. The optional `--typography-preset` applies the chosen preset to every lyric line; allowed values are `display`, `editorial`, `neon`, and `whisper`. Import the generated JSON into `film/src/Root.tsx` and register a composition to render it. Choose a new output path when you want to preserve an existing song file; the converter writes to the exact path you specify.
 
 The exported document preserves per-segment language and confidence, word timings when the ASR backend supplied them, and sets `reviewRequired: true` unless the input explicitly says otherwise. Generated lyric films show the detected language/confidence and a visible human-review warning. The exporter never invents word timings or translated subtitles.
 
