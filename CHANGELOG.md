@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- Extend conservative lexical lyric-language hints to Spanish, French, Portuguese, German, and Italian, while keeping uncertain text and code-switching reviewable.
+
 ### Fixed
 - Flag low-confidence ASR output for human review and validate live microphone sample-rate/chunk-duration settings before loading optional backends.
 - Normalize upstream language-timeline review reasons, deduplicate them, and fail safely to human review when reason metadata is malformed.
