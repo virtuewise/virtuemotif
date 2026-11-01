@@ -61,18 +61,18 @@ jobs:
         run: python .github/scripts/check_docs_links.py build/site
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
         with:
           enablement: true
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: build/site
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - name: Smoke-test published documentation
         env:
@@ -86,27 +86,27 @@ jobs:
 
           base = os.environ["SITE_URL"].rstrip("/") + "/"
           expected = {
-              "index.html": "tools.html",
-              "tools.html": "tools/make_video.html",
-              "tools/make_video.html": "make_video",
-              "tools/make_tapsync.html": "make_tapsync",
-              "tools/utils.html": "utils",
-              "tools/effects.html": "effects",
+              "index.html": ("tools.html", "VirtueMotif API Reference"),
+              "tools.html": ("tools/make_video.html",),
+              "tools/make_video.html": ("make_video",),
+              "tools/make_tapsync.html": ("make_tapsync",),
+              "tools/utils.html": ("utils",),
+              "tools/effects.html": ("effects",),
           }
           last_error = None
           for attempt in range(1, 13):
               try:
-                  for path, marker in expected.items():
+                  for path, markers in expected.items():
                       request = Request(base + path, headers={"User-Agent": "VirtueMotif-Pages-SmokeTest/1.0"})
                       with urlopen(request, timeout=10) as response:
                           if response.status != 200:
-                              raise RuntimeError(f"{path}: HTTP {response.status}")
+                              raise HTTPError(base + path, response.status, "unexpected HTTP status", response.headers, None)
                           body = response.read().decode("utf-8", errors="replace")
-                      if marker not in body:
-                          raise RuntimeError(f"{path}: expected content marker {marker!r} missing")
+                      if not any(marker in body for marker in markers):
+                          raise SystemExit(f"{path}: expected one of {markers!r} in published content")
                   print(f"Published documentation smoke test passed: {base}")
                   break
-              except (HTTPError, URLError, TimeoutError, RuntimeError) as exc:
+              except (HTTPError, URLError, TimeoutError) as exc:
                   last_error = exc
                   print(f"Attempt {attempt}/12 failed: {exc}")
                   if attempt < 12:
