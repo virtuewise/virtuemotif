@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "catalog_updated": "2026-11-01",
+  "policy": {
+    "default": "deny",
+    "download_requires_explicit_operator_action": true,
+    "never_commit_dataset_audio_or_raw_corpus_exports": true,
+    "never_rehost_or_redistribute_common_voice_archives": true,
+    "never_attempt_speaker_identification": true,
+    "speech_data_is_not_a_singing_benchmark": true
+  },
+  "datasets": [
+    {
+      "id": "mozilla-common-voice-shona-spontaneous-5",
+      "name": "Common Voice Spontaneous Speech 5.0 - Shona",
+      "languages": ["sn"],
+      "license": "CC0-1.0",
+      "task": "ASR",
+      "media_type": "speech",
+      "version": "5.0",
+      "reported_size": "1.53 MB",
+      "source_url": "https://mozilladatacollective.com/datasets?q=Common+Voice+Spontaneous+Speech",
+      "source_record_type": "catalog_listing",
+      "source_verified_date": "2026-11-01",
+      "training_use": "The source catalog identifies this release as CC0-1.0 and intended for ASR; re-check current terms before use.",
+      "redistribution": "Do not re-host or re-share Common Voice dataset files.",
+      "restrictions": ["Do not attempt to identify speakers."],
+      "limitations": ["Speech, not singing.", "Small release; not sufficient alone for robust Shona evaluation.", "The URL is a filtered catalog listing, not a direct immutable archive URL."]
+    },
+    {
+      "id": "mozilla-common-voice-english-spontaneous-5",
+      "name": "Common Voice Spontaneous Speech 5.0 - English",
+      "languages": ["en"],
+      "license": "CC0-1.0",
+      "task": "ASR",
+      "media_type": "speech",
+      "version": "5.0",
+      "reported_size": "519.05 MB",
+      "source_url": "https://mozilladatacollective.com/datasets?q=Common+Voice+Spontaneous+Speech",
+      "source_record_type": "catalog_listing",
+      "source_verified_date": "2026-11-01",
+      "training_use": "The source catalog identifies this release as CC0-1.0 and intended for ASR; re-check current terms before use.",
+      "redistribution": "Do not re-host or re-share Common Voice dataset files.",
+      "restrictions": ["Do not attempt to identify speakers."],
+      "limitations": ["Speech, not singing.", "Language and domain distribution differ from song lyrics.", "The URL is a filtered catalog listing, not a direct immutable archive URL."]
+    },
+    {
+      "id": "mozilla-common-voice-zulu-scripted-27",
+      "name": "Common Voice Scripted Speech 27.0 - Zulu",
+      "languages": ["zu"],
+      "license": "CC0-1.0",
+      "task": "ASR",
+      "media_type": "speech",
+      "version": "27.0",
+      "reported_size": "8.22 MB",
+      "source_url": "https://mozilladatacollective.com/datasets/cmu610aue00jtnq07hnb00xio",
+      "source_record_type": "dataset_record",
+      "source_verified_date": "2026-11-01",
+      "training_use": "The dataset record states CC0-1.0 and intended ASR training/evaluation use; re-check current terms before use.",
+      "redistribution": "Do not re-host or re-share Common Voice dataset files.",
+      "restrictions": ["Do not attempt to identify speakers."],
+      "limitations": ["Speech, not singing.", "The source record reports 223 clips from 9 speakers, with 29 validated clips; this is too small to represent broad Zulu variation."]
+    },
+    {
+      "id": "mozilla-common-voice-xhosa-scripted-27",
+      "name": "Common Voice Scripted Speech 27.0 - Xhosa",
+      "languages": ["xh"],
+      "license": "CC0-1.0",
+      "task": "ASR",
+      "media_type": "speech",
+      "version": "27.0",
+      "reported_size": "2.37 MB",
+      "source_url": "https://mozilladatacollective.com/datasets/cmu60x5rv00ilo1070jbpgna2",
+      "source_record_type": "dataset_record",
+      "source_verified_date": "2026-11-01",
+      "training_use": "The dataset record states CC0-1.0 and intended ASR training/evaluation use; re-check current terms before use.",
+      "redistribution": "Do not re-host or re-share Common Voice dataset files.",
+      "restrictions": ["Do not attempt to identify speakers."],
+      "limitations": ["Speech, not singing.", "The source record reports 35 clips from 5 speakers, with 13 validated clips; this is too small to represent broad Xhosa variation."]
+    }
+  ]
+}

@@ -86,6 +86,8 @@ jobs:
           tests/test_benchmark_governance_gate.py
           tests/test_lyrics_export.py
           tests/test_ci_smoke.py
+          tools/free_dataset_catalog.py
+          tests/test_free_dataset_catalog.py
 
       - name: Run Python tests
         run: python -m pytest -q
