@@ -1,6 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { evaluateAudioCues, frameToTime, parseAudioIntelligence, snapEntranceTime } from "../film/src/fur3d/audioCues.ts";
+import {
+  audioReactiveGlitchIntensity,
+  audioReactiveParticleFallRate,
+  audioReactiveWaveAmplitude,
+  evaluateAudioCues,
+  frameToTime,
+  parseAudioIntelligence,
+  snapEntranceTime,
+} from "../film/src/fur3d/audioCues.ts";
+import { createRainfallParticleData } from "../film/src/fur3d/deterministicParticles.ts";
 
 const valid = {
   schema_version: 1,
@@ -56,9 +65,7 @@ test("missing or invalid cue data uses deterministic fallback", () => {
   assert.equal(parseAudioIntelligence(null), null);
 });
 
-
-test("audio-reactive wave amplitude responds deterministically to beat and energy cues", async () => {
-  const { audioReactiveWaveAmplitude } = await import("../film/src/fur3d/audioCues.ts");
+test("audio-reactive wave amplitude responds deterministically to beat and energy cues", () => {
   const quiet = audioReactiveWaveAmplitude({ energy: 0, beatPulse: 0, transitionIntensity: 0 });
   const energetic = audioReactiveWaveAmplitude({ energy: 0.8, beatPulse: 1, transitionIntensity: 0.9 });
   assert.equal(quiet, 0.025);
@@ -69,4 +76,38 @@ test("audio-reactive wave amplitude responds deterministically to beat and energ
     energetic,
   );
   assert.ok(Math.abs(audioReactiveWaveAmplitude({ energy: Number.NaN, beatPulse: -1, transitionIntensity: 2 }) - 0.105) < 1e-12);
+});
+
+test("glitch intensity is bounded and reacts to beats and transitions", () => {
+  assert.equal(audioReactiveGlitchIntensity({ energy: 0, beatPulse: 0, transitionIntensity: 0 }), 0);
+  assert.ok(audioReactiveGlitchIntensity({ energy: 0.1, beatPulse: 1, transitionIntensity: 0 }) >
+    audioReactiveGlitchIntensity({ energy: 0.1, beatPulse: 0, transitionIntensity: 0 }));
+  assert.equal(audioReactiveGlitchIntensity({ energy: 1, beatPulse: 1, transitionIntensity: 1 }), 1);
+  assert.equal(audioReactiveGlitchIntensity({ energy: Number.NaN, beatPulse: -1, transitionIntensity: 2 }), 0.45);
+});
+
+test("particle fall rate is deterministic and responds to audio energy and beats", () => {
+  const quiet = audioReactiveParticleFallRate({ energy: 0, beatPulse: 0 });
+  const energetic = audioReactiveParticleFallRate({ energy: 1, beatPulse: 1 });
+  assert.equal(quiet, 0.8);
+  assert.ok(Math.abs(energetic - 1.4) < 1e-12);
+  assert.equal(audioReactiveParticleFallRate({ energy: Number.NaN, beatPulse: -1 }), 0.8);
+});
+
+test("rainfall particle fields are reproducible for the same seed", () => {
+  const first = createRainfallParticleData(128, 7);
+  const second = createRainfallParticleData(128, 7);
+  assert.deepEqual(first.positions, second.positions);
+  assert.deepEqual(first.speeds, second.speeds);
+  assert.notDeepEqual(first.positions, createRainfallParticleData(128, 8).positions);
+  assert.equal(first.positions.length, 128 * 3);
+  assert.equal(first.speeds.length, 128);
+  assert.ok(first.positions.every(Number.isFinite));
+  assert.ok(first.speeds.every((speed) => speed >= 0.02 && speed < 0.05));
+});
+
+test("rainfall particle generator validates size and seed", () => {
+  assert.throws(() => createRainfallParticleData(-1), /non-negative integer/);
+  assert.throws(() => createRainfallParticleData(1.5), /non-negative integer/);
+  assert.throws(() => createRainfallParticleData(1, Number.NaN), /seed must be finite/);
 });

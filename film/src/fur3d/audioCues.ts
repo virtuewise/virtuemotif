@@ -60,7 +60,6 @@ export function parseAudioIntelligence(value: unknown): AudioIntelligence | null
       isFiniteNumber(event.strength) && event.strength >= 0 && event.strength <= 1)
   ) return null;
 
-  // Capture the validated property so TypeScript keeps its narrowed number type in callbacks.
   const duration = data.duration;
   if (!isFiniteNumber(duration)) return null;
   if (
@@ -135,7 +134,6 @@ export function evaluateAudioCues(
   const duration = cues?.duration ?? Number.MAX_SAFE_INTEGER;
   const time = frameToTime(frame, fps, duration);
   if (!cues) {
-    // Stable frame-derived fallback: no randomness or wall-clock dependency.
     const phase = time * Math.PI * 3.6;
     return {
       time,
@@ -166,18 +164,34 @@ export function evaluateAudioCues(
   };
 }
 
+const unitInterval = (value: number): number =>
+  Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
 
-/**
- * Map normalized audio cues to a bounded wave displacement amplitude.
- * The pure mapping keeps beat/energy-driven motion deterministic and testable.
- */
+/** Map normalized audio cues to a bounded wave displacement amplitude. */
 export function audioReactiveWaveAmplitude(
   cue: Pick<AudioCueFrame, "energy" | "beatPulse" | "transitionIntensity">,
 ): number {
-  const unit = (value: number): number =>
-    Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
   return 0.025 +
-    unit(cue.energy) * 0.075 +
-    unit(cue.beatPulse) * 0.12 +
-    unit(cue.transitionIntensity) * 0.08;
+    unitInterval(cue.energy) * 0.075 +
+    unitInterval(cue.beatPulse) * 0.12 +
+    unitInterval(cue.transitionIntensity) * 0.08;
+}
+
+/** Map beat, transition, and energy cues to a stable, bounded glitch intensity. */
+export function audioReactiveGlitchIntensity(
+  cue: Pick<AudioCueFrame, "energy" | "beatPulse" | "transitionIntensity">,
+): number {
+  return Math.min(
+    1,
+    unitInterval(cue.beatPulse) * 0.7 +
+      unitInterval(cue.transitionIntensity) * 0.45 +
+      unitInterval(cue.energy) * 0.08,
+  );
+}
+
+/** Scale particle fall rate from the audio envelope without introducing randomness. */
+export function audioReactiveParticleFallRate(
+  cue: Pick<AudioCueFrame, "energy" | "beatPulse">,
+): number {
+  return 0.8 + unitInterval(cue.energy) * 0.4 + unitInterval(cue.beatPulse) * 0.2;
 }
