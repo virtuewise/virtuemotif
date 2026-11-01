@@ -160,8 +160,8 @@ def test_reviewable_multilingual_benchmark_examples(text: str, expected: str) ->
 
 def test_shared_nguni_words_remain_ambiguous() -> None:
     result = detect_text_language("mina wena thina uthando")
-    assert result["language"] in {"und", "mul"}
-    assert result["method"] in {"text-heuristic", "ambiguous-lexical", "code-switched-lexical"}
+    assert result["language"] == "und"
+    assert result["method"] == "text-heuristic"
 
 
 def test_code_switched_method_is_explicit() -> None:
@@ -180,8 +180,18 @@ def test_code_switched_method_is_explicit() -> None:
 ])
 def test_shared_or_overlapping_nguni_markers_do_not_force_a_single_language(text: str) -> None:
     result = detect_text_language(text)
-    assert result["language"] in {"und", "mul"}
-    assert result["confidence"] <= 0.4
+    assert result["language"] == "und"
+    assert result["method"] == "ambiguous-lexical"
+    assert result["confidence"] <= 0.25
+
+
+def test_long_run_of_shared_nguni_markers_is_not_misreported_as_code_switching() -> None:
+    result = detect_text_language(
+        "ngiyabonga ngiyakuthanda ngiyazi ngikhumbula ngizobuya"
+    )
+    assert result["language"] == "und"
+    assert result["method"] == "ambiguous-lexical"
+    assert result["confidence"] == 0.25
 
 
 def test_short_language_change_stays_a_candidate_and_requires_review() -> None:
