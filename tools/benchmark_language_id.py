@@ -213,7 +213,6 @@ def evaluate(corpus: Any, split: str | None = None) -> dict[str, Any]:
         "dataset_id": corpus["dataset_id"],
         "dataset_status": corpus["status"],
         "evidence_level": evidence_level,
-        "evaluation_provenance": evaluation_provenance,
         "evaluated_split": selected_split,
         "evaluated_examples": total,
         "unique_source_ids_in_evaluated_split": (
@@ -237,6 +236,7 @@ def evaluate(corpus: Any, split: str | None = None) -> dict[str, Any]:
         "dataset_id": corpus["dataset_id"],
         "dataset_status": corpus["status"],
         "evidence_level": evidence_level,
+        "evaluation_provenance": evaluation_provenance,
         "evaluated_split": selected_split,
         "available_split_counts": {
             name: sum(example["split"] == name for example in all_examples)
