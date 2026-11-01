@@ -1,1 +1,25 @@
-{"name":"lyrical-film","private":true,"version":"0.1.0","scripts":{"studio":"remotion studio src/index.ts","render":"remotion render src/index.ts"},"dependencies":{"@remotion/cli":"^4.0.539","@types/three":"^0.186.0","react":"^19.3.1","react-dom":"^19.3.1","remotion":"^4.0.538","three":"^0.186.1"},"devDependencies":{"@types/react":"^19.3.0","@types/react-dom":"^19.3.0","typescript":"^7.0.2"}}
+{
+  "name": "lyrical-film",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.539",
+    "@types/three": "^0.186.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "remotion": "^4.0.538",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2"
+  },
+  "overrides": {
+    "zod": "4.6.7"
+  }
+}
