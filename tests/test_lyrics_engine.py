@@ -403,3 +403,47 @@ def test_code_switch_candidate_never_claims_audio_timestamps() -> None:
     assert candidates
     assert all("start" not in candidate and "end" not in candidate for candidate in candidates)
     assert all(candidate["timing_available"] is False for candidate in candidates)
+
+ 
+def test_code_switch_candidates_use_word_times_only_with_exact_alignment() -> None:
+    text = "I love you forever ndinoda rudo rwangu"
+    words = [
+        {"text": "I", "start": 0.0, "end": 0.1},
+        {"text": "love", "start": 0.1, "end": 0.3},
+        {"text": "you", "start": 0.3, "end": 0.5},
+        {"text": "forever", "start": 0.5, "end": 0.9},
+        {"text": "ndinoda", "start": 1.0, "end": 1.4},
+        {"text": "rudo", "start": 1.4, "end": 1.7},
+        {"text": "rwangu", "start": 1.7, "end": 2.0},
+    ]
+    candidates = detect_code_switch_candidates(text, words)
+    assert len(candidates) == 1
+    assert candidates[0]["timing_available"] is True
+    assert candidates[0]["boundary_window"] == {"start": 0.9, "end": 1.0}
+    assert candidates[0]["review_required"] is True
+
+
+def test_code_switch_candidates_fall_back_to_indices_on_alignment_mismatch() -> None:
+    text = "I love you forever ndinoda rudo rwangu"
+    words = [{"text": "I", "start": 0, "end": 0.1}]
+    candidates = detect_code_switch_candidates(text, words)
+    assert candidates
+    assert candidates[0]["timing_available"] is False
+    assert "boundary_window" not in candidates[0]
+
+
+def test_code_switch_candidates_reject_overlapping_word_alignment_for_timing() -> None:
+    text = "I love you forever ndinoda rudo rwangu"
+    words = [
+        {"text": "I", "start": 0.0, "end": 0.2},
+        {"text": "love", "start": 0.1, "end": 0.3},
+        {"text": "you", "start": 0.3, "end": 0.5},
+        {"text": "forever", "start": 0.5, "end": 0.9},
+        {"text": "ndinoda", "start": 1.0, "end": 1.4},
+        {"text": "rudo", "start": 1.4, "end": 1.7},
+        {"text": "rwangu", "start": 1.7, "end": 2.0},
+    ]
+    candidates = detect_code_switch_candidates(text, words)
+    assert candidates
+    assert candidates[0]["timing_available"] is False
+    assert "boundary_window" not in candidates[0]
