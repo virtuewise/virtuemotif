@@ -365,3 +365,41 @@ def test_code_switch_candidates_fail_closed_for_non_string_input() -> None:
     assert detect_code_switch_candidates(None) == []  # type: ignore[arg-type]
 
 
+
+
+@pytest.mark.parametrize(("text", "expected_from", "expected_to"), [
+    ("I love you forever ndinoda rudo rwangu", "en", "sn"),
+    ("ndinoda rudo rwangu I love you forever", "sn", "en"),
+    ("I love you forever hola gracias quiero siempre", "en", "es"),
+    ("bonjour merci amour toujours I love you forever", "fr", "en"),
+    ("I love you forever ich liebe mein herz", "en", "de"),
+    ("ciao grazie amore sempre I love you forever", "it", "en"),
+    ("I love you forever saudade coracao quero minha", "en", "pt"),
+])
+def test_code_switch_candidates_cover_multiple_language_pairs_and_directions(
+    text: str, expected_from: str, expected_to: str
+) -> None:
+    candidates = detect_code_switch_candidates(text)
+    assert len(candidates) == 1
+    candidate = candidates[0]
+    assert (candidate["from"], candidate["to"]) == (expected_from, expected_to)
+    assert candidate["review_required"] is True
+    assert candidate["timing_available"] is False
+
+
+def test_code_switch_candidate_word_indices_are_monotonic_with_punctuation() -> None:
+    text = "I love you forever — ndinoda, rudo rwangu!"
+    candidates = detect_code_switch_candidates(text)
+    assert len(candidates) == 1
+    candidate = candidates[0]
+    tokens = re.findall(r"[\\w’']+", text, re.UNICODE)
+    assert 0 <= candidate["after_word"] < candidate["before_word"] < len(tokens)
+    assert tokens[candidate["after_word"]].casefold() == "forever"
+    assert tokens[candidate["before_word"]].casefold() == "ndinoda"
+
+
+def test_code_switch_candidate_never_claims_audio_timestamps() -> None:
+    candidates = detect_code_switch_candidates("I love you forever ndinoda rudo rwangu")
+    assert candidates
+    assert all("start" not in candidate and "end" not in candidate for candidate in candidates)
+    assert all(candidate["timing_available"] is False for candidate in candidates)
