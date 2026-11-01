@@ -50,9 +50,20 @@ def detect_text_language(text: str) -> dict[str, Any]:
     _, second = ranked[1]
     if score == 0:
         return {"language": "und", "confidence": 0.0, "method": "text-heuristic"}
-    # A score tie is ambiguous evidence, not proof of code-switching. This is
-    # especially important for shared isiNdebele/isiZulu markers.
+    # A score tie is ambiguous unless at least two tied languages each have
+    # exclusive marker evidence. Shared isiNdebele/isiZulu tokens alone cannot
+    # prove code-switching, but balanced English/Shona markers can support it.
     if score == second:
+        tied_languages = {language for language, value in scores.items() if value == score}
+        exclusive_languages = {
+            next(iter(owners))
+            for word in words
+            if len(owners := {
+                language for language, markers in _LANGUAGE_MARKERS.items() if word in markers
+            }) == 1
+        }
+        if len(words) >= 4 and len(tied_languages & exclusive_languages) >= 2:
+            return {"language": "mul", "confidence": 0.4, "method": "code-switched-lexical"}
         return {"language": "und", "confidence": 0.25, "method": "ambiguous-lexical"}
     # A text span with substantial evidence for two languages is code-switched.
     if second >= 1 and score >= 1 and len(words) >= 5 and score <= second * 2:
