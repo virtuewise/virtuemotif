@@ -28,8 +28,61 @@ def _normalise_token(value: Any) -> str:
     return " ".join(str(value).casefold().replace("’", "'").split())
 
 
+def _validated_words(words: Any, example_id: str, label: str) -> list[dict[str, Any]]:
+    if not isinstance(words, list):
+        raise TypeError(f"{label} words for {example_id!r} must be an array")
+    result: list[dict[str, Any]] = []
+    previous_start = -1.0
+    for index, word in enumerate(words):
+        if not isinstance(word, dict):
+            raise TypeError(f"{label} word {index} for {example_id!r} must be an object")
+        token = word.get("text")
+        if not isinstance(token, str) or not _normalise_token(token):
+            raise ValueError(f"{label} word {index} for {example_id!r} requires non-empty text")
+        try:
+            start, end = float(word["start"]), float(word["end"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(f"{label} word {index} for {example_id!r} has invalid timestamps") from exc
+        if (
+            not math.isfinite(start) or not math.isfinite(end)
+            or start < 0 or end <= start
+        ):
+            raise ValueError(f"{label} word {index} for {example_id!r} has invalid interval")
+        if start < previous_start:
+            raise ValueError(f"{label} words for {example_id!r} are out of order")
+        previous_start = start
+        result.append({"text": token, "normalised": _normalise_token(token), "start": start, "end": end})
+    return result
+
+
+def _match_word_sequences(
+    reference: list[dict[str, Any]], predicted: list[dict[str, Any]]
+) -> list[tuple[int, int]]:
+    """Return maximum-cardinality ordered token matches (LCS), not positional zip pairs."""
+    rows, columns = len(reference), len(predicted)
+    lengths = [[0] * (columns + 1) for _ in range(rows + 1)]
+    for i in range(rows - 1, -1, -1):
+        for j in range(columns - 1, -1, -1):
+            if reference[i]["normalised"] == predicted[j]["normalised"]:
+                lengths[i][j] = 1 + lengths[i + 1][j + 1]
+            else:
+                lengths[i][j] = max(lengths[i + 1][j], lengths[i][j + 1])
+    matches: list[tuple[int, int]] = []
+    i = j = 0
+    while i < rows and j < columns:
+        if reference[i]["normalised"] == predicted[j]["normalised"]:
+            matches.append((i, j))
+            i += 1
+            j += 1
+        elif lengths[i + 1][j] >= lengths[i][j + 1]:
+            i += 1
+        else:
+            j += 1
+    return matches
+
+
 def evaluate_alignment(corpus: Any, predictions: Any, split: str = "test") -> dict[str, Any]:
-    """Report token match and boundary error by language on a reviewed split."""
+    """Report ordered token matches and boundary errors by language on a reviewed split."""
     errors = validate_corpus(corpus)
     if errors:
         raise ValueError("invalid reference corpus: " + "; ".join(errors))
@@ -40,59 +93,47 @@ def evaluate_alignment(corpus: Any, predictions: Any, split: str = "test") -> di
     if not isinstance(predictions, dict):
         raise TypeError("predictions must be an object keyed by example id")
 
-    selected = [
-        item for item in corpus["examples"]
-        if split == "all" or item.get("split") == split
-    ]
+    selected = [item for item in corpus["examples"] if split == "all" or item.get("split") == split]
     if not selected:
         raise ValueError(f"requested split {split!r} has no examples")
 
     metrics: dict[str, dict[str, Any]] = {}
-    overall: dict[str, Any] = {"examples": 0, "reference_words": 0, "predicted_words": 0,
-                               "matched_words": 0, "start_errors": [], "end_errors": []}
+    overall: dict[str, Any] = {
+        "examples": 0, "reference_words": 0, "predicted_words": 0, "matched_words": 0,
+        "start_errors": [], "end_errors": [],
+    }
     for example in selected:
         language = example["language"]
+        example_id = example["id"]
         reference = example.get("words")
-        predicted = predictions.get(example["id"])
         if not isinstance(reference, list) or not reference:
-            raise ValueError(f"example {example['id']!r} requires reference words")
-        if not isinstance(predicted, list):
-            raise TypeError(f"missing predicted word list for {example['id']!r}")
+            raise ValueError(f"example {example_id!r} requires reference words")
+        reference_words = _validated_words(reference, example_id, "reference")
+        if example_id not in predictions:
+            raise ValueError(f"missing predictions for {example_id!r}")
+        predicted_words = _validated_words(predictions[example_id], example_id, "predicted")
+        matches = _match_word_sequences(reference_words, predicted_words)
 
         bucket = metrics.setdefault(language, {
             "examples": 0, "reference_words": 0, "predicted_words": 0, "matched_words": 0,
-            "start_errors": [], "end_errors": [],
+            "insertions": 0, "deletions": 0, "start_errors": [], "end_errors": [],
         })
-        bucket["examples"] += 1
-        overall["examples"] += 1
-        bucket["reference_words"] += len(reference)
-        bucket["predicted_words"] += len(predicted)
-        overall["reference_words"] += len(reference)
-        overall["predicted_words"] += len(predicted)
+        for target in (bucket, overall):
+            target["examples"] += 1
+            target["reference_words"] += len(reference_words)
+            target["predicted_words"] += len(predicted_words)
+            target["matched_words"] += len(matches)
+        bucket["insertions"] += len(predicted_words) - len(matches)
+        bucket["deletions"] += len(reference_words) - len(matches)
 
-        for index, (ref_word, pred_word) in enumerate(zip(reference, predicted)):
-            if not isinstance(ref_word, dict) or not isinstance(pred_word, dict):
-                raise TypeError(f"example {example['id']!r} word {index} must be an object")
-            if _normalise_token(ref_word.get("text", "")) != _normalise_token(pred_word.get("text", "")):
-                continue
-            try:
-                ref_start, ref_end = float(ref_word["start"]), float(ref_word["end"])
-                pred_start, pred_end = float(pred_word["start"]), float(pred_word["end"])
-            except (KeyError, TypeError, ValueError) as exc:
-                raise ValueError(f"example {example['id']!r} word {index} has invalid timestamps") from exc
-            values = (ref_start, ref_end, pred_start, pred_end)
-            if not all(math.isfinite(value) for value in values):
-                raise ValueError(f"example {example['id']!r} word {index} has non-finite timestamps")
-            if ref_start < 0 or ref_end <= ref_start or pred_start < 0 or pred_end <= pred_start:
-                raise ValueError(f"example {example['id']!r} word {index} has invalid interval")
-            start_error = abs(pred_start - ref_start)
-            end_error = abs(pred_end - ref_end)
+        for ref_index, pred_index in matches:
+            ref_word, pred_word = reference_words[ref_index], predicted_words[pred_index]
+            start_error = abs(pred_word["start"] - ref_word["start"])
+            end_error = abs(pred_word["end"] - ref_word["end"])
             bucket["start_errors"].append(start_error)
             bucket["end_errors"].append(end_error)
-            bucket["matched_words"] += 1
             overall["start_errors"].append(start_error)
             overall["end_errors"].append(end_error)
-            overall["matched_words"] += 1
 
     def finish(bucket: dict[str, Any]) -> dict[str, Any]:
         matched = bucket["matched_words"]
@@ -110,7 +151,7 @@ def evaluate_alignment(corpus: Any, predictions: Any, split: str = "test") -> di
             "end_boundary_mae_seconds": round(statistics.mean(end_errors), 4) if end_errors else None,
             "end_boundary_median_absolute_error_seconds": _percentile(end_errors, 0.5) if end_errors else None,
             "end_boundary_p95_absolute_error_seconds": _percentile(end_errors, 0.95) if end_errors else None,
-            "warning": "Word timing metrics only describe matched tokens; inspect unmatched tokens and audio manually.",
+            "warning": "Boundary metrics cover ordered token matches only; inspect insertions, deletions, and audio manually.",
         }
 
     return {
@@ -118,11 +159,12 @@ def evaluate_alignment(corpus: Any, predictions: Any, split: str = "test") -> di
         "evidence_level": "human_reviewed_rights_cleared_reference_alignment",
         "dataset_id": corpus["dataset_id"],
         "evaluated_split": split,
+        "matching_method": "longest_common_subsequence_normalized_tokens",
         "per_language": {language: finish(bucket) for language, bucket in sorted(metrics.items())},
         "overall": finish(overall),
         "limitations": [
             "This evaluator compares supplied predictions; it does not run ASR or force alignment.",
-            "Word position pairing is used; token insertions/deletions can shift later pairs and require manual inspection.",
+            "Ordered token matching avoids positional-shift timing errors but does not establish semantic equivalence.",
             "Reference rights, consent, annotation quality, and native-speaker review must be independently verified.",
         ],
     }
@@ -139,7 +181,7 @@ def main() -> int:
         corpus = json.loads(args.references.read_text(encoding="utf-8"))
         predictions = json.loads(args.predictions.read_text(encoding="utf-8"))
         report = evaluate_alignment(corpus, predictions, split=args.split)
-    except (OSError, json.JSONDecodeError, ValueError) as exc:
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
         print(f"word-alignment-benchmark: {exc}", file=sys.stderr)
         return 2
     rendered = json.dumps(report, indent=2, ensure_ascii=False) + "\n"
