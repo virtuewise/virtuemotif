@@ -189,6 +189,35 @@ export function audioReactiveGlitchIntensity(
   );
 }
 
+/** Apply a subtle, bounded pulse to 2D motion typography from validated audio cues. */
+export function audioReactiveTypographyScale(
+  cue: Pick<AudioCueFrame, "energy" | "beatPulse" | "transitionIntensity">,
+): number {
+  return 1 +
+    unitInterval(cue.beatPulse) * 0.018 +
+    unitInterval(cue.transitionIntensity) * 0.012 +
+    unitInterval(cue.energy) * 0.006;
+}
+
+/** Return a small, bounded lighting boost for audio-reactive scenic highlights. */
+export function audioReactiveLightBoost(
+  cue: Pick<AudioCueFrame, "energy" | "beatPulse" | "transitionIntensity">,
+): number {
+  return unitInterval(cue.energy) * 0.08 +
+    unitInterval(cue.beatPulse) * 0.12 +
+    unitInterval(cue.transitionIntensity) * 0.1;
+}
+
+/** Keep scenery camera motion subtle so beats do not cause distracting jumps. */
+export function audioReactiveSceneScale(
+  cue: Pick<AudioCueFrame, "energy" | "beatPulse" | "transitionIntensity">,
+): number {
+  return 1 +
+    unitInterval(cue.beatPulse) * 0.005 +
+    unitInterval(cue.transitionIntensity) * 0.007 +
+    unitInterval(cue.energy) * 0.002;
+}
+
 /** Scale particle fall rate from the audio envelope without introducing randomness. */
 export function audioReactiveParticleFallRate(
   cue: Pick<AudioCueFrame, "energy" | "beatPulse">,
