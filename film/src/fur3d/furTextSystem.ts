@@ -256,6 +256,8 @@ export function prepareTextGeometryForFur(geometry: THREE.BufferGeometry): THREE
 
 export interface FurMeshGroup {
   group: THREE.Group;
+  /** Geometry fit scale computed from the viewport-safe text bounds. */
+  fitScale: number;
   uniforms: Record<string, THREE.IUniform>;
   update: (time: number, audioBeat?: THREE.Vector3) => void;
   dispose: () => void;
@@ -425,6 +427,7 @@ export function createFurryTextMesh(
 
   return {
     group,
+    fitScale: autoScale,
     uniforms,
     update: (time: number, audioBeat?: THREE.Vector3) => {
       uniforms.uTime.value = time;
