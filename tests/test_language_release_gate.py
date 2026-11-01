@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from tools.language_release_gate import release_errors
-from tools.validate_language_dataset import REVIEWED_STATUS, SMOKE_STATUS
+from tools.validate_language_dataset import REVIEWED_STATUS
 
 SMOKE_CORPUS = Path("tests/fixtures/multilingual_language_smoke_v1.json")
 
