@@ -37,3 +37,9 @@ known but different language, the engine preserves both values and adds the
 `asr_lexical_disagreement` review reason instead of silently choosing one as certain.
 The disagreement may reflect code-switching or an error in either signal; it is a
 review trigger, not a claim that either detector is correct.
+
+
+A lexical score tie is reported as `und` with an ambiguity method, not as `mul`.
+Tied evidence alone cannot establish code-switching, particularly when the tokens are
+shared across isiNdebele and isiZulu. A mixed-language label requires distinct
+competing evidence rather than a tie caused by overlapping markers.
