@@ -11,13 +11,15 @@ from typing import Any
 
 # Conservative lexical hints; ambiguous short lines remain "und".
 _LANGUAGE_MARKERS: dict[str, set[str]] = {
-    "en": {"the", "and", "you", "your", "with", "love", "heart", "we", "are", "is", "my"},
-    "sn": {"ndiri", "uri", "iwe", "isu", "rudo", "wangu", "wako", "moyo", "zvino", "kwete", "hongu", "ndinoda"},
-    "nd": {"mina", "wena", "thina", "lami", "lakho", "uthando", "ngiyabonga", "yebo", "cha", "khona", "ngikhona"},
-    "zu": {"mina", "wena", "thina", "yami", "yakho", "uthando", "ngiyabonga", "yebo", "cha", "kakhulu"},
-    "xh": {"mna", "yam", "uthando", "enkosi", "ewe", "hayi", "ndiyakuthanda"},
-    "af": {"die", "en", "ek", "jy", "liefde", "hart", "vir", "met", "ons", "nie"},
-    "sw": {"mimi", "wewe", "upendo", "ndiyo", "hapana", "asante", "sana", "yangu"},
+    "en": {"the", "and", "you", "your", "with", "love", "heart", "we", "are", "is", "my", "this", "that", "have", "never", "tonight", "forever", "because", "when", "all", "for", "to"},
+    "sn": {"ndiri", "uri", "iwe", "isu", "rudo", "wangu", "wako", "moyo", "zvino", "kwete", "hongu", "ndinoda", "ndinokuda", "ndichauya", "musha", "hupenyu", "mangwanani", "manheru", "tiri", "nguva", "chokwadi", "kana", "ndiye", "ndichiri", "pamwe"},
+    # Only distinctive forms are used for Nguni classification. Shared words such
+    # as mina, wena, thina, uthando, yebo and cha are intentionally omitted.
+    "nd": {"lami", "lakho", "ngikhona", "ngiyabonga", "ngiyahamba", "ngiyazi", "ngiyabona", "ngikhumbula", "ngizokubona", "ngiyakuthanda", "ngikhuluma", "ngifuna", "ngiyakhala", "ngiphila", "ngizobuya", "khona"},
+    "zu": {"yami", "yakho", "kakhulu", "ngiyabonga", "ngiyakuthanda", "ngihamba", "ngiyazi", "ngiyabona", "ngifuna", "ngikhumbula", "ngizokubona", "ngiyaphila", "ngiyacula", "ngizobuya", "ngiyakhala"},
+    "xh": {"mna", "yam", "enkosi", "ewe", "hayi", "ndiyakuthanda", "ndiyahamba", "ndiyazi", "ndiyabona", "ndifuna", "ndiyaphila", "ndikhumbula", "ndiza", "ndithetha"},
+    "af": {"die", "en", "ek", "jy", "liefde", "hart", "vir", "met", "ons", "nie", "baie", "vandag", "saam", "altyd"},
+    "sw": {"mimi", "wewe", "upendo", "ndiyo", "hapana", "asante", "sana", "yangu", "ninakupenda", "habari", "rafiki", "maisha", "kesho", "karibu"},
 }
 _WORD_RE = re.compile(r"[\w’']+", re.UNICODE)
 _SCRIPT_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -41,13 +43,20 @@ def detect_text_language(text: str) -> dict[str, Any]:
             if matches / letters >= 0.35:
                 return {"language": code, "confidence": round(min(0.99, 0.65 + matches / letters / 3), 3), "method": "script"}
     scores = {code: sum(word in markers for word in words) for code, markers in _LANGUAGE_MARKERS.items()}
-    ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+    ranked = sorted(scores.items(), key=lambda item: (-item[1], item[0]))
     code, score = ranked[0]
-    second = ranked[1][1]
+    second_code, second = ranked[1]
     if score == 0:
         return {"language": "und", "confidence": 0.0, "method": "text-heuristic"}
+    # Nguni varieties share substantial vocabulary. Do not force a language when
+    # evidence is tied; expose mixed-language evidence instead of hiding it.
     if score == second:
+        if score > 0 and len(words) >= 4:
+            return {"language": "mul", "confidence": 0.4, "method": "code-switched-lexical"}
         return {"language": "und", "confidence": 0.25, "method": "ambiguous-lexical"}
+    # A text span with substantial evidence for two languages is code-switched.
+    if second >= 1 and score >= 1 and len(words) >= 5 and score <= second * 2:
+        return {"language": "mul", "confidence": 0.45, "method": "code-switched-lexical"}
     return {"language": code, "confidence": round(min(0.94, 0.45 + 0.12 * score + 0.08 * (score - second)), 3), "method": "lexical-hint"}
 
 
