@@ -51,6 +51,27 @@ For actual audio-to-text transcription, use the optional `faster-whisper` engine
 
 Language identification is best-effort, not universal. Whisper-family models vary in support for Shona, isiNdebele, isiZulu, and code-switched singing. Short windows, instrumental bleed, backing vocals, and sung pronunciation can lower accuracy. Keep human review enabled and evaluate representative native-speaker audio before claiming production coverage.
 
+## One-command auto-lyrics video
+
+After installing the optional ASR dependencies and the Node dependencies in
+`film/`, the orchestration command runs transcription, converts the result to
+Remotion Song JSON, writes the props wrapper, and renders the video:
+
+```bash
+python -m pip install "faster-whisper>=1.1"
+cd film && npm ci && cd ..
+python -m tools.make_auto_lyrics_video "path/to/song.m4a" \
+  --output out/song.mp4 --title "My Song" --artist "Artist"
+```
+
+Omit `--language` to let the multilingual ASR model detect the language, or
+supply a language code to force one. The command copies the source audio into
+`film/public/audio/auto-lyrics/`, writes reviewable intermediate JSON under
+`timing/` and `film/src/data/`, and renders through the generic `AutoLyrics`
+composition. It refuses to replace an existing output video unless `--force`
+is supplied. Use only audio you have permission to process and redistribute;
+review machine-generated lyrics before publishing.
+
 ## Export generated lyrics for Remotion
 
 Generate a versioned ASR document, then convert it into the exact Song JSON shape used by the film compositions:
