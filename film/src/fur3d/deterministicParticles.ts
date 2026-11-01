@@ -1,9 +1,13 @@
-import { rnd } from "../theme";
-
 export interface RainfallParticleData {
   positions: Float32Array;
   speeds: Float32Array;
 }
+
+/** Small deterministic pseudo-random function returning a value in [0, 1). */
+const seededUnit = (seed: number): number => {
+  const value = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+  return value - Math.floor(value);
+};
 
 /**
  * Build a stable particle field for repeatable Remotion renders.
@@ -24,10 +28,10 @@ export function createRainfallParticleData(
   const speeds = new Float32Array(particleCount);
   for (let i = 0; i < particleCount; i += 1) {
     const offset = seed + i * 4;
-    positions[i * 3] = (rnd(offset) - 0.5) * 12;
-    positions[i * 3 + 1] = rnd(offset + 1) * 6 + 2;
-    positions[i * 3 + 2] = (rnd(offset + 2) - 0.5) * 12;
-    speeds[i] = 0.02 + rnd(offset + 3) * 0.03;
+    positions[i * 3] = (seededUnit(offset) - 0.5) * 12;
+    positions[i * 3 + 1] = seededUnit(offset + 1) * 6 + 2;
+    positions[i * 3 + 2] = (seededUnit(offset + 2) - 0.5) * 12;
+    speeds[i] = 0.02 + seededUnit(offset + 3) * 0.03;
   }
   return { positions, speeds };
 }
