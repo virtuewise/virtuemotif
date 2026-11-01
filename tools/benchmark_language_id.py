@@ -22,7 +22,7 @@ def evaluate(corpus: Any) -> dict[str, Any]:
     predictions = []
     for index, example in enumerate(examples):
         if not isinstance(example, dict) or not isinstance(example.get("text"), str):
-            raise ValueError(f"example {index} must contain text")
+            raise TypeError(f"example {index} must contain text as a string")
         expected = example.get("language")
         if not isinstance(expected, str) or not expected:
             raise ValueError(f"example {index} must contain a language label")
