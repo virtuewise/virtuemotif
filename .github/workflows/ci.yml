@@ -48,6 +48,7 @@ jobs:
           tools/make_video.py
           tools/make_tapsync.py
           tools/utils.py
+          tools/export_audio_cues.py
           tools/effects
           tests/test_ci_smoke.py
 
@@ -94,6 +95,21 @@ jobs:
 
       - name: Install Node dependencies
         run: npm ci
+
+      - name: Install FFmpeg for compressed audio cue export
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+
+      - name: Generate versioned audio cues for Remotion
+        run: |
+          cd ..
+          python -m pip install --upgrade pip
+          python -m pip install numpy soundfile
+          python tools/export_audio_cues.py
+
+      - name: Test frame-time and audio-cue utilities
+        run: node --experimental-strip-types --test ../tests/audio_cues.test.mjs
 
       - name: Type-check Remotion project
         run: npx tsc --noEmit
