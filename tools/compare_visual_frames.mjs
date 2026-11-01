@@ -3,14 +3,10 @@ import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readPngDimensions } from "./validate_visual_review_frames.mjs";
+import { readPngDimensions, VISUAL_REVIEW_FRAMES } from "./validate_visual_review_frames.mjs";
 
-export const COMPARABLE_VISUAL_FRAMES = {
-  "smart-fur-landscape.png": [1920, 1080],
-  "smart-fur-4k.png": [3840, 2160],
-  "smart-fur-portrait.png": [1080, 1920],
-  "smart-fur-square.png": [1024, 1024],
-};
+// Every required CI review capture participates in comparison once an approved baseline exists.
+export const COMPARABLE_VISUAL_FRAMES = VISUAL_REVIEW_FRAMES;
 
 /** Compare RGBA buffers and report changed pixels plus mean channel error. */
 export function comparePixelBuffers(expected, actual, channelThreshold = 8) {
