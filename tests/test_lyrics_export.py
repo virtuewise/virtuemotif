@@ -38,7 +38,8 @@ def test_export_preserves_language_word_timing_and_instrumental_gaps() -> None:
     assert song["id"] == "shona-track"
     assert song["audio"] == "audio/song.m4a"
     assert song["duration"] == 20
-    assert song["detectedLanguage"] == "sn"
+    assert song["detectedLanguage"] == "Shona"
+    assert song["detectedLanguageCode"] == "sn"
     assert song["languageConfidence"] == pytest.approx(0.88)
     assert song["reviewRequired"] is True
     assert song["sections"][0]["id"] == "intro"
@@ -63,7 +64,8 @@ def test_export_handles_instrumental_audio_without_fabricating_lyrics() -> None:
         "end": 9.0,
         "lines": [],
     }]
-    assert song["detectedLanguage"] == "und"
+    assert song["detectedLanguage"] == "Unknown / undetected"
+    assert song["detectedLanguageCode"] == "und"
     assert song["languageConfidence"] == 0
 
 
