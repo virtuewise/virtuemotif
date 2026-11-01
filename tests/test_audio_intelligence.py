@@ -49,3 +49,25 @@ def test_energy_curve_and_events_are_chronological() -> None:
     assert [row["time"] for row in result["energy_curve"]] == sorted(row["time"] for row in result["energy_curve"])
     assert [row["time"] for row in result["events"]] == sorted(row["time"] for row in result["events"])
     assert any(event["type"] == "energy-rise" for event in result["events"])
+
+
+
+def test_analysis_is_deterministic_for_identical_synthetic_audio() -> None:
+    sample_rate = 16_000
+    time = np.arange(sample_rate * 6, dtype=np.float32) / sample_rate
+    samples = (
+        0.2 * np.sin(2 * np.pi * 220 * time)
+        + 0.1 * np.sin(2 * np.pi * 440 * time)
+    ).astype(np.float32)
+
+    first = analyze_samples(samples, sample_rate)
+    second = analyze_samples(samples.copy(), sample_rate)
+
+    assert first == second
+
+
+def test_analyzer_rejects_non_finite_samples_and_boolean_sample_rate() -> None:
+    with pytest.raises(ValueError, match="NaN or infinite"):
+        analyze_samples(np.array([0.0, np.nan, 0.0], dtype=np.float32), 16_000)
+    with pytest.raises(ValueError, match="positive integer"):
+        analyze_samples(np.zeros(100, dtype=np.float32), True)

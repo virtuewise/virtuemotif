@@ -39,3 +39,11 @@ The output sets `review_required: true`; machine transcriptions are not
 canonical lyrics until reviewed. The current CLI streams decoded segments from
 an audio file; live microphone capture and strict low-latency streaming are a
 separate adapter and are not claimed by this implementation.
+
+## Browser worker versus real transcription
+
+The browser worker in `film/src/workers/whisper.worker.ts` currently performs **voice-activity detection only**. It reports vocal-energy intervals and deliberately returns `detectedLanguage: "und"`, zero language confidence, and `transcriptionAvailable: false`. It does not contain an ASR model; it must not invent placeholder lyric phrases or a language label.
+
+For actual audio-to-text transcription, use the optional `faster-whisper` engine documented above. In `--live` mode it captures microphone windows, runs the ASR model per window, and streams timestamped JSONL lyric segments with the model's language probability. Latency depends on chunk size, hardware, and model. Five-second windows are a starting point, not a real-time guarantee.
+
+Language identification is best-effort, not universal. Whisper-family models vary in support for Shona, isiNdebele, isiZulu, and code-switched singing. Short windows, instrumental bleed, backing vocals, and sung pronunciation can lower accuracy. Keep human review enabled and evaluate representative native-speaker audio before claiming production coverage.

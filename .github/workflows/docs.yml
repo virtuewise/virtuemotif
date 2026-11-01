@@ -7,6 +7,7 @@ on:
       - ".github/workflows/docs.yml"
       - ".github/scripts/check_docs_links.py"
       - "requirements-dev.txt"
+      - "requirements-ci.txt"
       - "site/index.html"
       - "site/tools.html"
       - "site/tools/**"
@@ -23,7 +24,7 @@ concurrency:
 jobs:
   deploy:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -34,19 +35,21 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: requirements-dev.txt
+          cache-dependency-path: |
+            requirements-dev.txt
+            requirements-ci.txt
 
       - name: Install documentation dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements-dev.txt
+          python -m pip install -r requirements-dev.txt -c requirements-ci.txt
 
       - name: Prepare clean publishing directory
         run: |
@@ -56,24 +59,24 @@ jobs:
       - name: Build public API reference
         run: |
           # Keep this list aligned with the import-safe modules built in CI.
-          python -m pdoc -o build/site tools.make_video tools.make_tapsync tools.utils tools.effects
+          python -m pdoc -o build/site tools.make_video tools.make_tapsync tools.utils tools.effects tools.benchmark_render
 
       - name: Check generated documentation links
         run: python .github/scripts/check_docs_links.py build/site
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
         with:
           enablement: true
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: build/site
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
 
       - name: Smoke-test published documentation
         env:

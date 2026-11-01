@@ -40,6 +40,7 @@ yarn-error.log*
 # Build & rendered output
 out/
 build/
+film/public/audio-cues/
 
 # Stems & temporary audio caches
 timing/stems/

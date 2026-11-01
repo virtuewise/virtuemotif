@@ -23,7 +23,7 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements-dev.txt
 ```
 
-The pipeline and CI use FFmpeg/ffprobe for media processing. Install FFmpeg for your operating system and verify that both commands are available.
+The pipeline and CI use FFmpeg/ffprobe for media processing. Install FFmpeg for your operating system and verify that both commands are available. CI installs the human-maintained minimum requirements from `requirements-dev.txt` with the exact Python 3.11 CI constraints in `requirements-ci.txt`; weekly Dependabot updates should update these files together and the resulting checks must pass.
 
 ### Remotion application
 
@@ -48,7 +48,7 @@ From the repository root:
 ```bash
 python -m pytest -q
 python -m compileall -q tools tests
-ruff check tools/make_video.py tools/make_tapsync.py tools/utils.py tools/effects tests/test_ci_smoke.py
+ruff check tools/make_video.py tools/benchmark_render.py tools/make_tapsync.py tools/utils.py tools/effects tests/test_ci_smoke.py
 ```
 
 If you change documentation-generation inputs, validate the maintained API docs too:
@@ -69,7 +69,7 @@ npx remotion browser ensure
 npx remotion compositions src/index.ts
 ```
 
-CI runs Python quality checks and Remotion validation for pull requests targeting `main`. Do not commit generated build artifacts unless a change specifically requires them.
+CI runs Python quality checks, a deterministic synthetic-audio render benchmark, and Remotion validation for pull requests targeting `main`. The benchmark report is retained as a 14-day CI artifact; its synthetic input is useful for regression comparisons but is not a substitute for production-media profiling. Do not commit generated build artifacts unless a change specifically requires them.
 
 ## Code and content expectations
 

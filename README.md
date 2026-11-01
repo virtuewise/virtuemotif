@@ -61,6 +61,15 @@ flowchart TD
 
 ---
 
+## Supported development environment
+
+- Python **3.11** for the Python pipeline and tests.
+- Node.js **24** and npm for the Remotion application in `film/`.
+- FFmpeg and `ffprobe` for media decoding, encoding, and output validation.
+- GitHub Actions runs on Ubuntu 22.04; CI applies the exact Python 3.11 constraints in `requirements-ci.txt` to the declared dependencies in `requirements-dev.txt` and uses `film/package-lock.json` for the Node dependency graph.
+
+See [Contributing](CONTRIBUTING.md) for reproducible setup and validation commands, [Architecture](docs/architecture.md) for data contracts, [asset provenance](docs/assets-and-provenance.md) for media rights status, and the [release checklist](docs/release-checklist.md) for release gates.
+
 ## Quick Start
 
 ### 1. Installation
