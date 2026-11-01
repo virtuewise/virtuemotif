@@ -65,13 +65,27 @@ def detect_text_language(text: str) -> dict[str, Any]:
 def _normalise_segment(segment: Any, asr_language: str, asr_confidence: float) -> dict[str, Any]:
     text = str(getattr(segment, "text", "")).strip()
     hint = detect_text_language(text)
-    language = hint["language"] if hint["language"] != "und" else (asr_language or "und")
+    asr_code = asr_language or "und"
+    lexical_code = str(hint["language"])
+    language = lexical_code if lexical_code != "und" else asr_code
+    disagreement = lexical_code not in {"und", asr_code} and asr_code != "und"
+    review_reasons = ["asr_lexical_disagreement"] if disagreement else []
     return {
         "start": round(float(segment.start), 3), "end": round(float(segment.end), 3),
         "text": text, "language": language,
-        "language_confidence": hint["confidence"] if hint["language"] != "und" else round(asr_confidence, 3),
-        "language_method": hint["method"] if hint["language"] != "und" else "asr-segment-fallback",
-        "asr_language": asr_language or "und",
+        "language_confidence": hint["confidence"] if lexical_code != "und" else round(asr_confidence, 3),
+        "language_method": hint["method"] if lexical_code != "und" else "asr-segment-fallback",
+        "asr_language": asr_code,
+        "language_evidence": {
+            "asr_language": asr_code,
+            "asr_confidence": round(asr_confidence, 3),
+            "lexical_language": lexical_code,
+            "lexical_confidence": hint["confidence"],
+            "lexical_method": hint["method"],
+            "disagreement": disagreement,
+        },
+        "review_required": bool(review_reasons),
+        "review_reasons": review_reasons,
         "words": [
             {"text": str(getattr(word, "word", "")).strip(), "start": round(float(word.start), 3),
              "end": round(float(word.end), 3), "probability": round(float(getattr(word, "probability", 0.0) or 0.0), 3)}

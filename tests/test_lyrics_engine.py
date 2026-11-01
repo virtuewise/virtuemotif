@@ -193,3 +193,28 @@ def test_short_language_change_stays_a_candidate_and_requires_review() -> None:
     ])
     assert len(report["transitions"]) == 1
     assert report["transitions"][0]["review_required"] is True
+
+
+def test_normalised_segment_preserves_asr_lexical_disagreement_for_review() -> None:
+    segment = SimpleNamespace(start=0.0, end=1.4, text="Ndinoda rudo rwako", words=[])
+    result = _normalise_segment(segment, "en", 0.91)
+    assert result["language"] == "sn"
+    assert result["asr_language"] == "en"
+    assert result["language_evidence"] == {
+        "asr_language": "en",
+        "asr_confidence": 0.91,
+        "lexical_language": "sn",
+        "lexical_confidence": result["language_evidence"]["lexical_confidence"],
+        "lexical_method": "lexical-hint",
+        "disagreement": True,
+    }
+    assert result["review_required"] is True
+    assert result["review_reasons"] == ["asr_lexical_disagreement"]
+
+
+def test_normalised_segment_does_not_flag_agreeing_asr_and_lexical_evidence() -> None:
+    segment = SimpleNamespace(start=0.0, end=1.4, text="I love you with all my heart", words=[])
+    result = _normalise_segment(segment, "en", 0.91)
+    assert result["language_evidence"]["disagreement"] is False
+    assert result["review_required"] is False
+    assert result["review_reasons"] == []
