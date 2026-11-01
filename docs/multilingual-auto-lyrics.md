@@ -221,3 +221,11 @@ ambiguous spans, spelling variants, dialects, and difficult sung audio. Keep
 train/tuning examples separate from a held-out test set and report per-language
 precision/recall as well as accuracy. Unknown or mixed predictions should remain
 visible in the confusion report rather than being silently discarded.
+
+
+When word timestamps are supplied, a code-switch candidate may include a review-only
+boundary_window only if every text token maps exactly to one ordered, non-overlapping
+word record. A mismatch in tokenization or invalid timing falls back to word indices
+without a time window. The window is bounded by the prior marked word's end and the
+next marked word's start; it is an ASR-derived interval, not a precise boundary or a
+claim of language-model certainty. Human review remains mandatory.
