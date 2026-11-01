@@ -13,6 +13,11 @@ from tools.lyrics_engine import (
 
 @pytest.mark.parametrize(("text", "expected"), [
     ("I love you with all my heart", "en"),
+    ("Hola gracias, quiero bailar contigo esta noche", "es"),
+    ("Bonjour merci, je t’aime avec tout mon coeur", "fr"),
+    ("Obrigado, quero você comigo esta noite", "pt"),
+    ("Ich liebe dich, mein Herz schlägt heute Nacht", "de"),
+    ("Ciao grazie, amore mio per sempre stanotte", "it"),
     ("Ndinoda rudo rwako moyo wangu", "sn"),
     ("yami yakho yami", "zu"),
     ("lami lakho khona ngikhona", "nd"),
