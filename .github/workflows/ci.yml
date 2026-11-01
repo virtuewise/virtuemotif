@@ -202,7 +202,7 @@ jobs:
         run: npx remotion still src/index.ts SmartFurScene ../build/visual-review/smart-fur-landscape.png --frame=90
 
       - name: Capture 4K visual review frame
-        run: npx remotion still src/index.ts SmartFurScene4K ../build/visual-review/smart-fur-4k.png --frame=90
+        run: npx remotion still src/index.ts SmartFurScene4K ../build/visual-review/smart-fur-4k.png --frame=90 --timeout=120000
 
       - name: Capture portrait visual review frame
         run: npx remotion still src/index.ts SmartFurSceneVertical ../build/visual-review/smart-fur-portrait.png --frame=90
