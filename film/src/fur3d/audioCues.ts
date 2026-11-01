@@ -61,8 +61,12 @@ export function parseAudioIntelligence(value: unknown): AudioIntelligence | null
   ) return null;
 
   if (
-    data.energy_curve.some((point, index) => index > 0 && point.time < data.energy_curve![index - 1].time) ||
-    data.events.some((event, index) => index > 0 && event.time < data.events![index - 1].time)
+    data.beats.some((time) => time > data.duration) ||
+    data.downbeats.some((time) => time > data.duration) ||
+    data.energy_curve.some((point, index) => point.time > data.duration ||
+      (index > 0 && point.time < data.energy_curve![index - 1].time)) ||
+    data.events.some((event, index) => event.time > data.duration ||
+      (index > 0 && event.time < data.events![index - 1].time))
   ) return null;
 
   return data as AudioIntelligence;
@@ -125,7 +129,7 @@ export function evaluateAudioCues(
   fps: number,
   cues: AudioIntelligence | null | undefined,
 ): AudioCueFrame {
-  const duration = cues?.duration ?? Number.POSITIVE_INFINITY;
+  const duration = cues?.duration ?? Number.MAX_SAFE_INTEGER;
   const time = frameToTime(frame, fps, duration);
   if (!cues) {
     // Stable frame-derived fallback: no randomness or wall-clock dependency.
