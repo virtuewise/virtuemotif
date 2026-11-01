@@ -1,6 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { comparePixelBuffers } from "../tools/compare_visual_frames.mjs";
+import {
+  COMPARABLE_VISUAL_FRAMES,
+  comparePixelBuffers,
+} from "../tools/compare_visual_frames.mjs";
+import { VISUAL_REVIEW_FRAMES } from "../tools/validate_visual_review_frames.mjs";
+
+test("visual comparator covers every required CI review capture", () => {
+  assert.deepEqual(COMPARABLE_VISUAL_FRAMES, VISUAL_REVIEW_FRAMES);
+  assert.equal(Object.keys(COMPARABLE_VISUAL_FRAMES).length, 12);
+});
 
 test("identical RGBA frames have zero changed pixels and zero channel error", () => {
   const frame = Buffer.from([10, 20, 30, 255, 40, 50, 60, 255]);
