@@ -11,9 +11,10 @@ JSON document instead.
 Install ASR separately so the video renderer stays lightweight:
 
 ```bash
-python -m pip install "faster-whisper>=1.1"
+python -m pip install "faster-whisper>=1.1" sounddevice
 python -m tools.lyrics_engine path/to/song.wav --model small
 python -m tools.lyrics_engine path/to/song.wav --output lyrics/song.auto.json
+python -m tools.lyrics_engine --live --model small --chunk-seconds 5
 ```
 
 Omit `--language` to let the backend detect the dominant audio language. The
