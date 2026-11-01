@@ -1,10 +1,11 @@
 """Generate Remotion-ready versioned audio-intelligence JSON for film assets."""
 from __future__ import annotations
 
+from pathlib import Path
+
 import argparse
 import subprocess
 import tempfile
-from pathlib import Path
 
 from tools.audio_intelligence import analyze_file
 
