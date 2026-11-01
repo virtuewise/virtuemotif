@@ -71,19 +71,33 @@ export const calculateLyricFontSize = (
 };
 
 /**
- * Return word start times only when every supplied timestamp aligns with the
- * visible lyric token in order. Invalid/mismatched ASR timings fall back to
- * deterministic staggered animation rather than animating the wrong word.
+ * Return word start times only when each timestamp matches its visible token.
+ * Optional line bounds reject stale ASR timings that fall outside the lyric.
+ * Invalid/mismatched timings fall back to deterministic staggered animation.
  */
 export const resolveWordTimings = (
   text: string,
   wordTimes?: LyricWordTime[],
+  lineFrom?: number,
+  lineTo?: number,
 ): number[] | null => {
   const words = text.trim().split(/\s+/u).filter(Boolean);
   if (!wordTimes || wordTimes.length !== words.length || words.length === 0) return null;
 
-  const normalizeWord = (word: string): string =>
-    word.normalize("NFC").toLowerCase().replace(/[\p{P}\p{S}]/gu, "");
+  const hasLineBounds = lineFrom !== undefined || lineTo !== undefined;
+  if (
+    hasLineBounds &&
+    (!Number.isFinite(lineFrom) || !Number.isFinite(lineTo) || lineFrom! < 0 || lineTo! <= lineFrom!)
+  ) {
+    return null;
+  }
+
+  const normalizeWord = (word: string): string => {
+    const normalized = word.normalize("NFC").toLowerCase();
+    // Strip punctuation for ordinary token matching, but preserve symbols and
+    // punctuation-only tokens so unrelated emoji/music symbols cannot match.
+    return normalized.replace(/[\p{P}]/gu, "") || normalized;
+  };
 
   let previousFrom = -Infinity;
   for (let index = 0; index < words.length; index += 1) {
@@ -93,8 +107,10 @@ export const resolveWordTimings = (
       !Number.isFinite(timing.from) ||
       !Number.isFinite(timing.to) ||
       timing.from < 0 ||
-      timing.to < timing.from ||
-      timing.from < previousFrom
+      timing.to <= timing.from ||
+      timing.from < previousFrom ||
+      (lineFrom !== undefined && timing.from < lineFrom) ||
+      (lineTo !== undefined && timing.to > lineTo)
     ) {
       return null;
     }

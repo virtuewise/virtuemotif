@@ -54,7 +54,7 @@ export const LyricLine: React.FC<{
   if (t < from - 0.2 || t > to + 0.6) return null;
 
   const words = text.trim().split(/\s+/u).filter(Boolean);
-  const wordStarts = resolveWordTimings(text, wordTimes);
+  const wordStarts = resolveWordTimings(text, wordTimes, from, to);
   const stagger = Math.min(0.14, 1.6 / Math.max(words.length, 1));
   const lastStart = wordStarts ? wordStarts[wordStarts.length - 1] : from + (words.length - 1) * stagger;
   const inEnd = wordStarts ? lastStart + 0.9 : from + 0.9 + words.length * stagger;
@@ -116,7 +116,8 @@ export const LyricLine: React.FC<{
           }}
         >
           {words.map((w, i) => {
-            const start = wordStarts ? wordStarts[i] - 0.06 : from + i * stagger;
+            const wordTiming = wordStarts ? wordTimes?.[i] : undefined;
+            const start = wordTiming ? wordTiming.from - 0.06 : from + i * stagger;
             const pr = spring({
               frame: Math.round((t - start) * fps),
               fps,
@@ -126,7 +127,10 @@ export const LyricLine: React.FC<{
             const dy = interpolate(pr, [0, 1], [46, 0]);
             const rot = interpolate(pr, [0, 1], [(rnd(i + text.length) - 0.5) * 3.2, 0]);
             const blurW = interpolate(pr, [0, 1], [10, 0]);
-            const recent = clamp((t - start) / 0.45);
+            const highlightStart = wordTiming?.from ?? start;
+            const highlightEnd = wordTiming?.to ?? highlightStart + 0.45;
+            const highlightDuration = Math.max(0.12, highlightEnd - highlightStart);
+            const recent = clamp((t - highlightStart) / highlightDuration);
             const hot = 1 - Math.abs(recent * 2 - 1);
             const color = hot > 0.02
               ? activePresetName === "display" ? `rgb(${246 + hot * 9},${231 - hot * 20},${200 - hot * 120})` : preset.highlightColor
