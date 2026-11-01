@@ -77,11 +77,24 @@ jobs:
           tools/effects
           tests/test_audio_intelligence.py
           tests/test_lyrics_engine.py
+          tools/benchmark_language_id.py
+          tests/test_benchmark_language_id.py
           tests/test_lyrics_export.py
           tests/test_ci_smoke.py
 
       - name: Run Python tests
         run: python -m pytest -q
+
+      - name: Run repeatable multilingual language-ID smoke benchmark
+        run: python -m tools.benchmark_language_id --output build/benchmark/multilingual-language-id.json
+
+      - name: Upload multilingual language-ID report
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: multilingual-language-id-smoke
+          path: build/benchmark/multilingual-language-id.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Check Python syntax
         run: python -m compileall -q tools tests

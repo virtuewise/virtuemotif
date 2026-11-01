@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "dataset_id": "multilingual-lexical-smoke-v1",
+  "status": "synthetic_smoke_only_requires_native_speaker_review",
+  "description": "Deterministic hand-authored regression prompts for plumbing and obvious lexical cues. Not a native-speaker-reviewed corpus and not evidence of production language accuracy.",
+  "labels": [
+    "sn",
+    "nd",
+    "zu",
+    "en",
+    "mul",
+    "und"
+  ],
+  "examples": [
+    {
+      "id": "sn-001",
+      "text": "Mangwanani shamwari yangu, ndinoda rudo rwako",
+      "language": "sn",
+      "split": "smoke"
+    },
+    {
+      "id": "sn-002",
+      "text": "Ndiri kumusha mangwanani, moyo wangu une rudo",
+      "language": "sn",
+      "split": "smoke"
+    },
+    {
+      "id": "sn-003",
+      "text": "Ndinokuda uye ndichauya manheru",
+      "language": "sn",
+      "split": "smoke"
+    },
+    {
+      "id": "nd-001",
+      "text": "Lami lakho ngikhona ngiyahamba",
+      "language": "nd",
+      "split": "smoke"
+    },
+    {
+      "id": "nd-002",
+      "text": "Lakho ngikhona ngiyahamba lami",
+      "language": "nd",
+      "split": "smoke"
+    },
+    {
+      "id": "zu-001",
+      "text": "Yami yakho ngiyacula kakhulu",
+      "language": "zu",
+      "split": "smoke"
+    },
+    {
+      "id": "zu-002",
+      "text": "Yami yakho ngiyacula ngiyaphila kakhulu",
+      "language": "zu",
+      "split": "smoke"
+    },
+    {
+      "id": "en-001",
+      "text": "I love you forever, we are together",
+      "language": "en",
+      "split": "smoke"
+    },
+    {
+      "id": "en-002",
+      "text": "When you are with me, my heart is happy",
+      "language": "en",
+      "split": "smoke"
+    },
+    {
+      "id": "mul-001",
+      "text": "I love you ndinoda rudo rwako",
+      "language": "mul",
+      "split": "smoke"
+    },
+    {
+      "id": "mul-002",
+      "text": "We are together, mangwanani shamwari yangu",
+      "language": "mul",
+      "split": "smoke"
+    },
+    {
+      "id": "und-001",
+      "text": "xylophone glimmer",
+      "language": "und",
+      "split": "smoke"
+    },
+    {
+      "id": "und-002",
+      "text": "123 !!!",
+      "language": "und",
+      "split": "smoke"
+    }
+  ]
+}
