@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Audio, staticFile } from "remotion";
-import { Song } from "../HorizonFilm";
+import type { Song } from "../HorizonFilm";
 import { FurryLyricView } from "./FurryLyricView";
 import { FUR_PRESETS } from "./furTextSystem";
 import { AutoLyricsPanel } from "../ui/AutoLyricsPanel";
