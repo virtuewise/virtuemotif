@@ -32,9 +32,13 @@ include:
   songs, and speakers between training/development and held-out test data.
 - Unique example IDs, non-empty text, a language label present in the corpus
   label list, and explicit `train` or `test` membership.
-- Per-example pseudonymous `source_id`, `reviewer_ids`,
-  `review_status: native_speaker_reviewed`, and a `consent_ref` that points to
-  an access-controlled record outside the public repository.
+- Per-example pseudonymous `source_id` and `speaker_id`, `reviewer_ids`,
+  `review_status: native_speaker_reviewed`, and a `consent_ref` that points
+  to an access-controlled record outside the public repository.
+
+The validator checks that a source or speaker identifier does not occur across
+multiple dataset splits. It cannot verify that distinct pseudonyms refer to
+distinct real sources or people, so split design must be stewarded and audited.
 
 Use pseudonymous identifiers, not real names or contact details. Keep raw consent
 documents, personal data, private contributor communications, and any
