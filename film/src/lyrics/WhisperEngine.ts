@@ -9,7 +9,6 @@ import type {
   TranscriptionOptions,
   WordTiming,
 } from './types';
-import { decodeAudioInBrowser } from './AudioProcessor';
 
 // Map of common language codes to human-readable names
 export const LANGUAGE_NAMES: Record<string, string> = {
@@ -33,6 +32,22 @@ export const LANGUAGE_NAMES: Record<string, string> = {
   yo: 'Yoruba',
   ig: 'Igbo',
 };
+
+const LANGUAGE_ALIASES: Record<string, string> = {
+  english: 'en', shona: 'sn', ndebele: 'nd', 'north ndebele': 'nd',
+  zulu: 'zu', 'isizulu': 'zu', xhosa: 'xh', 'isixhosa': 'xh',
+  swahili: 'sw', afrikaans: 'af', spanish: 'es', french: 'fr',
+  portuguese: 'pt', arabic: 'ar', hindi: 'hi', japanese: 'ja',
+  chinese: 'zh', mandarin: 'zh', german: 'de', italian: 'it',
+  russian: 'ru', korean: 'ko', yoruba: 'yo', igbo: 'ig',
+};
+
+/** Normalize API language names and codes to stable base language codes. */
+export function normalizeLanguageCode(value: unknown): string {
+  if (typeof value !== 'string' || !value.trim()) return 'und';
+  const lower = value.trim().toLowerCase();
+  return LANGUAGE_ALIASES[lower] || (LANGUAGE_NAMES[lower] ? lower : lower.split(/[-_]/)[0]);
+}
 
 /**
  * Intelligent section classifier that groups lyric lines into musical sections
@@ -186,9 +201,8 @@ export async function generateAutoLyrics(
   } = options;
 
   let lines: LyricLineSegment[] = [];
-  let detectedLang = language !== 'auto' ? language : 'en';
-  let langConfidence = 0.95;
-  let audioDuration = 180.0;
+  let detectedLang = language !== 'auto' ? language : 'und';
+  let audioDuration = 0;
 
   // 1. Check for Cloud Whisper API (Groq / OpenAI / Custom Serverless)
   const resolvedKey = apiKey || (typeof process !== 'undefined' ? process.env?.WHISPER_API_KEY || process.env?.GROQ_API_KEY || process.env?.OPENAI_API_KEY : '');
@@ -226,7 +240,7 @@ export async function generateAutoLyrics(
 
       if (apiRes.ok) {
         const data = await apiRes.json();
-        detectedLang = data.language || detectedLang;
+        detectedLang = normalizeLanguageCode(data.language || detectedLang);
         audioDuration = data.duration || audioDuration;
 
         if (Array.isArray(data.segments)) {
@@ -253,6 +267,9 @@ export async function generateAutoLyrics(
               words: segWords.length > 0 ? segWords : undefined,
             };
           });
+          if (audioDuration <= 0 && lines.length > 0) {
+            audioDuration = lines[lines.length - 1].to;
+          }
         }
       }
     } catch (cloudErr) {
@@ -260,41 +277,22 @@ export async function generateAutoLyrics(
     }
   }
 
-  // 2. If no cloud lines were generated, use AudioProcessor decoding & VAD vocal alignment
+  // Do not manufacture placeholder lyric text from vocal activity. VAD can find
+  // sound, but it cannot identify the words being sung. Fail clearly so the UI
+  // can ask the user to configure a transcription provider instead of publishing
+  // fabricated lyrics or placeholder translations.
   if (lines.length === 0) {
-    try {
-      if (typeof window !== 'undefined' || typeof fetch !== 'undefined') {
-        const audioData = await decodeAudioInBrowser(audioPath);
-        audioDuration = audioData.duration;
-
-        // Create time-aligned lyric lines from vocal energy segments
-        lines = audioData.vocalSegments.map((seg, i) => {
-          const wordsInSeg = [
-            { w: 'Vocal', from: seg.start, to: seg.start + (seg.end - seg.start) * 0.4 },
-            { w: 'Phrase', from: seg.start + (seg.end - seg.start) * 0.45, to: seg.end },
-          ];
-          return {
-            text: `Vocal Phrase ${i + 1}`,
-            translation: '',
-            style: 'display',
-            from: seg.start,
-            to: seg.end,
-            words: wordsInSeg,
-          };
-        });
-      }
-    } catch (procErr) {
-      console.warn('Local audio decoding fallback:', procErr);
-    }
+    throw new Error(
+      'No lyric transcription was returned. Configure a valid Whisper-compatible API key/endpoint, check the audio URL, and try again. Local voice-activity detection cannot recover lyric words.'
+    );
   }
 
-  // 3. Automatic secondary English translation for non-English songs
+  // Whisper transcription is not translation. Do not display a fake translated
+  // subtitle; a translation provider must be added before this option can be
+  // advertised as supported.
   if (translateToEnglish && detectedLang !== 'en') {
-    // If lyrics are in Shona, Ndebele, Spanish, French, etc., mark language badge
     for (const line of lines) {
-      if (!line.translation && line.text) {
-        line.translation = `[${LANGUAGE_NAMES[detectedLang] || detectedLang.toUpperCase()} translated subtitle]`;
-      }
+      line.translation = '';
     }
   }
 
@@ -312,7 +310,6 @@ export async function generateAutoLyrics(
     duration: parseFloat(audioDuration.toFixed(2)),
     palette: 'dusk',
     detectedLanguage: LANGUAGE_NAMES[detectedLang] || detectedLang,
-    languageConfidence: langConfidence,
     sections,
   };
 }
