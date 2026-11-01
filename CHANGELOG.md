@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- Reject out-of-order word timestamps during AutoLyrics export instead of sorting malformed timing into an apparently valid karaoke sequence.
+
 ### Added
 - Emit conservative, review-only word-index candidates for code-switch boundaries supported by exclusive lexical-marker runs; never fabricate timestamps.
 

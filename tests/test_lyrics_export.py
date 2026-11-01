@@ -123,3 +123,36 @@ def test_export_rejects_unknown_typography_preset() -> None:
 def test_remotion_props_wrap_song_for_generic_composition() -> None:
     song = {"id": "sample", "duration": 12.5, "sections": []}
     assert build_remotion_props(song) == {"song": song}
+
+
+def test_export_rejects_out_of_order_word_timestamps() -> None:
+    document = {
+        "schema_version": 1,
+        "segments": [{
+            "start": 0, "end": 3, "text": "first second third", "language": "en",
+            "words": [
+                {"text": "first", "start": 0.0, "end": 0.4},
+                {"text": "second", "start": 1.2, "end": 1.5},
+                {"text": "third", "start": 0.8, "end": 1.0},
+            ],
+        }],
+    }
+    with pytest.raises(ValueError, match="word starts must be non-decreasing"):
+        convert_lyrics_document(document, audio="audio/test.wav")
+
+
+def test_export_preserves_valid_word_timestamp_order() -> None:
+    document = {
+        "schema_version": 1,
+        "segments": [{
+            "start": 0, "end": 2, "text": "hello world", "language": "en",
+            "words": [
+                {"text": "hello", "start": 0.1, "end": 0.5},
+                {"text": "world", "start": 0.6, "end": 1.0},
+            ],
+        }],
+    }
+    song = convert_lyrics_document(document, audio="audio/test.wav")
+    words = song["sections"][0]["lines"][0]["words"]
+    assert [word["w"] for word in words] == ["hello", "world"]
+    assert [word["from"] for word in words] == [0.1, 0.6]

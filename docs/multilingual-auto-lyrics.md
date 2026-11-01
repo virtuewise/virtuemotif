@@ -164,7 +164,7 @@ python -m tools.export_lyrics_song timing/song.auto.json --audio audio/song.m4a 
 
 The `--audio` value is a path relative to `film/public/`. You can pass `--duration` when you know the full audio duration, including an instrumental outro; otherwise the exporter uses the final recognized lyric end time or the input document's duration. The optional `--typography-preset` applies the chosen preset to every lyric line; allowed values are `display`, `editorial`, `neon`, and `whisper`. Import the generated JSON into `film/src/Root.tsx` and register a composition to render it. Choose a new output path when you want to preserve an existing song file; the converter writes to the exact path you specify.
 
-The exported document preserves per-segment language and confidence, word timings when the ASR backend supplied them, and sets `reviewRequired: true` unless the input explicitly says otherwise. Generated lyric films show the detected language/confidence and a visible human-review warning. The exporter never invents word timings or translated subtitles.
+The exporter validates that word timestamps stay within each segment and appear in non-decreasing start-time order; malformed ordering fails the export instead of being silently sorted. The exported document preserves per-segment language and confidence, word timings when the ASR backend supplied them, and sets `reviewRequired: true` unless the input explicitly says otherwise. Generated lyric films show the detected language/confidence and a visible human-review warning. The exporter never invents word timings or translated subtitles.
 
 ## Render generated lyrics without editing the React registry
 
