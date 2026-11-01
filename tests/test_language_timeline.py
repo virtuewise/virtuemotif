@@ -42,6 +42,36 @@ def test_timeline_does_not_force_missing_confidence_to_zero_or_certainty() -> No
     assert "confidence_missing" in row["uncertainty_reasons"]
 
 
+def test_transition_requires_review_when_previous_segment_is_uncertain() -> None:
+    report = build_language_timeline([
+        {"start": 0, "end": 1, "text": "longer English phrase", "language": "en"},
+        {"start": 1, "end": 2, "text": "Ndinoda rudo rwako", "language": "sn",
+         "language_confidence": 0.9},
+    ])
+    assert report["segments"][0]["review_required"] is True
+    assert report["segments"][1]["review_required"] is False
+    assert report["transitions"][0]["review_required"] is True
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+def test_non_finite_timestamps_are_rejected(value: float) -> None:
+    with pytest.raises(ValueError, match="timestamps must be finite"):
+        build_language_timeline([
+            {"start": value, "end": 2, "text": "a longer phrase", "language": "en"}
+        ])
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+def test_non_finite_confidence_becomes_uncertain(value: float) -> None:
+    row = build_language_timeline([
+        {"start": 0, "end": 1, "text": "a longer phrase", "language": "en",
+         "language_confidence": value}
+    ])["segments"][0]
+    assert row["language_confidence"] is None
+    assert row["review_required"] is True
+    assert "confidence_missing" in row["uncertainty_reasons"]
+
+
 @pytest.mark.parametrize("segments", [
     [{"start": -1, "end": 1, "text": "bad", "language": "en"}],
     [{"start": 2, "end": 1, "text": "bad", "language": "en"}],
@@ -56,6 +86,7 @@ def test_invalid_timestamp_intervals_are_rejected(segments: list[dict[str, objec
         build_language_timeline(segments)
 
 
-def test_confidence_threshold_is_validated() -> None:
-    with pytest.raises(ValueError):
-        build_language_timeline([], min_confidence=1.1)
+@pytest.mark.parametrize("threshold", [float("nan"), float("inf"), float("-inf"), -0.1, 1.1])
+def test_invalid_confidence_threshold_is_rejected(threshold: float) -> None:
+    with pytest.raises(ValueError, match="finite number between 0 and 1"):
+        build_language_timeline([], min_confidence=threshold)
