@@ -56,7 +56,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       .finally(() => {
         if (!cancelled) continueRender(cueRenderHandle);
       });
-    return () => { cancelled = true; };
+    return () => { cancelled = true; continueRender(cueRenderHandle); };
   }, [song.id, cueRenderHandle]);
 
   // Synchronously load bundled typeface font
@@ -93,9 +93,13 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
     ? song.title.toUpperCase()
     : song.subtitle.toUpperCase();
 
-  const lineEntranceTime = activeLine && audioCues
+  const snappedEntranceTime = activeLine && audioCues
     ? snapEntranceTime(activeLine.from, audioCues.beats)
     : activeLine?.from ?? 0;
+  // A beat before the lyric starts must not make the entrance animation partially complete.
+  const lineEntranceTime = activeLine
+    ? Math.max(activeLine.from, snappedEntranceTime)
+    : snappedEntranceTime;
   const activePreset = FUR_PRESETS[presetName] || FUR_PRESETS.goldenHorizon;
 
   // Main three.js setup – runs once per frame to stay in sync with Remotion
