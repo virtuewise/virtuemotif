@@ -234,3 +234,8 @@ audio and representative language coverage.
 
 
 When word timestamps are supplied, a code-switch candidate may include a review-only `boundary_window` only if every text token maps exactly to one ordered, non-overlapping word record. A mismatch in tokenization or invalid timing falls back to word indices without a time window. The window is bounded by the prior marked word's end and the next marked word's start; it is an ASR-derived interval, not a precise boundary or a claim of language-model certainty. Human review remains mandatory.
+
+
+## Held-out word-alignment evaluation
+
+`tools/benchmark_word_alignment.py` compares predicted word timestamps with independently annotated reference words from a structurally validated `native_speaker_reviewed_rights_cleared` corpus. It reports word-match precision/recall and per-language mean, median, and 95th-percentile absolute start/end boundary errors. It defaults to the held-out `test` split, rejects synthetic smoke corpora, and never creates predictions. Provide a separate predictions JSON keyed by example ID. The tool's schema checks cannot independently prove licensing, consent, or the truth of review metadata; those require external evidence and human audit. The initial unit fixtures are synthetic software tests, not benchmark evidence.
