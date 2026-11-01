@@ -38,12 +38,19 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
   const { fps, width, height } = useVideoConfig();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [audioCues, setAudioCues] = useState<AudioIntelligence | null>(null);
-  const [cueRenderHandle] = useState(() => delayRender("Loading versioned audio intelligence cues"));
+  const cueRenderHandle = useMemo(() => delayRender("Loading versioned audio intelligence cues"), [song.id]);
 
   // Cue files are generated from the same audio engine used by the Python pipeline.
   // Missing, stale, or invalid data deliberately falls back to deterministic motion.
   useEffect(() => {
     let cancelled = false;
+    let released = false;
+    const releaseRender = () => {
+      if (!released) {
+        released = true;
+        continueRender(cueRenderHandle);
+      }
+    };
     setAudioCues(null);
     fetch(staticFile(`audio-cues/${song.id}.audio-intelligence.json`))
       .then((response) => response.ok ? response.json() : null)
@@ -54,9 +61,12 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
         if (!cancelled) setAudioCues(null);
       })
       .finally(() => {
-        if (!cancelled) continueRender(cueRenderHandle);
+        if (!cancelled) releaseRender();
       });
-    return () => { cancelled = true; continueRender(cueRenderHandle); };
+    return () => {
+      cancelled = true;
+      releaseRender();
+    };
   }, [song.id, cueRenderHandle]);
 
   // Synchronously load bundled typeface font
