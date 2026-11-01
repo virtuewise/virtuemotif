@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from collections.abc import Iterable
@@ -72,22 +73,73 @@ def detect_text_language(text: str) -> dict[str, Any]:
 
 
 def _normalise_segment(segment: Any, asr_language: str, asr_confidence: float) -> dict[str, Any]:
+    """Normalize ASR evidence and reject malformed segment timing before serialization."""
+    try:
+        start = float(segment.start)
+        end = float(segment.end)
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise ValueError("ASR segment must contain numeric start and end timestamps") from exc
+    if not (math.isfinite(start) and math.isfinite(end)) or start < 0 or end < start:
+        raise ValueError("ASR segment has invalid timestamp interval")
+
     text = str(getattr(segment, "text", "")).strip()
     hint = detect_text_language(text)
-    asr_code = asr_language or "und"
+    asr_code = str(asr_language or "und")
     lexical_code = str(hint["language"])
     language = lexical_code if lexical_code != "und" else asr_code
     disagreement = lexical_code not in {"und", asr_code} and asr_code != "und"
     review_reasons = ["asr_lexical_disagreement"] if disagreement else []
+
+    try:
+        confidence = float(asr_confidence)
+    except (TypeError, ValueError):
+        confidence = float("nan")
+    if not math.isfinite(confidence) or not 0.0 <= confidence <= 1.0:
+        confidence = 0.0
+        review_reasons.append("invalid_asr_confidence")
+
+    words: list[dict[str, Any]] = []
+    invalid_word_timing_count = 0
+    for word in getattr(segment, "words", None) or []:
+        try:
+            word_start = float(word.start)
+            word_end = float(word.end)
+        except (AttributeError, TypeError, ValueError):
+            invalid_word_timing_count += 1
+            continue
+        if (
+            not math.isfinite(word_start)
+            or not math.isfinite(word_end)
+            or word_start < start
+            or word_end < word_start
+            or word_end > end + 0.05
+        ):
+            invalid_word_timing_count += 1
+            continue
+        try:
+            probability = float(getattr(word, "probability", 0.0) or 0.0)
+        except (TypeError, ValueError):
+            probability = 0.0
+        if not math.isfinite(probability) or not 0.0 <= probability <= 1.0:
+            probability = 0.0
+        words.append({
+            "text": str(getattr(word, "word", "")).strip(),
+            "start": round(word_start, 3),
+            "end": round(word_end, 3),
+            "probability": round(probability, 3),
+        })
+    if invalid_word_timing_count:
+        review_reasons.append("invalid_word_timing")
+
     return {
-        "start": round(float(segment.start), 3), "end": round(float(segment.end), 3),
+        "start": round(start, 3), "end": round(end, 3),
         "text": text, "language": language,
-        "language_confidence": hint["confidence"] if lexical_code != "und" else round(asr_confidence, 3),
+        "language_confidence": hint["confidence"] if lexical_code != "und" else round(confidence, 3),
         "language_method": hint["method"] if lexical_code != "und" else "asr-segment-fallback",
         "asr_language": asr_code,
         "language_evidence": {
             "asr_language": asr_code,
-            "asr_confidence": round(asr_confidence, 3),
+            "asr_confidence": round(confidence, 3),
             "lexical_language": lexical_code,
             "lexical_confidence": hint["confidence"],
             "lexical_method": hint["method"],
@@ -95,11 +147,8 @@ def _normalise_segment(segment: Any, asr_language: str, asr_confidence: float) -
         },
         "review_required": bool(review_reasons),
         "review_reasons": review_reasons,
-        "words": [
-            {"text": str(getattr(word, "word", "")).strip(), "start": round(float(word.start), 3),
-             "end": round(float(word.end), 3), "probability": round(float(getattr(word, "probability", 0.0) or 0.0), 3)}
-            for word in (getattr(segment, "words", None) or [])
-        ],
+        "words": words,
+        "invalid_word_timing_count": invalid_word_timing_count,
     }
 
 
