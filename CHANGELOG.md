@@ -8,6 +8,7 @@
 - Validate lyric word-timing tokens and timestamp order before karaoke animation; mismatched timings fall back to deterministic staggered entrances.
 
 ### Added
+- Connect validated beat, energy, and event cues to restrained 2D lyric scaling, scenic camera motion, and horizon lighting; missing cue files retain non-audio-reactive defaults.
 - Deterministic Unicode-aware lyric sizing for long lines and CJK-width characters, scaled for landscape, portrait, square, and 4K compositions.
 - Named display, whisper, neon, and editorial motion-typography presets with configurable emphasis, spacing, rule, and translation styling.
 - Beat/energy-driven FurWaveSynth displacement using the same validated per-frame audio cues as lyric motion.
