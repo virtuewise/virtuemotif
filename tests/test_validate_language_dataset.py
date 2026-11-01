@@ -115,8 +115,11 @@ def test_non_object_corpus_returns_actionable_error() -> None:
 
 
 
-def test_reviewed_corpus_requires_each_release_language_in_held_out_test() -> None:
+def test_release_profile_requires_each_language_in_held_out_test() -> None:
     corpus = _valid_reviewed_corpus()
+    governance = corpus["governance"]
+    assert isinstance(governance, dict)
+    governance["release_profile"] = "multilingual_music_v1"
     examples = corpus["examples"]
     assert isinstance(examples, list)
     corpus["examples"] = [
