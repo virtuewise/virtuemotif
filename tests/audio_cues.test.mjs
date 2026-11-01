@@ -55,3 +55,18 @@ test("missing or invalid cue data uses deterministic fallback", () => {
   assert.notEqual(evaluateAudioCues(0, 30, null).beatPulse, missing.beatPulse);
   assert.equal(parseAudioIntelligence(null), null);
 });
+
+
+test("audio-reactive wave amplitude responds deterministically to beat and energy cues", async () => {
+  const { audioReactiveWaveAmplitude } = await import("../film/src/fur3d/audioCues.ts");
+  const quiet = audioReactiveWaveAmplitude({ energy: 0, beatPulse: 0, transitionIntensity: 0 });
+  const energetic = audioReactiveWaveAmplitude({ energy: 0.8, beatPulse: 1, transitionIntensity: 0.9 });
+  assert.equal(quiet, 0.025);
+  assert.ok(energetic > quiet);
+  assert.ok(energetic <= 0.3);
+  assert.equal(
+    audioReactiveWaveAmplitude({ energy: 0.8, beatPulse: 1, transitionIntensity: 0.9 }),
+    energetic,
+  );
+  assert.equal(audioReactiveWaveAmplitude({ energy: Number.NaN, beatPulse: -1, transitionIntensity: 2 }), 0.105);
+});
