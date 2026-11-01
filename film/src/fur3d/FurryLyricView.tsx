@@ -71,9 +71,6 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
 
   const currentTime = frame / fps;
   const cueFrame = evaluateAudioCues(frame, fps, audioCues);
-  const lineEntranceTime = activeLine && audioCues
-    ? snapEntranceTime(activeLine.from, audioCues.beats)
-    : activeLine?.from ?? 0;
 
   // Identify active lyric line
   let activeLine: Line | null = null;
@@ -96,6 +93,9 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
     ? song.title.toUpperCase()
     : song.subtitle.toUpperCase();
 
+  const lineEntranceTime = activeLine && audioCues
+    ? snapEntranceTime(activeLine.from, audioCues.beats)
+    : activeLine?.from ?? 0;
   const activePreset = FUR_PRESETS[presetName] || FUR_PRESETS.goldenHorizon;
 
   // Main three.js setup – runs once per frame to stay in sync with Remotion
