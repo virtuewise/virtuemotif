@@ -4,8 +4,13 @@
 
 ### Fixed
 - Place FFmpeg audio inputs before output options so end-to-end video encoding with audio works reliably.
+- Validate lyric word-timing tokens and timestamp order before karaoke animation; mismatched timings fall back to deterministic staggered entrances.
 
 ### Added
+- Deterministic Unicode-aware lyric sizing for long lines and CJK-width characters, scaled for landscape, portrait, square, and 4K compositions.
+- Named display, whisper, neon, and editorial motion-typography presets with configurable emphasis, spacing, rule, and translation styling.
+- Beat/energy-driven FurWaveSynth displacement using the same validated per-frame audio cues as lyric motion.
+- Multi-aspect Remotion visual-review frame artifacts and CI checks for expected PNG dimensions.
 - Deterministic end-to-end render validation with `ffprobe` checks for audio/video streams, dimensions, frame rate, frame count, and duration.
 - Immutable GitHub Actions commit-SHA pins, pinned Python CI constraints, architecture decision records, asset provenance guidance, and release validation/rollback gates.
 - A repeatable synthetic render benchmark that reports timing, peak memory, output size, and validated media metadata as a short-lived CI artifact.
