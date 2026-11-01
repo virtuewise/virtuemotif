@@ -92,7 +92,20 @@ python -m tools.make_video example
 
 Output frames and the encoded MP4 video will be written to `out/example/` and `out/example.mp4`.
 
-### 3. Generate Tap-Sync Timing Page
+### 3. Generate a Video from Audio Automatically
+
+Install the optional multilingual ASR backend and Remotion dependencies, then run the full transcription-to-render pipeline:
+
+```bash
+python -m pip install "faster-whisper>=1.1"
+cd film && npm ci && cd ..
+python -m tools.make_auto_lyrics_video "path/to/song.m4a" \
+  --output out/song.mp4 --title "My Song" --artist "Artist"
+```
+
+The command detects the language unless `--language` is supplied, probes the full audio duration with `ffprobe`, and renders the generic `AutoLyrics` composition. Use only audio you have permission to process and redistribute, and review the generated lyrics before publishing. Pass `--force` only when you intend to replace an existing output video. See the [multilingual auto-lyrics guide](docs/multilingual-auto-lyrics.md) for limitations and details.
+
+### 4. Generate Tap-Sync Timing Page
 
 To interactively align lyrics by tapping along to the audio:
 
