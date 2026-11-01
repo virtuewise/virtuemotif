@@ -10,6 +10,7 @@ import {
   snapEntranceTime,
 } from "../film/src/fur3d/audioCues.ts";
 import { createRainfallParticleData } from "../film/src/fur3d/deterministicParticles.ts";
+import { createCityBuildingSpecs } from "../film/src/fur3d/proceduralSceneData.ts";
 
 const valid = {
   schema_version: 1,
@@ -110,4 +111,27 @@ test("rainfall particle generator validates size and seed", () => {
   assert.throws(() => createRainfallParticleData(-1), /non-negative integer/);
   assert.throws(() => createRainfallParticleData(1.5), /non-negative integer/);
   assert.throws(() => createRainfallParticleData(1, Number.NaN), /seed must be finite/);
+});
+
+test("procedural city geometry is stable across renders and varies by seed", () => {
+  const first = createCityBuildingSpecs(12, 11);
+  const second = createCityBuildingSpecs(12, 11);
+  assert.deepEqual(first, second);
+  assert.notDeepEqual(first, createCityBuildingSpecs(12, 12));
+  assert.equal(first.length, 12);
+  assert.deepEqual([first[0].x, first.at(-1).x], [-5, 5]);
+  assert.ok(first.every((building) =>
+    Number.isFinite(building.x) &&
+    building.width >= 0.8 && building.width < 1.2 &&
+    building.depth >= 0.8 && building.depth < 1.2 &&
+    building.height >= 1.5 && building.height < 4.5
+  ));
+});
+
+test("procedural city geometry handles small layouts and rejects invalid inputs", () => {
+  assert.deepEqual(createCityBuildingSpecs(0), []);
+  assert.equal(createCityBuildingSpecs(1)[0].x, 0);
+  assert.throws(() => createCityBuildingSpecs(-1), /non-negative integer/);
+  assert.throws(() => createCityBuildingSpecs(1.5), /non-negative integer/);
+  assert.throws(() => createCityBuildingSpecs(1, Number.NaN), /seed must be finite/);
 });
