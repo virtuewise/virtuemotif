@@ -49,15 +49,15 @@ export function parseAudioIntelligence(value: unknown): AudioIntelligence | null
     !isFiniteNumber(data.duration) || data.duration <= 0 ||
     !isFiniteNumber(data.sample_rate) || data.sample_rate <= 0 ||
     !data.tempo || !(data.tempo.bpm === null || (isFiniteNumber(data.tempo.bpm) && data.tempo.bpm > 0)) ||
-    !isFiniteNumber(data.tempo.confidence) ||
+    !isFiniteNumber(data.tempo.confidence) || data.tempo.confidence < 0 || data.tempo.confidence > 1 ||
     !isSortedTimes(data.beats) ||
     !isSortedTimes(data.downbeats) ||
     !Array.isArray(data.energy_curve) ||
-    !data.energy_curve.every((point) => point && isFiniteNumber(point.time) && point.time >= 0 && isFiniteNumber(point.rms) && point.rms >= 0) ||
+    !data.energy_curve.every((point) => point && isFiniteNumber(point.time) && point.time >= 0 && isFiniteNumber(point.rms) && point.rms >= 0 && point.rms <= 1) ||
     !Array.isArray(data.events) ||
     !data.events.every((event) => event && isFiniteNumber(event.time) && event.time >= 0 &&
       (event.type === "onset" || event.type === "energy-rise" || event.type === "energy-drop") &&
-      isFiniteNumber(event.strength) && event.strength >= 0)
+      isFiniteNumber(event.strength) && event.strength >= 0 && event.strength <= 1)
   ) return null;
 
   // Capture the validated property so TypeScript keeps its narrowed number type in callbacks.
