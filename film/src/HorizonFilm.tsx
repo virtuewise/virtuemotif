@@ -41,6 +41,8 @@ export type Line = {
   from: number;
   to: number;
   words?: WordTime[];
+  language?: string;
+  languageConfidence?: number;
 };
 export type Section = { id: string; label: string; look: string; start: number; end: number; lines: Line[] };
 export type Song = {
@@ -51,6 +53,10 @@ export type Song = {
   audio: string;
   duration: number;
   sections: Section[];
+  detectedLanguage?: string;
+  detectedLanguageCode?: string;
+  languageConfidence?: number;
+  reviewRequired?: boolean;
 };
 
 /* --------------------------------------------------------------- scenery */
