@@ -90,7 +90,7 @@ test("particle fall rate is deterministic and responds to audio energy and beats
   const quiet = audioReactiveParticleFallRate({ energy: 0, beatPulse: 0 });
   const energetic = audioReactiveParticleFallRate({ energy: 1, beatPulse: 1 });
   assert.equal(quiet, 0.8);
-  assert.equal(energetic, 1.4);
+  assert.ok(Math.abs(energetic - 1.4) < 1e-12);
   assert.equal(audioReactiveParticleFallRate({ energy: Number.NaN, beatPulse: -1 }), 0.8);
 });
 
