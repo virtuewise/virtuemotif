@@ -264,3 +264,22 @@ def test_normalizer_sanitizes_invalid_asr_confidence(confidence: object) -> None
     assert result["language_evidence"]["asr_confidence"] == 0.0
     assert result["review_required"] is True
     assert "invalid_asr_confidence" in result["review_reasons"]
+
+
+def test_normalizer_drops_out_of_order_word_timestamps() -> None:
+    segment = SimpleNamespace(
+        start=0.0,
+        end=3.0,
+        text="first second third fourth",
+        words=[
+            SimpleNamespace(word=" first", start=0.0, end=0.4, probability=0.9),
+            SimpleNamespace(word=" third", start=1.4, end=1.8, probability=0.9),
+            SimpleNamespace(word=" second", start=0.8, end=1.2, probability=0.9),
+            SimpleNamespace(word=" fourth", start=2.0, end=2.4, probability=0.9),
+        ],
+    )
+    result = _normalise_segment(segment, "en", 0.9)
+    assert [word["text"] for word in result["words"]] == ["first", "third", "fourth"]
+    assert result["invalid_word_timing_count"] == 1
+    assert result["review_required"] is True
+    assert "invalid_word_timing" in result["review_reasons"]
