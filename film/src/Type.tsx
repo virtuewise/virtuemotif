@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AbsoluteFill, continueRender, delayRender, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { FONT_DISPLAY, FONT_MONO, FONT_SERIF, PALETTE as P, clamp, easeOut, rnd } from "./theme";
 import { calculateLyricFontSize, resolveWordTimings } from "./typography";
+import { LYRIC_TYPOGRAPHY_PRESETS, resolveLyricTypographyPreset } from "./lyricTypographyPresets";
 
 /* ------------------------------------------------------------ font load */
 const FACES = [
@@ -42,16 +43,17 @@ export const LyricLine: React.FC<{
   offset?: number;
   size?: number;
   whisper?: boolean;
+  typographyPreset?: string;
   words?: WordTime[];
   y?: number;
-}> = ({ text, translation, from, to, offset = 0, size = 104, whisper = false, words: wordTimes, y = 0 }) => {
+}> = ({ text, translation, from, to, offset = 0, size = 104, whisper = false, typographyPreset, words: wordTimes, y = 0 }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const t = frame / fps + offset;
 
   if (t < from - 0.2 || t > to + 0.6) return null;
 
-  const words = text.trim().split(/\\s+/u).filter(Boolean);
+  const words = text.trim().split(/\s+/u).filter(Boolean);
   const wordStarts = resolveWordTimings(text, wordTimes);
   const stagger = Math.min(0.14, 1.6 / Math.max(words.length, 1));
   const lastStart = wordStarts ? wordStarts[wordStarts.length - 1] : from + (words.length - 1) * stagger;
@@ -60,7 +62,10 @@ export const LyricLine: React.FC<{
   const exit = clamp((t - outStart) / 0.75);
 
   const isPortrait = width < height;
-  const requestedSize = whisper && isPortrait ? size * 0.75 : size;
+  const activePresetName = resolveLyricTypographyPreset(typographyPreset, whisper ? "whisper" : "display");
+  const preset = LYRIC_TYPOGRAPHY_PRESETS[activePresetName];
+  const isWhisper = activePresetName === "whisper";
+  const requestedSize = isWhisper && isPortrait ? size * 0.75 : size;
   const fs = calculateLyricFontSize(text, width, height, requestedSize);
   const lineOpacity = 1 - exit;
   const enterP = clamp((t - from) / 0.65);
@@ -96,20 +101,18 @@ export const LyricLine: React.FC<{
       >
         <div
           style={{
-            fontFamily: whisper ? FONT_SERIF : FONT_DISPLAY,
-            fontStyle: whisper ? "italic" : "normal",
+            fontFamily: preset.fontFamily,
+            fontStyle: preset.fontStyle,
             fontSize: fs,
             lineHeight: 1.06,
-            letterSpacing: whisper ? "0.01em" : "-0.005em",
-            textTransform: whisper ? "none" : "uppercase",
-            color: P.bone,
+            letterSpacing: preset.letterSpacing,
+            textTransform: preset.textTransform,
+            color: preset.color,
             display: "flex",
             flexWrap: "wrap",
             justifyContent: "center",
-            gap: "0 0.26em",
-            textShadow: whisper
-              ? "0 6px 26px rgba(0,0,0,0.75)"
-              : "0 3px 0 #2A140F, 0 20px 44px rgba(0,0,0,0.55)",
+            gap: preset.wordGap,
+            textShadow: preset.textShadow,
           }}
         >
           {words.map((w, i) => {
@@ -125,7 +128,9 @@ export const LyricLine: React.FC<{
             const blurW = interpolate(pr, [0, 1], [10, 0]);
             const recent = clamp((t - start) / 0.45);
             const hot = 1 - Math.abs(recent * 2 - 1);
-            const color = hot > 0.02 ? `rgb(${246 + hot * 9},${231 - hot * 20},${200 - hot * 120})` : P.bone;
+            const color = hot > 0.02
+              ? activePresetName === "display" ? `rgb(${246 + hot * 9},${231 - hot * 20},${200 - hot * 120})` : preset.highlightColor
+              : preset.color;
             return (
               <span
                 key={i}
@@ -152,7 +157,7 @@ export const LyricLine: React.FC<{
             height: 3,
             margin: "26px auto 0",
             width: Math.min(width * 0.72, 1500 * (width < height ? width / 1080 : width === height ? width / 1024 : width / 1920)) * clamp((t - from - 0.25) / 0.9) * (1 - exit),
-            background: `linear-gradient(90deg, transparent, ${P.ochre} 12%, ${P.amber} 50%, ${P.ochre} 88%, transparent)`,
+            background: `linear-gradient(90deg, transparent, ${preset.ruleColor} 12%, ${preset.ruleAccent} 50%, ${preset.ruleColor} 88%, transparent)`,
             opacity: 0.85 * (1 - exit),
             transform: `scaleY(${Math.max(1, 0.4 + Math.sin(t * 2) * 0.05)})`,
           }}
@@ -162,15 +167,15 @@ export const LyricLine: React.FC<{
           <div
             style={{
               marginTop: 22,
-              fontFamily: FONT_SERIF,
-              fontStyle: "italic",
-              fontSize: Math.min(isPortrait ? 34 : 44, width * 0.035),
+              fontFamily: preset.translationFontFamily,
+              fontStyle: preset.translationFontStyle,
+              fontSize: Math.min(isPortrait ? 34 : 44, width * 0.035) * preset.translationScale,
               maxWidth: width * 0.82,
               marginLeft: "auto",
               marginRight: "auto",
               overflowWrap: "anywhere",
-              color: P.ochre,
-              letterSpacing: "0.01em",
+              color: preset.translationColor,
+              letterSpacing: preset.letterSpacing,
               opacity: clamp((t - inEnd) / 0.7) * (1 - exit),
               transform: `translateY(${interpolate(clamp((t - inEnd) / 0.7), [0, 1], [14, 0])}px)`,
               textShadow: "0 4px 18px rgba(0,0,0,0.7)",
