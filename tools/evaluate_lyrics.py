@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-_TOKEN_RE = re.compile(r"[\\w’']+", re.UNICODE)
+_TOKEN_RE = re.compile(r"[\w’']+", re.UNICODE)
 
 
 def _tokens(text: str) -> list[str]:
@@ -150,7 +150,7 @@ def main() -> int:
         reference = json.loads(args.reference.read_text(encoding="utf-8"))
         hypothesis = json.loads(args.hypothesis.read_text(encoding="utf-8"))
         report = evaluate_documents(reference, hypothesis)
-        rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\\n"
+        rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
         if args.output is None:
             print(rendered, end="")
         else:
