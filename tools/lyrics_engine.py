@@ -41,6 +41,65 @@ _SCRIPT_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 )
 
 
+def detect_code_switch_candidates(text: str) -> list[dict[str, Any]]:
+    """Return conservative word-index spans for distinctive lexical code-switch evidence.
+
+    These are review candidates, not word-level language predictions or timestamps.
+    Only runs with at least two distinctive markers are reported, and shared words
+    cannot independently establish an isiNdebele/isiZulu boundary.
+    """
+    if not isinstance(text, str):
+        return []
+    tokens = list(_WORD_RE.finditer(text))
+    if len(tokens) < 4:
+        return []
+    owners_by_word: list[set[str]] = []
+    for token in tokens:
+        word = token.group(0).casefold().replace("’", "'")
+        owners_by_word.append({
+            code for code, markers in _LANGUAGE_MARKERS.items() if word in markers
+        })
+
+    # Assign only words with exclusive marker ownership; ambiguous shared markers
+    # are deliberately left unlabeled rather than used to manufacture boundaries.
+    labels = [
+        next(iter(owners)) if len(owners) == 1 else None
+        for owners in owners_by_word
+    ]
+    runs: list[dict[str, Any]] = []
+    for index, label in enumerate(labels):
+        if label is None:
+            continue
+        if runs and runs[-1]["language"] == label:
+            runs[-1]["end_word"] = index + 1
+            runs[-1]["marker_count"] += 1
+        else:
+            runs.append({
+                "language": label,
+                "start_word": index,
+                "end_word": index + 1,
+                "marker_count": 1,
+            })
+
+    candidates: list[dict[str, Any]] = []
+    for left, right in zip(runs, runs[1:]):
+        if left["language"] == right["language"]:
+            continue
+        if left["marker_count"] < 2 or right["marker_count"] < 2:
+            continue
+        candidates.append({
+            "after_word": left["end_word"] - 1,
+            "before_word": right["start_word"],
+            "from": left["language"],
+            "to": right["language"],
+            "candidate": True,
+            "review_required": True,
+            "timing_available": False,
+            "method": "exclusive-lexical-markers",
+        })
+    return candidates
+
+
 def detect_text_language(text: str) -> dict[str, Any]:
     """Guess a language conservatively from a text span; not a full language model."""
     if not isinstance(text, str):
@@ -162,6 +221,7 @@ def _normalise_segment(segment: Any, asr_language: str, asr_confidence: float) -
         "review_required": bool(review_reasons),
         "review_reasons": review_reasons,
         "words": words,
+        "code_switch_candidates": detect_code_switch_candidates(text),
         "invalid_word_timing_count": invalid_word_timing_count,
     }
 
