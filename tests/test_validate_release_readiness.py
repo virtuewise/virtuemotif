@@ -20,4 +20,6 @@ def test_release_gate_blocks_current_unverified_repository_state() -> None:
     assert result.returncode == 1
     assert "root LICENSE is missing or empty" in result.stdout
     assert "non-cleared status UNVERIFIED" in result.stdout
+    assert "release evidence decision must be explicitly APPROVED" in result.stdout
+    assert "release evidence must record the exact 40-character release commit SHA" in result.stdout
     assert "do not bypass this gate" in result.stdout
