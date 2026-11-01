@@ -32,6 +32,23 @@ def resolve_output_format(value: str) -> dict[str, str | int]:
         raise ValueError(f"unsupported output format: {value}") from exc
 
 
+def export_song_audio_cues(audio_path: Path, song_id: str) -> Path:
+    """Generate the versioned cue file consumed by Remotion's Film composition."""
+    try:
+        from tools.export_audio_cues import export_audio_cues
+    except ImportError as exc:
+        raise RuntimeError(
+            "Audio-reactive AutoLyrics requires NumPy and SoundFile; install them with "
+            "'python -m pip install numpy soundfile'."
+        ) from exc
+
+    output_dir = FILM / "public" / "audio-cues"
+    written = export_audio_cues(output_dir, {song_id: audio_path})
+    if len(written) != 1:
+        raise RuntimeError(f"expected one audio-cue file for {song_id!r}, got {len(written)}")
+    return written[0]
+
+
 def safe_song_id(value: str) -> str:
     """Convert a filename/title into a portable identifier for generated artifacts."""
     identifier = re.sub(r"[^a-zA-Z0-9_-]+", "-", value.strip()).strip("-_").lower()
@@ -224,7 +241,7 @@ def main() -> int:
 
         transcribe = [
             sys.executable, "-m", "tools.lyrics_engine", str(source),
-            "--model", args.model, "--output", str(asr_output),
+            "--song-id", song_id, "--model", args.model, "--output", str(asr_output),
         ]
         if args.language:
             transcribe.extend(["--language", args.language])
@@ -235,12 +252,17 @@ def main() -> int:
             "--audio", audio_relative.as_posix(),
             "--output", str(song_output),
             "--props-output", str(props_output),
+            "--song-id", song_id,
             "--title", args.title or source.stem,
             "--artist", args.artist,
             "--typography-preset", args.typography_preset,
         ]
         export.extend(["--duration", str(duration)])
         subprocess.run(export, cwd=ROOT, check=True)
+
+        # Film resolves cues by Song.id, so keep the sanitized id consistent across
+        # transcription, export, the copied audio asset, and the cue filename.
+        export_song_audio_cues(audio_destination, song_id)
 
         output.parent.mkdir(parents=True, exist_ok=True)
         render = [
