@@ -51,6 +51,28 @@ For actual audio-to-text transcription, use the optional `faster-whisper` engine
 
 Language identification is best-effort, not universal. Whisper-family models vary in support for Shona, isiNdebele, isiZulu, and code-switched singing. Short windows, instrumental bleed, backing vocals, and sung pronunciation can lower accuracy. Keep human review enabled and evaluate representative native-speaker audio before claiming production coverage.
 
+## Evaluate multilingual transcription quality
+
+Use a manually reviewed schema-v1 reference JSON and the generated ASR JSON to
+measure transcript word error rate (WER) and timestamp-overlap language accuracy:
+
+```bash
+python -m tools.lyrics_engine "path/to/rights-cleared-song.wav" \
+  --output timing/song.auto.json --model small
+python -m tools.evaluate_lyrics lyrics/reference.reviewed.json timing/song.auto.json \
+  --output timing/song.evaluation.json
+```
+
+The report includes overall WER, language accuracy, per-language counts and
+accuracy, and how many reference segments were excluded because their language
+was marked `und`. Language scoring matches each hypothesis segment to the
+reference segment with the greatest positive time overlap; WER compares the
+concatenated normalized transcripts. Keep reference lyrics and timing reviewed
+by fluent speakers, particularly for Shona, isiNdebele, isiZulu, code-switching,
+and sung pronunciation. The repository does not bundle a rights-cleared
+multilingual benchmark, and these metrics should not be reported as universal
+language-coverage guarantees.
+
 ## One-command auto-lyrics video
 
 After installing the optional ASR dependencies and the Node dependencies in
