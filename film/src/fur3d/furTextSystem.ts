@@ -3,7 +3,7 @@ import { Font, FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { SHELL_VERTEX_SHADER, SHELL_FRAGMENT_SHADER } from "./furShaders";
-import { estimateLyricCharacterEquivalent } from "../typography";
+import { estimateLyricCharacterEquivalent, wrapWideScriptText } from "../typography";
 import helvetikerBoldJson from "../../public/fonts/helvetiker_bold.typeface.json";
 
 export interface FurParams {
@@ -126,22 +126,8 @@ export function balanceWrapText(str: string, maxCharsPerLine = 18): string[] {
   const measure = (value: string) => estimateLyricCharacterEquivalent(value);
 
   // CJK text commonly has no spaces; wrap it at character boundaries when needed.
-  const hasWideGlyphs = /[\u2e80-\u9fff\uac00-\ud7af\uf900-\ufaff\uff01-\uff60]/u.test(trimmed);
-  if (words.length === 1 && hasWideGlyphs && measure(trimmed) > maxCharsPerLine) {
-    const wrapped: string[] = [];
-    let currentLine = "";
-    for (const glyph of Array.from(trimmed)) {
-      const candidate = currentLine + glyph;
-      if (currentLine && measure(candidate) > maxCharsPerLine) {
-        wrapped.push(currentLine);
-        currentLine = glyph;
-      } else {
-        currentLine = candidate;
-      }
-    }
-    if (currentLine) wrapped.push(currentLine);
-    return wrapped;
-  }
+  const wideScriptLines = words.length === 1 ? wrapWideScriptText(trimmed, maxCharsPerLine) : null;
+  if (wideScriptLines) return wideScriptLines;
 
   if (words.length <= 1 || measure(trimmed) <= maxCharsPerLine) {
     return [trimmed];
