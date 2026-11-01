@@ -3,6 +3,7 @@ import { AbsoluteFill, continueRender, delayRender, interpolate, spring, staticF
 import { FONT_DISPLAY, FONT_MONO, FONT_SERIF, PALETTE as P, clamp, easeOut, rnd } from "./theme";
 import { calculateLyricFontSize, resolveWordTimings } from "./typography";
 import { LYRIC_TYPOGRAPHY_PRESETS, resolveLyricTypographyPreset } from "./lyricTypographyPresets";
+import { audioReactiveTypographyScale, type AudioCueFrame } from "./fur3d/audioCues";
 
 /* ------------------------------------------------------------ font load */
 const FACES = [
@@ -45,8 +46,9 @@ export const LyricLine: React.FC<{
   whisper?: boolean;
   typographyPreset?: string;
   words?: WordTime[];
+  audioCueFrame?: AudioCueFrame;
   y?: number;
-}> = ({ text, translation, from, to, offset = 0, size = 104, whisper = false, typographyPreset, words: wordTimes, y = 0 }) => {
+}> = ({ text, translation, from, to, offset = 0, size = 104, whisper = false, typographyPreset, words: wordTimes, audioCueFrame, y = 0 }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const t = frame / fps + offset;
@@ -67,6 +69,7 @@ export const LyricLine: React.FC<{
   const isWhisper = activePresetName === "whisper";
   const requestedSize = isWhisper && isPortrait ? size * 0.75 : size;
   const fs = calculateLyricFontSize(text, width, height, requestedSize);
+  const audioScale = audioCueFrame ? audioReactiveTypographyScale(audioCueFrame) : 1;
   const lineOpacity = 1 - exit;
   const enterP = clamp((t - from) / 0.65);
   const fallY = (1 - easeOut(enterP)) * -32;
@@ -93,7 +96,7 @@ export const LyricLine: React.FC<{
         style={{
           width: maxW,
           margin: "0 auto",
-          transform: `translateY(${y + rise + fallY}px)`,
+          transform: `translateY(${y + rise + fallY}px) scale(${audioScale})`,
           opacity: lineOpacity,
           filter: blur > 0.05 ? `blur(${blur}px)` : undefined,
           textAlign: "center",
