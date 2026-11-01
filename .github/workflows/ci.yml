@@ -212,6 +212,24 @@ jobs:
       - name: Capture square visual review frame
         run: npx remotion still src/index.ts SmartFurSceneSquare ../build/visual-review/smart-fur-square.png --frame=90
 
+      - name: Capture generic AutoLyrics landscape frame
+        run: npx remotion still src/index.ts AutoLyrics ../build/visual-review/auto-lyrics-landscape.png --frame=90
+
+      - name: Capture generic AutoLyrics portrait frame
+        run: npx remotion still src/index.ts AutoLyricsPortrait ../build/visual-review/auto-lyrics-portrait.png --frame=90
+
+      - name: Capture generic AutoLyrics square frame
+        run: npx remotion still src/index.ts AutoLyricsSquare ../build/visual-review/auto-lyrics-square.png --frame=90
+
+      - name: Capture generic AutoLyrics 4K frame
+        run: npx remotion still src/index.ts AutoLyrics4K ../build/visual-review/auto-lyrics-4k.png --frame=90 --timeout=120000
+
+      - name: Smoke-render deterministic rainfall effect
+        run: npx remotion still src/index.ts ParticleRainfall ../build/visual-review/particle-rainfall-smoke.png --frame=90
+
+      - name: Smoke-render audio-reactive glitch effect
+        run: npx remotion still src/index.ts GlitchDistortionOverlay ../build/visual-review/glitch-distortion-smoke.png --frame=90
+
       - name: Validate visual review frame dimensions
         run: node ../tools/validate_visual_review_frames.mjs ../build/visual-review
 
