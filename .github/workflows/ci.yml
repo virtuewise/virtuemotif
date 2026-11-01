@@ -96,6 +96,11 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Set up Python for audio cue export
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
       - name: Install FFmpeg for compressed audio cue export
         run: |
           sudo apt-get update
