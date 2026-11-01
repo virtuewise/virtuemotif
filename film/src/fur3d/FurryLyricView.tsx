@@ -1,5 +1,6 @@
-import React, { useLayoutEffect, useMemo, useRef } from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { AbsoluteFill, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { evaluateAudioCues, parseAudioIntelligence, snapEntranceTime, type AudioIntelligence } from "./audioCues";
 import * as THREE from "three";
 import {
   createFurryTextMesh,
@@ -36,6 +37,37 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [audioCues, setAudioCues] = useState<AudioIntelligence | null>(null);
+  const cueRenderHandle = useMemo(() => delayRender("Loading versioned audio intelligence cues"), [song.id]);
+
+  // Cue files are generated from the same audio engine used by the Python pipeline.
+  // Missing, stale, or invalid data deliberately falls back to deterministic motion.
+  useEffect(() => {
+    let cancelled = false;
+    let released = false;
+    const releaseRender = () => {
+      if (!released) {
+        released = true;
+        continueRender(cueRenderHandle);
+      }
+    };
+    setAudioCues(null);
+    fetch(staticFile(`audio-cues/${song.id}.audio-intelligence.json`))
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload: unknown) => {
+        if (!cancelled) setAudioCues(parseAudioIntelligence(payload));
+      })
+      .catch(() => {
+        if (!cancelled) setAudioCues(null);
+      })
+      .finally(() => {
+        if (!cancelled) releaseRender();
+      });
+    return () => {
+      cancelled = true;
+      releaseRender();
+    };
+  }, [song.id, cueRenderHandle]);
 
   // Synchronously load bundled typeface font
   const font = useMemo(() => getDefaultFont(), []);
@@ -48,6 +80,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
   const currentTextRef = useRef<string>("");
 
   const currentTime = frame / fps;
+  const cueFrame = evaluateAudioCues(frame, fps, audioCues);
 
   // Identify active lyric line
   let activeLine: Line | null = null;
@@ -70,6 +103,13 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
     ? song.title.toUpperCase()
     : song.subtitle.toUpperCase();
 
+  const snappedEntranceTime = activeLine && audioCues
+    ? snapEntranceTime(activeLine.from, audioCues.beats)
+    : activeLine?.from ?? 0;
+  // A beat before the lyric starts must not make the entrance animation partially complete.
+  const lineEntranceTime = activeLine
+    ? Math.max(activeLine.from, snappedEntranceTime)
+    : snappedEntranceTime;
   const activePreset = FUR_PRESETS[presetName] || FUR_PRESETS.goldenHorizon;
 
   // Main three.js setup – runs once per frame to stay in sync with Remotion
@@ -179,11 +219,11 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
     camera.lookAt(0, 0, 0);
 
     // Audio‑reactive wind and floating motion
-    const beatPulse = (Math.sin(currentTime * Math.PI * 2 * 1.8) + 1.0) * 0.5;
+    const beatPulse = cueFrame.beatPulse;
     const audioDisplacement = new THREE.Vector3(
-      Math.sin(currentTime * 2.8) * 0.18,
-      beatPulse * 0.22,
-      Math.cos(currentTime * 2.4) * 0.14,
+      Math.sin(currentTime * 2.8) * (0.12 + cueFrame.energy * 0.12),
+      0.04 + cueFrame.energy * 0.12 + beatPulse * 0.22 + cueFrame.transitionIntensity * 0.12,
+      Math.cos(currentTime * 2.4) * (0.1 + cueFrame.energy * 0.08),
     );
 
     // Entrance and positioning animation ("fall on the screen not overlapping" unless motion zoom is applied)
@@ -192,7 +232,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
     if (activeLine) {
       const lineDuration = Math.max(0.1, activeLine.to - activeLine.from);
       const enterDur = Math.min(0.9, lineDuration * 0.35);
-      enterProgress = Math.min(1.0, Math.max(0.0, (currentTime - activeLine.from) / enterDur));
+      enterProgress = Math.min(1.0, Math.max(0.0, (currentTime - lineEntranceTime) / enterDur));
     } else {
       // Intro title: "THE HORIZON OF LIGHT"
       enterProgress = Math.min(1.0, Math.max(0.0, currentTime / 1.5));
@@ -207,12 +247,14 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       // If motion zoom is explicitly requested, zoom in from scale 0.35 to 1.0;
       // otherwise text falls into place from above (+1.45 world units down to 0)
       if (isZoomMotion) {
-        const zoomScale = 0.35 + 0.65 * eased;
+        const zoomScale = (0.35 + 0.65 * eased) * (1 + beatPulse * 0.025 + cueFrame.transitionIntensity * 0.04);
         mesh.group.scale.set(zoomScale, zoomScale, zoomScale);
         mesh.group.position.y = Math.sin(currentTime * 1.1) * 0.08;
       } else {
         const fallY = (1.0 - eased) * 1.45; // Smoothly drops and settles into screen center
         mesh.group.position.y = fallY + Math.sin(currentTime * 1.1) * 0.08;
+        const beatScale = 1 + beatPulse * 0.025 + cueFrame.transitionIntensity * 0.04;
+        mesh.group.scale.set(beatScale, beatScale, beatScale);
       }
 
       mesh.group.rotation.y = Math.sin(currentTime * 0.5) * 0.09;
@@ -222,11 +264,11 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
 
     // Render the frame
     renderer.render(scene, camera);
-  }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady]);
+  }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady, cueFrame.beatPulse, cueFrame.energy, cueFrame.transitionIntensity]);
 
   // Fade in/out based on lyric line progress or title entrance
   const lineProgress = activeLine
-    ? (currentTime - activeLine.from) / Math.max(0.1, activeLine.to - activeLine.from)
+    ? (currentTime - lineEntranceTime) / Math.max(0.1, activeLine.to - lineEntranceTime)
     : Math.min(1.0, currentTime / 1.5);
   const opacity = activeLine
     ? interpolate(lineProgress, [0, 0.08, 0.9, 1], [0, 1, 1, 0], {

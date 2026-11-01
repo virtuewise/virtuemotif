@@ -17,7 +17,7 @@ concurrency:
 jobs:
   python-quality:
     name: Python lint, tests, and docs
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - name: Check out repository
@@ -48,6 +48,7 @@ jobs:
           tools/make_video.py
           tools/make_tapsync.py
           tools/utils.py
+          tools/export_audio_cues.py
           tools/effects
           tests/test_ci_smoke.py
 
@@ -70,7 +71,7 @@ jobs:
 
   remotion-quality:
     name: Remotion type check and composition validation
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 25
     defaults:
       run:
@@ -95,6 +96,26 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Set up Python for audio cue export
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install FFmpeg for compressed audio cue export
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+
+      - name: Generate versioned audio cues for Remotion
+        run: |
+          cd ..
+          python -m pip install --upgrade pip
+          python -m pip install numpy soundfile
+          python -m tools.export_audio_cues
+
+      - name: Test frame-time and audio-cue utilities
+        run: node --experimental-strip-types --test ../tests/audio_cues.test.mjs
+
       - name: Type-check Remotion project
         run: npx tsc --noEmit
 
@@ -103,3 +124,9 @@ jobs:
 
       - name: Validate Remotion compositions
         run: npx remotion compositions src/index.ts
+
+      - name: Smoke-render audio-cue-driven Horizon composition
+        run: npx remotion still src/index.ts FurryHorizon /tmp/furry-horizon-smoke.png --frame=0
+
+      - name: Smoke-render audio-cue-driven Rise composition
+        run: npx remotion still src/index.ts FurryRise /tmp/furry-rise-smoke.png --frame=0
