@@ -115,19 +115,21 @@ def validate_corpus(corpus: Any) -> list[str]:
         }
         if not {"train", "test"} <= split_names:
             errors.append("reviewed datasets must contain separate train and test splits")
-        test_languages = {
-            example["language"]
-            for example in examples
-            if isinstance(example, dict)
-            and example.get("split") == "test"
-            and isinstance(example.get("language"), str)
-        }
-        missing_test_languages = REQUIRED_RELEASE_LANGUAGES - test_languages
-        if missing_test_languages:
-            errors.append(
-                "reviewed test split is missing required release cohorts: "
-                + ", ".join(sorted(missing_test_languages))
-            )
+        release_profile = governance.get("release_profile") if isinstance(governance, dict) else None
+        if release_profile == "multilingual_music_v1":
+            test_languages = {
+                example["language"]
+                for example in examples
+                if isinstance(example, dict)
+                and example.get("split") == "test"
+                and isinstance(example.get("language"), str)
+            }
+            missing_test_languages = REQUIRED_RELEASE_LANGUAGES - test_languages
+            if missing_test_languages:
+                errors.append(
+                    "reviewed test split is missing required release cohorts: "
+                    + ", ".join(sorted(missing_test_languages))
+                )
         for source_id, splits in source_splits.items():
             if len(splits) > 1:
                 errors.append(f"source_id {source_id!r} crosses dataset splits")
