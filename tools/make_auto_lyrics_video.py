@@ -11,7 +11,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-
 ROOT = Path(__file__).resolve().parents[1]
 FILM = ROOT / "film"
 
@@ -102,9 +101,11 @@ def validate_rendered_video(
     except (TypeError, json.JSONDecodeError) as exc:
         raise ValueError("ffprobe returned invalid JSON for rendered video") from exc
 
+    if not isinstance(metadata, dict):
+        raise TypeError("ffprobe metadata must be a JSON object")
     streams = metadata.get("streams")
-    if not isinstance(streams, list):
-        raise ValueError("ffprobe metadata is missing a streams array")
+    if not isinstance(streams, list) or any(not isinstance(stream, dict) for stream in streams):
+        raise TypeError("ffprobe metadata streams must be an array of objects")
     video = next((stream for stream in streams if stream.get("codec_type") == "video"), None)
     audio = next((stream for stream in streams if stream.get("codec_type") == "audio"), None)
     if video is None:
@@ -217,7 +218,7 @@ def main() -> int:
         ]
         subprocess.run(render, cwd=FILM, check=True)
         validation = validate_rendered_video(output, expected_duration=duration)
-    except (OSError, ValueError, subprocess.CalledProcessError) as exc:
+    except (OSError, TypeError, ValueError, subprocess.CalledProcessError) as exc:
         print(f"auto-lyrics-video: {exc}", file=sys.stderr)
         return 2
 
