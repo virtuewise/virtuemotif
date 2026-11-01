@@ -61,7 +61,7 @@ jobs:
         run: python -m pdoc -o build/api-docs tools.make_video tools.make_tapsync tools.utils tools.effects
 
       - name: Upload API documentation artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: api-documentation
           path: build/api-docs/

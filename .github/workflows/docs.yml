@@ -9,6 +9,7 @@ on:
       - "requirements-dev.txt"
       - "site/index.html"
       - "site/tools.html"
+      - "site/tools/**"
       - "tools/**"
   workflow_dispatch:
 
