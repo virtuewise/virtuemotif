@@ -134,6 +134,22 @@ def evaluate(corpus: Any, split: str | None = None) -> dict[str, Any]:
 
     total = len(predictions)
     correct = sum(item["correct"] for item in predictions)
+    cohort_languages = ("sn", "nd", "zu", "en", "mul")
+    cohort_coverage = {}
+    for language in cohort_languages:
+        cohort_items = [item for item in predictions if item["expected"] == language]
+        cohort_correct = sum(item["correct"] for item in cohort_items)
+        cohort_coverage[language] = {
+            "support": len(cohort_items),
+            "correct": cohort_correct,
+            "accuracy": _ratio(cohort_correct, len(cohort_items)),
+            "represented": bool(cohort_items),
+            "note": (
+                "Metrics are descriptive only; empty cohorts are not evidence of zero accuracy."
+                if not cohort_items else
+                "Interpret only within this dataset, split, source mix, and review scope."
+            ),
+        }
     labels = sorted(set(corpus["labels"]) | {item["predicted"] for item in predictions})
     per_language = {}
     for language in labels:
@@ -196,6 +212,12 @@ def evaluate(corpus: Any, split: str | None = None) -> dict[str, Any]:
         },
         "examples": total,
         "correct": correct,
+        "required_multilingual_cohorts": cohort_coverage,
+        "cohort_coverage_complete": all(item["represented"] for item in cohort_coverage.values()),
+        "cohort_coverage_warning": (
+            "Coverage is a reporting check, not evidence of representative sampling. "
+            "Missing cohorts must not be inferred accurate or inaccurate."
+        ),
         "accuracy": _ratio(correct, total),
         "per_language": per_language,
         "macro_average": macro,
