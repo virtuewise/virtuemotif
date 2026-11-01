@@ -107,7 +107,7 @@ export const resolveWordTimings = (
       !Number.isFinite(timing.from) ||
       !Number.isFinite(timing.to) ||
       timing.from < 0 ||
-      timing.to < timing.from ||
+      timing.to <= timing.from ||
       timing.from < previousFrom ||
       (lineFrom !== undefined && timing.from < lineFrom) ||
       (lineTo !== undefined && timing.to > lineTo)
