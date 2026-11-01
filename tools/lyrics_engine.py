@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import math
 import re
@@ -82,7 +83,7 @@ def detect_code_switch_candidates(text: str) -> list[dict[str, Any]]:
             })
 
     candidates: list[dict[str, Any]] = []
-    for left, right in zip(runs, runs[1:]):
+    for left, right in itertools.pairwise(runs):
         if left["language"] == right["language"]:
             continue
         if left["marker_count"] < 2 or right["marker_count"] < 2:
