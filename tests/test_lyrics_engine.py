@@ -58,23 +58,37 @@ def test_document_marks_machine_lyrics_for_review() -> None:
     assert doc["schema_version"] == 1
     assert doc["id"] == "sample"
     assert doc["review_required"] is True
+    assert doc["language_timeline"] is not None
+    assert doc["language_timeline"]["segments"][0]["review_required"] is True
+
 
 def test_document_records_forced_language_and_language_distribution() -> None:
     segments = [
-        {"text": "hello", "start": 0, "end": 1, "language": "en"},
-        {"text": "mangwanani", "start": 1, "end": 2, "language": "sn"},
-        {"text": "uncertain", "start": 2, "end": 3},
+        {"text": "hello there my friend", "start": 0, "end": 1, "language": "en", "language_confidence": 0.9},
+        {"text": "mangwanani shamwari yangu", "start": 1, "end": 2, "language": "sn", "language_confidence": 0.8},
+        {"text": "uncertain phrase here", "start": 2, "end": 3},
     ]
     doc = build_lyrics_document("sample", segments, language_mode="en")
     assert doc["language_mode"] == "en"
     assert doc["language_summary"] == {"en": 1, "sn": 1, "und": 1}
     assert doc["review_required"] is True
+    assert doc["language_timeline"]["language_counts"] == {"en": 1, "sn": 1, "und": 1}
+    assert doc["language_timeline"]["transitions"][0]["to"] == "sn"
+    assert doc["language_timeline"]["review_required"] is True
 
 
 def test_document_language_summary_is_empty_for_no_segments() -> None:
     doc = build_lyrics_document("empty", [])
     assert doc["language_mode"] == "auto"
     assert doc["language_summary"] == {}
+    assert doc["language_timeline"]["segments"] == []
+
+
+def test_legacy_segments_without_timestamps_remain_supported() -> None:
+    doc = build_lyrics_document("legacy", [{"text": "hello", "language": "en"}])
+    assert doc["language_timeline"] is None
+    assert doc["review_required"] is True
+
 
 def test_live_transcription_offsets_each_microphone_chunk(monkeypatch: pytest.MonkeyPatch) -> None:
     from tools.lyrics_engine import transcribe_live
@@ -131,7 +145,6 @@ def test_live_transcription_offsets_each_microphone_chunk(monkeypatch: pytest.Mo
     assert len(model.transcribe_calls) == 2
     assert all(call["language"] is None for call in model.transcribe_calls)
     assert all(call["word_timestamps"] is True for call in model.transcribe_calls)
-
 
 
 @pytest.mark.parametrize(("text", "expected"), [

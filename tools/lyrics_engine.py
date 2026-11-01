@@ -9,6 +9,8 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
+from tools.language_timeline import build_language_timeline
+
 # Conservative lexical hints; ambiguous short lines remain "und".
 _LANGUAGE_MARKERS: dict[str, set[str]] = {
     "en": {"the", "and", "you", "your", "with", "love", "heart", "we", "are", "is", "my", "this", "that", "have", "never", "tonight", "forever", "because", "when", "all", "for", "to"},
@@ -94,7 +96,6 @@ def transcribe_audio(audio_path: str | Path, model_name: str = "small", language
         yield _normalise_segment(segment, asr_language, asr_confidence)
 
 
-
 def transcribe_live(model_name: str = "small", language: str | None = None,
                     device: str = "auto", compute_type: str = "default",
                     sample_rate: int = 16000, chunk_seconds: float = 5.0) -> Iterable[dict[str, Any]]:
@@ -145,11 +146,17 @@ def build_lyrics_document(
     segments: list[dict[str, Any]],
     language_mode: str = "auto",
 ) -> dict[str, Any]:
-    """Create a versioned lyric document with language provenance and review warnings."""
+    """Create a versioned lyric document with language provenance and review warnings.
+
+    A timestamped timeline is included when all segments carry start/end values.
+    Incomplete legacy segment records remain supported and get no fabricated timeline.
+    """
     language_counts: dict[str, int] = {}
     for segment in segments:
         language = str(segment.get("language") or "und")
         language_counts[language] = language_counts.get(language, 0) + 1
+    has_timestamps = all("start" in segment and "end" in segment for segment in segments)
+    timeline = build_language_timeline(segments) if has_timestamps else None
     return {
         "schema_version": 1,
         "id": song_id,
@@ -157,6 +164,7 @@ def build_lyrics_document(
         "language_mode": language_mode,
         "language_summary": dict(sorted(language_counts.items())),
         "segments": segments,
+        "language_timeline": timeline,
         "review_required": True,
         "notes": "Machine lyrics may mishear singing, code-switching, names, and under-resourced languages. Review before publication.",
     }
@@ -189,9 +197,23 @@ def main() -> int:
             if args.live else transcribe_audio(args.audio, args.model, args.language,
                                                args.device, args.compute_type)
         )
+        previous_language: str | None = None
         for segment in stream:
             segments.append(segment)
             print(json.dumps({"event": "lyric_segment", **segment}, ensure_ascii=False), flush=True)
+            language = str(segment.get("language") or "und")
+            if previous_language is not None and language != previous_language:
+                print(json.dumps({
+                    "event": "language_transition_candidate",
+                    "at": segment["start"],
+                    "from": previous_language,
+                    "to": language,
+                    "candidate": True,
+                    "review_required": language in {"und", "mul"} or segment.get("language_confidence") is None
+                    or float(segment.get("language_confidence", 0.0)) < 0.55
+                    or len(str(segment.get("text") or "").split()) <= 2,
+                }, ensure_ascii=False), flush=True)
+            previous_language = language
         if args.output is not None:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(
@@ -205,6 +227,7 @@ def main() -> int:
         print(f"lyrics-engine: {exc}", file=sys.stderr)
         return 2
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
