@@ -165,3 +165,19 @@ export function evaluateAudioCues(
     hasAudioCues: true,
   };
 }
+
+
+/**
+ * Map normalized audio cues to a bounded wave displacement amplitude.
+ * The pure mapping keeps beat/energy-driven motion deterministic and testable.
+ */
+export function audioReactiveWaveAmplitude(
+  cue: Pick<AudioCueFrame, "energy" | "beatPulse" | "transitionIntensity">,
+): number {
+  const unit = (value: number): number =>
+    Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
+  return 0.025 +
+    unit(cue.energy) * 0.075 +
+    unit(cue.beatPulse) * 0.12 +
+    unit(cue.transitionIntensity) * 0.08;
+}

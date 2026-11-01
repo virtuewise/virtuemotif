@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo } from "react";
-import { AbsoluteFill, Audio, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import React, { useCallback, useMemo } from "react";
+import { AbsoluteFill, Audio, staticFile } from "remotion";
 import * as THREE from "three";
 import { FurryLyricView } from "./FurryLyricView";
-import { getDefaultFont, createFurryTextMesh, FUR_PRESETS, FurParams } from "./furTextSystem";
-import { Song } from "../HorizonFilm";
+import { FUR_PRESETS, type FurMeshGroup } from "./furTextSystem";
+import { audioReactiveWaveAmplitude, type AudioCueFrame } from "./audioCues";
+import type { Song } from "../HorizonFilm";
 
 /**
  * Fur‑Wave Synth composition
@@ -13,10 +14,6 @@ import { Song } from "../HorizonFilm";
  * - The plane uses a simple ShaderMaterial with a time‑varying displacement.
  */
 export const FurWaveSynth: React.FC<{song: Song; presetName?: keyof typeof FUR_PRESETS}> = ({song, presetName = "goldenHorizon"}) => {
-  const {durationInFrames, fps} = useVideoConfig();
-  const frame = useCurrentFrame();
-  const time = frame / fps;
-
   // Reuse the same furry mesh creation logic via FurryLyricView internally.
   // Here we only inject an extra wave plane into the scene using Three.js hooks.
 
@@ -57,16 +54,20 @@ export const FurWaveSynth: React.FC<{song: Song; presetName?: keyof typeof FUR_P
     return mesh;
   }, [waveMaterial]);
 
-  // Update wave uniforms each frame.
-  useEffect(() => {
-    waveMaterial.uniforms.uTime.value = time;
-    // Simple audio‑reactive amplitude: we reuse the audio beat uniform if available.
-    // The FurryLyricView updates a global uniform "uAudioBeat" on the fur mesh.
-    // Here we read that value (if present) to modulate wave height.
-    // We assume the fur mesh group is attached to the parent scene; we locate it via name.
-    // For simplicity we set a static amplitude.
-    waveMaterial.uniforms.uAmplitude.value = 0.06 + 0.04 * Math.sin(time * 0.7);
-  }, [time, waveMaterial]);
+  // Consume the same analysed cues that drive the furry text and lighting.
+  // Updating uniforms from the frame callback keeps the wave deterministic in still renders.
+  const handleAudioCueFrame = useCallback((cueFrame: AudioCueFrame) => {
+    waveMaterial.uniforms.uTime.value = cueFrame.time;
+    waveMaterial.uniforms.uAmplitude.value = audioReactiveWaveAmplitude(cueFrame);
+  }, [waveMaterial]);
+
+  const attachWavePlane = useCallback((mesh: FurMeshGroup) => {
+    const group = mesh.group;
+    if (!group.getObjectByName("wavePlane")) {
+      wavePlane.name = "wavePlane";
+      group.add(wavePlane);
+    }
+  }, [wavePlane]);
 
   return (
     <AbsoluteFill>
@@ -75,14 +76,8 @@ export const FurWaveSynth: React.FC<{song: Song; presetName?: keyof typeof FUR_P
       <FurryLyricView
         song={song}
         presetName={presetName}
-        // Attach wave plane after mesh is ready
-        onMeshReady={(mesh) => {
-          const group = mesh.group;
-          if (!group.getObjectByName("wavePlane")) {
-            wavePlane.name = "wavePlane";
-            group.add(wavePlane);
-          }
-        }}
+        onMeshReady={attachWavePlane}
+        onAudioCueFrame={handleAudioCueFrame}
       />
     </AbsoluteFill>
   );
