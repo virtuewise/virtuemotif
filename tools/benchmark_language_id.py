@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from tools.lyrics_engine import detect_text_language
+from tools.validate_language_dataset import REVIEWED_STATUS, SMOKE_STATUS, validate_corpus
 
 
 def _ratio(numerator: int, denominator: int) -> float:
@@ -16,28 +17,26 @@ def _ratio(numerator: int, denominator: int) -> float:
 
 
 def evaluate(corpus: Any) -> dict[str, Any]:
-    if not isinstance(corpus, dict) or corpus.get("schema_version") != 1:
-        raise ValueError("corpus must be a schema_version 1 object")
-    examples = corpus.get("examples")
-    if not isinstance(examples, list) or not examples:
-        raise ValueError("corpus must contain a non-empty examples array")
+    """Evaluate a validated corpus and clearly label its evidence status."""
+    errors = validate_corpus(corpus)
+    if errors:
+        raise ValueError("invalid language dataset: " + "; ".join(errors))
+    assert isinstance(corpus, dict)
+    examples = corpus["examples"]
 
     counts: dict[str, dict[str, int]] = defaultdict(lambda: {"correct": 0, "total": 0})
     confusion: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
     predictions = []
     for index, example in enumerate(examples):
-        if not isinstance(example, dict) or not isinstance(example.get("text"), str):
-            raise TypeError(f"example {index} must contain text as a string")
-        expected = example.get("language")
-        if not isinstance(expected, str) or not expected:
-            raise ValueError(f"example {index} must contain a language label")
         predicted = detect_text_language(example["text"])
         actual = str(predicted["language"])
+        expected = example["language"]
         counts[expected]["total"] += 1
         counts[expected]["correct"] += int(actual == expected)
         confusion[expected][actual] += 1
         predictions.append({
-            "id": str(example.get("id", index)),
+            "id": example["id"],
+            "split": example["split"],
             "expected": expected,
             "predicted": actual,
             "correct": actual == expected,
@@ -86,8 +85,9 @@ def evaluate(corpus: Any) -> dict[str, Any]:
     expected_unknown = sum(item["expected"] == "und" for item in predictions)
     return {
         "schema_version": 1,
-        "dataset_id": str(corpus.get("dataset_id", "unnamed")),
-        "dataset_status": str(corpus.get("status", "unspecified")),
+        "dataset_id": corpus["dataset_id"],
+        "dataset_status": corpus["status"],
+        "evidence_level": "human_reviewed_rights_cleared" if corpus["status"] == REVIEWED_STATUS else "synthetic_smoke_only",
         "examples": total,
         "correct": correct,
         "accuracy": _ratio(correct, total),
@@ -105,10 +105,9 @@ def evaluate(corpus: Any) -> dict[str, Any]:
         },
         "predictions": predictions,
         "limitations": (
-            "Lexical text-only smoke test. This synthetic corpus is not native-speaker reviewed, "
-            "does not evaluate audio/ASR, and must not be used as a production-accuracy claim. "
-            "Precision, recall, and F1 on this small synthetic set are plumbing checks, not "
-            "estimates of real-world performance."
+            "Lexical text-only evaluation, not an ASR/audio benchmark. Dataset metadata validation "
+            "cannot prove consent, licensing, fluency, or that human review occurred. Synthetic "
+            "smoke scores are regression plumbing only, never production-accuracy estimates."
         ),
     }
 
@@ -129,7 +128,7 @@ def main() -> int:
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(rendered, encoding="utf-8")
-            print(f"Wrote language-ID smoke report to {args.output}", file=sys.stderr)
+            print(f"Wrote language-ID report to {args.output}", file=sys.stderr)
         else:
             print(rendered, end="")
     except (OSError, json.JSONDecodeError, ValueError, TypeError) as exc:
