@@ -178,7 +178,7 @@ jobs:
           python -m tools.export_audio_cues
 
       - name: Test frame-time and audio-cue utilities
-        run: node --experimental-strip-types --test ../tests/audio_cues.test.mjs ../tests/typography.test.mjs
+        run: node --experimental-strip-types --test ../tests/audio_cues.test.mjs ../tests/typography.test.mjs ../tests/visual_review_frames.test.mjs
 
       - name: Type-check Remotion project
         run: npx tsc --noEmit
@@ -209,6 +209,9 @@ jobs:
 
       - name: Capture square visual review frame
         run: npx remotion still src/index.ts SmartFurSceneSquare ../build/visual-review/smart-fur-square.png --frame=90
+
+      - name: Validate visual review frame dimensions
+        run: node ../tools/validate_visual_review_frames.mjs ../build/visual-review
 
       - name: Upload Remotion visual review frames
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
