@@ -69,6 +69,7 @@ jobs:
           tools/make_video.py
           tools/audio_intelligence.py
           tools/lyrics_engine.py
+          tools/language_timeline.py
           tools/export_lyrics_song.py
           tools/benchmark_render.py
           tools/make_tapsync.py
@@ -77,6 +78,7 @@ jobs:
           tools/effects
           tests/test_audio_intelligence.py
           tests/test_lyrics_engine.py
+          tests/test_language_timeline.py
           tools/benchmark_language_id.py
           tests/test_benchmark_language_id.py
           tools/validate_language_dataset.py
