@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { FurryLyricView, FurryLyricViewProps } from "./FurryLyricView";
 import { Song } from "../HorizonFilm";
 import { FUR_PRESETS } from "./furTextSystem";
+import { createCityBuildingSpecs } from "./proceduralSceneData";
 
 /**
  * Neon‑Pulse Cityscape composition
@@ -35,14 +36,11 @@ export const NeonPulseCityscape: React.FC<{song: Song; presetName?: keyof typeof
     });
 
     // Simple procedural skyline – 12 buildings spaced across X
-    const count = 12;
-    for (let i = 0; i < count; i++) {
-      const width = 0.8 + Math.random() * 0.4;
-      const depth = 0.8 + Math.random() * 0.4;
-      const height = 1.5 + Math.random() * 3.0;
-      const geometry = new THREE.BoxGeometry(width, height, depth);
+    const buildings = createCityBuildingSpecs(12, 11);
+    for (const building of buildings) {
+      const geometry = new THREE.BoxGeometry(building.width, building.height, building.depth);
       const mesh = new THREE.Mesh(geometry, buildingMaterial.clone());
-      mesh.position.set(-5 + i * (10 / (count - 1)), height / 2 - 0.2, -2.5);
+      mesh.position.set(building.x, building.height / 2 - 0.2, -2.5);
       group.add(mesh);
     }
     group.name = "NeonCityGroup";

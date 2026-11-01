@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Fixed
+- Replace unseeded randomness in the Neon-Pulse Cityscape with repeatable procedural building geometry for stable stills and full renders.
 - Place FFmpeg audio inputs before output options so end-to-end video encoding with audio works reliably.
 - Validate lyric word-timing tokens and timestamp order before karaoke animation; mismatched timings fall back to deterministic staggered entrances.
 
