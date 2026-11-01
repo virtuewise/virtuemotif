@@ -9,7 +9,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
-from tools.language_timeline import build_language_timeline
+from tools.language_timeline import build_language_timeline, segment_requires_review
 
 # Conservative lexical hints; ambiguous short lines remain "und".
 _LANGUAGE_MARKERS: dict[str, set[str]] = {
@@ -197,23 +197,25 @@ def main() -> int:
             if args.live else transcribe_audio(args.audio, args.model, args.language,
                                                args.device, args.compute_type)
         )
-        previous_language: str | None = None
+        previous_segment: dict[str, Any] | None = None
         for segment in stream:
             segments.append(segment)
             print(json.dumps({"event": "lyric_segment", **segment}, ensure_ascii=False), flush=True)
             language = str(segment.get("language") or "und")
-            if previous_language is not None and language != previous_language:
+            previous_language = str(previous_segment.get("language") or "und") if previous_segment else None
+            if previous_segment is not None and language != previous_language:
                 print(json.dumps({
                     "event": "language_transition_candidate",
                     "at": segment["start"],
                     "from": previous_language,
                     "to": language,
                     "candidate": True,
-                    "review_required": language in {"und", "mul"} or segment.get("language_confidence") is None
-                    or float(segment.get("language_confidence", 0.0)) < 0.55
-                    or len(str(segment.get("text") or "").split()) <= 2,
+                    "review_required": (
+                        segment_requires_review(previous_segment)
+                        or segment_requires_review(segment)
+                    ),
                 }, ensure_ascii=False), flush=True)
-            previous_language = language
+            previous_segment = segment
         if args.output is not None:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(

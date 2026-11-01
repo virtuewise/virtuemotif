@@ -90,3 +90,32 @@ def test_invalid_timestamp_intervals_are_rejected(segments: list[dict[str, objec
 def test_invalid_confidence_threshold_is_rejected(threshold: float) -> None:
     with pytest.raises(ValueError, match="finite number between 0 and 1"):
         build_language_timeline([], min_confidence=threshold)
+
+
+def test_rapid_language_changes_preserve_every_candidate_boundary() -> None:
+    report = build_language_timeline([
+        {"start": 0, "end": 0.4, "text": "English lyric line", "language": "en", "language_confidence": 0.9},
+        {"start": 0.4, "end": 0.8, "text": "Ndinoda rudo rwako", "language": "sn", "language_confidence": 0.8},
+        {"start": 0.8, "end": 1.2, "text": "Yami yakho kakhulu", "language": "zu", "language_confidence": 0.8},
+        {"start": 1.2, "end": 1.6, "text": "I love you tonight", "language": "en", "language_confidence": 0.9},
+    ])
+    assert [(item["from"], item["to"], item["at"]) for item in report["transitions"]] == [
+        ("en", "sn", 0.4), ("sn", "zu", 0.8), ("zu", "en", 1.2)
+    ]
+
+
+def test_large_timestamp_gap_is_preserved_not_filled_or_smoothed() -> None:
+    report = build_language_timeline([
+        {"start": 0, "end": 1, "text": "English lyric line", "language": "en", "language_confidence": 0.9},
+        {"start": 8, "end": 9, "text": "Ndinoda rudo rwako", "language": "sn", "language_confidence": 0.8},
+    ])
+    assert report["segments"][1]["start"] == 8
+    assert report["transitions"][0]["at"] == 8
+    assert report["transitions"][0]["review_required"] is False
+
+
+def test_segment_review_policy_handles_shared_nguni_words_conservatively() -> None:
+    from tools.language_timeline import segment_requires_review
+
+    assert segment_requires_review({"language": "und", "text": "mina wena", "language_confidence": 0.25})
+    assert segment_requires_review({"language": "mul", "text": "ngiyabonga kakhulu", "language_confidence": 0.45})

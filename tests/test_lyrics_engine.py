@@ -168,3 +168,28 @@ def test_code_switched_method_is_explicit() -> None:
     result = detect_text_language("I love you ndinoda rudo rwako")
     assert result["language"] == "mul"
     assert result["method"] == "code-switched-lexical"
+
+
+@pytest.mark.parametrize("text", [
+    "ngiyabonga",
+    "ngiyakuthanda",
+    "ngiyazi",
+    "ngiyabona",
+    "ngikhumbula",
+    "ngizobuya",
+])
+def test_shared_or_overlapping_nguni_markers_do_not_force_a_single_language(text: str) -> None:
+    result = detect_text_language(text)
+    assert result["language"] in {"und", "mul"}
+    assert result["confidence"] <= 0.4
+
+
+def test_short_language_change_stays_a_candidate_and_requires_review() -> None:
+    from tools.language_timeline import build_language_timeline
+
+    report = build_language_timeline([
+        {"start": 0, "end": 1, "text": "A longer English phrase", "language": "en", "language_confidence": 0.9},
+        {"start": 1, "end": 1.2, "text": "yebo", "language": "zu", "language_confidence": 0.9},
+    ])
+    assert len(report["transitions"]) == 1
+    assert report["transitions"][0]["review_required"] is True

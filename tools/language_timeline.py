@@ -8,6 +8,35 @@ from typing import Any
 DEFAULT_MIN_CONFIDENCE = 0.55
 
 
+def _normalise_confidence(value: Any) -> float | None:
+    try:
+        confidence = float(value) if value is not None else None
+    except (TypeError, ValueError):
+        return None
+    if confidence is not None and (
+        not math.isfinite(confidence) or not 0.0 <= confidence <= 1.0
+    ):
+        return None
+    return confidence
+
+
+def segment_requires_review(
+    segment: Mapping[str, Any], *, min_confidence: float = DEFAULT_MIN_CONFIDENCE
+) -> bool:
+    """Return whether one segment warrants review using timeline's shared policy."""
+    if not math.isfinite(min_confidence) or not 0.0 <= min_confidence <= 1.0:
+        raise ValueError("min_confidence must be a finite number between 0 and 1")
+    language = str(segment.get("language") or "und")
+    confidence = _normalise_confidence(segment.get("language_confidence"))
+    short = len(str(segment.get("text") or "").split()) <= 2
+    return bool(segment.get("review_required", False)) or (
+        language in {"und", "mul"}
+        or confidence is None
+        or confidence < min_confidence
+        or short
+    )
+
+
 def build_language_timeline(
     segments: Iterable[Mapping[str, Any]],
     *,
@@ -40,23 +69,12 @@ def build_language_timeline(
             raise ValueError(f"segment {index} starts before the previous segment ends")
 
         language = str(segment.get("language") or "und")
-        confidence_value = segment.get("language_confidence")
-        try:
-            confidence = float(confidence_value) if confidence_value is not None else None
-        except (TypeError, ValueError):
-            confidence = None
-        if confidence is not None and (
-            not math.isfinite(confidence) or not 0.0 <= confidence <= 1.0
-        ):
-            confidence = None
-
+        confidence = _normalise_confidence(segment.get("language_confidence"))
         text = str(segment.get("text") or "")
         is_short = len(text.split()) <= 2
-        uncertain = (
-            language in {"und", "mul"}
-            or confidence is None
-            or confidence < min_confidence
-            or is_short
+        uncertain = segment_requires_review(
+            {**segment, "language": language, "text": text, "language_confidence": confidence},
+            min_confidence=min_confidence,
         )
         row = {
             "index": index,

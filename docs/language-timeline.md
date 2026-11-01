@@ -24,3 +24,9 @@ Confidence values are model/heuristic signals, **not calibrated probabilities**
 unless separately validated. The default threshold is a conservative review
 trigger, not a measured operating point. Keep source timestamps and ASR metadata
 alongside the timeline, and review uncertain transcriptions before publication.
+
+
+The live JSONL event stream uses the same segment-review policy for both sides of a
+candidate transition. This avoids a high-confidence new segment masking an uncertain
+preceding segment. Every observed label change remains a candidate; rapid changes are
+not silently smoothed away. Long timestamp gaps are preserved as gaps, not interpolated.
