@@ -29,7 +29,7 @@ def segment_requires_review(
     language = str(segment.get("language") or "und")
     confidence = _normalise_confidence(segment.get("language_confidence"))
     short = len(str(segment.get("text") or "").split()) <= 2
-    return bool(segment.get("review_required", False)) or (
+    return bool(segment.get("review_required", False) or segment.get("review_reasons")) or (
         language in {"und", "mul"}
         or confidence is None
         or confidence < min_confidence
@@ -86,14 +86,17 @@ def build_language_timeline(
             "text": text,
             "review_required": bool(segment.get("review_required", False)) or uncertain,
             "uncertainty_reasons": [
-                reason
-                for reason, condition in (
-                    ("unknown_or_mixed_language", language in {"und", "mul"}),
-                    ("confidence_missing", confidence is None),
-                    ("low_confidence", confidence is not None and confidence < min_confidence),
-                    ("short_segment", is_short),
-                )
-                if condition
+                *list(segment.get("review_reasons") or []),
+                *[
+                    reason
+                    for reason, condition in (
+                        ("unknown_or_mixed_language", language in {"und", "mul"}),
+                        ("confidence_missing", confidence is None),
+                        ("low_confidence", confidence is not None and confidence < min_confidence),
+                        ("short_segment", is_short),
+                    )
+                    if condition
+                ],
             ],
         }
         rows.append(row)
