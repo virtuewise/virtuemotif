@@ -1,4 +1,4 @@
-"""Repeatable lexical language-ID smoke benchmark (not an ASR/audio benchmark)."""
+""""Repeatable lexical language-ID smoke benchmark (not an ASR/audio benchmark)."""
 from __future__ import annotations
 
 import argparse
@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from tools.lyrics_engine import detect_text_language
-from tools.validate_language_dataset import REVIEWED_STATUS, SMOKE_STATUS, validate_corpus
+from tools.validate_language_dataset import REVIEWED_STATUS, validate_corpus
 
 
 def _ratio(numerator: int, denominator: int) -> float:
@@ -27,7 +27,7 @@ def evaluate(corpus: Any) -> dict[str, Any]:
     counts: dict[str, dict[str, int]] = defaultdict(lambda: {"correct": 0, "total": 0})
     confusion: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
     predictions = []
-    for index, example in enumerate(examples):
+    for example in examples:
         predicted = detect_text_language(example["text"])
         actual = str(predicted["language"])
         expected = example["language"]
@@ -83,11 +83,16 @@ def evaluate(corpus: Any) -> dict[str, Any]:
     }
     unknown_count = sum(item["predicted"] == "und" for item in predictions)
     expected_unknown = sum(item["expected"] == "und" for item in predictions)
+    evidence_level = (
+        "human_reviewed_rights_cleared"
+        if corpus["status"] == REVIEWED_STATUS
+        else "synthetic_smoke_only"
+    )
     return {
         "schema_version": 1,
         "dataset_id": corpus["dataset_id"],
         "dataset_status": corpus["status"],
-        "evidence_level": "human_reviewed_rights_cleared" if corpus["status"] == REVIEWED_STATUS else "synthetic_smoke_only",
+        "evidence_level": evidence_level,
         "examples": total,
         "correct": correct,
         "accuracy": _ratio(correct, total),
