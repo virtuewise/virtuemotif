@@ -19,7 +19,10 @@ python -m tools.lyrics_engine --live --model small --chunk-seconds 5
 
 Omit `--language` to let the backend detect the dominant audio language. The
 engine attaches timestamps, word timestamps when available, language metadata,
-and a confidence/method field.
+and a confidence/method field. Saved JSON records whether language detection was automatic
+or a language was explicitly forced with `--language`, and includes `language_summary`
+(segment counts by detected language, including `und` for unknown segments). The summary
+is diagnostic rather than a claim that every word in a segment uses that language.
 
 ## Language coverage and limits
 
