@@ -18,7 +18,7 @@ export const AutoLyricsPanel: React.FC<AutoLyricsPanelProps> = ({
   detectedLanguage = 'Awaiting transcription',
   confidence = 0,
   audioFormat = 'M4A / AAC / MP3 / WAV',
-  isTranslating = true,
+  isTranslating = false,
 }) => {
   const totalLines = song.sections.reduce((acc, s) => acc + s.lines.length, 0);
 
