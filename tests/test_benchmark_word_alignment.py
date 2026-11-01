@@ -49,6 +49,7 @@ def test_alignment_benchmark_reports_per_language_timing_error():
     })
     assert report["evidence_level"] == "human_reviewed_rights_cleared_reference_alignment"
     assert report["evaluated_split"] == "test"
+    assert report["matching_method"] == "longest_common_subsequence_normalized_tokens"
     metrics = report["per_language"]["en"]
     assert metrics["matched_words"] == 2
     assert metrics["word_match_precision"] == 1.0
@@ -64,6 +65,7 @@ def test_alignment_benchmark_fails_closed_for_smoke_data():
     with pytest.raises(ValueError, match="requires a reviewed rights-cleared corpus"):
         evaluate_alignment(corpus, {"test-en": []})
 
+
 def test_alignment_benchmark_reports_unmatched_tokens_without_fake_timing():
     report = evaluate_alignment(_corpus(), {
         "test-en": [
@@ -75,6 +77,33 @@ def test_alignment_benchmark_reports_unmatched_tokens_without_fake_timing():
     assert metrics["matched_words"] == 1
     assert metrics["word_match_recall"] == 0.5
     assert metrics["start_boundary_mae_seconds"] == 0.0
+    assert metrics["insertions"] == 1
+    assert metrics["deletions"] == 1
+
+
+def test_alignment_benchmark_matches_tokens_after_insertions_without_shifting_timing():
+    report = evaluate_alignment(_corpus(), {
+        "test-en": [
+            {"text": "hello", "start": 0.1, "end": 0.4},
+            {"text": "unexpected", "start": 0.42, "end": 0.48},
+            {"text": "world", "start": 0.52, "end": 0.92},
+        ],
+    })
+    metrics = report["per_language"]["en"]
+    assert metrics["matched_words"] == 2
+    assert metrics["insertions"] == 1
+    assert metrics["deletions"] == 0
+    assert metrics["start_boundary_mae_seconds"] == pytest.approx(0.01)
+
+
+def test_alignment_benchmark_rejects_invalid_unmatched_prediction_timestamps():
+    with pytest.raises(ValueError, match="invalid interval"):
+        evaluate_alignment(_corpus(), {
+            "test-en": [
+                {"text": "hello", "start": 0.1, "end": 0.4},
+                {"text": "extra", "start": 0.5, "end": 0.5},
+            ],
+        })
 
 
 def test_alignment_benchmark_requires_reference_words_for_selected_split():
