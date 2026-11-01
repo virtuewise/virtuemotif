@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Fixed
+- Document NumPy and SoundFile as required dependencies for the end-to-end AutoLyrics audio-cue export, avoiding a late render-time dependency failure.
 - Preserve the viewport-safe 3D lyric geometry fit scale while applying deterministic beat/transition motion, preventing animation from discarding the calculated fit.
 - Replace unseeded randomness in the Neon-Pulse Cityscape with repeatable procedural building geometry for stable stills and full renders.
 - Place FFmpeg audio inputs before output options so end-to-end video encoding with audio works reliably.
