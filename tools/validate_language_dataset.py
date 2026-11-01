@@ -23,7 +23,8 @@ def validate_corpus(corpus: Any) -> list[str]:
     if not isinstance(dataset_id, str) or not dataset_id.strip():
         errors.append("dataset_id must be a non-empty string")
     status = corpus.get("status")
-    if status not in {SMOKE_STATUS, REVIEWED_STATUS}:
+    valid_statuses = {SMOKE_STATUS, REVIEWED_STATUS}
+    if not isinstance(status, str) or status not in valid_statuses:
         errors.append(f"status must be {SMOKE_STATUS!r} or {REVIEWED_STATUS!r}")
 
     labels = corpus.get("labels")
@@ -64,7 +65,7 @@ def validate_corpus(corpus: Any) -> list[str]:
         elif labels_set and language not in labels_set:
             errors.append(f"{prefix}.language {language!r} is absent from labels")
         split = example.get("split")
-        if split not in ALLOWED_SPLITS:
+        if not isinstance(split, str) or split not in ALLOWED_SPLITS:
             errors.append(f"{prefix}.split must be one of {sorted(ALLOWED_SPLITS)}")
         if status == REVIEWED_STATUS:
             for field in ("source_id", "review_status", "consent_ref"):
@@ -98,7 +99,12 @@ def validate_corpus(corpus: Any) -> list[str]:
             split_policy = governance.get("split_policy")
             if not isinstance(split_policy, str) or not split_policy.strip():
                 errors.append("governance.split_policy must document source/speaker separation")
-        split_names = {example.get("split") for example in examples if isinstance(example, dict)}
+        split_names = {
+            example["split"]
+            for example in examples
+            if isinstance(example, dict)
+            and isinstance(example.get("split"), str)
+        }
         if not {"train", "test"} <= split_names:
             errors.append("reviewed datasets must contain separate train and test splits")
 
