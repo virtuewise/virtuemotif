@@ -86,13 +86,31 @@ def _code_switch_metrics(predictions: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def evaluate(corpus: Any) -> dict[str, Any]:
-    """Evaluate a validated corpus and clearly label its evidence status."""
+def evaluate(corpus: Any, split: str | None = None) -> dict[str, Any]:
+    """Evaluate a corpus; reviewed datasets default to held-out test only.
+
+    Smoke fixtures default to all examples because their only split is smoke.
+    Pass split="all" explicitly to aggregate every split of a reviewed corpus.
+    """
     errors = validate_corpus(corpus)
     if errors:
         raise ValueError("invalid language dataset: " + "; ".join(errors))
     assert isinstance(corpus, dict)
-    examples = corpus["examples"]
+    all_examples = corpus["examples"]
+    available_splits = sorted({example["split"] for example in all_examples})
+    if split is None:
+        selected_split = "test" if corpus["status"] == REVIEWED_STATUS else "all"
+    else:
+        selected_split = split
+    if selected_split == "all":
+        examples = all_examples
+    else:
+        examples = [example for example in all_examples if example["split"] == selected_split]
+        if not examples:
+            raise ValueError(
+                f"requested split {selected_split!r} has no examples; "
+                f"available splits: {available_splits}"
+            )
 
     counts: dict[str, dict[str, int]] = defaultdict(lambda: {"correct": 0, "total": 0})
     confusion: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
@@ -116,7 +134,7 @@ def evaluate(corpus: Any) -> dict[str, Any]:
 
     total = len(predictions)
     correct = sum(item["correct"] for item in predictions)
-    labels = sorted(set(counts) | {item["predicted"] for item in predictions})
+    labels = sorted(set(corpus["labels"]) | {item["predicted"] for item in predictions})
     per_language = {}
     for language in labels:
         true_positive = sum(
@@ -146,7 +164,7 @@ def evaluate(corpus: Any) -> dict[str, Any]:
             "accuracy": _ratio(true_positive, support),
         }
 
-    supported = [per_language[label] for label in sorted(counts)]
+    supported = [per_language[label] for label in sorted(counts) if counts[label]["total"]]
     macro = {
         metric: _ratio(sum(item[metric] for item in supported), len(supported))
         for metric in ("precision", "recall", "f1", "accuracy")
@@ -163,6 +181,11 @@ def evaluate(corpus: Any) -> dict[str, Any]:
         "dataset_id": corpus["dataset_id"],
         "dataset_status": corpus["status"],
         "evidence_level": evidence_level,
+        "evaluated_split": selected_split,
+        "available_split_counts": {
+            name: sum(example["split"] == name for example in all_examples)
+            for name in available_splits
+        },
         "examples": total,
         "correct": correct,
         "accuracy": _ratio(correct, total),
@@ -184,10 +207,10 @@ def evaluate(corpus: Any) -> dict[str, Any]:
         "limitations": (
             "Lexical text-only evaluation, not an ASR/audio benchmark. Dataset metadata validation "
             "cannot prove consent, licensing, fluency, or that human review occurred. Synthetic "
-            "smoke scores are regression plumbing only, never production-accuracy estimates."
+            "smoke scores are regression plumbing only, never production-accuracy estimates. "
+            "Reviewed datasets default to the held-out test split; do not tune on test results."
         ),
     }
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -196,11 +219,11 @@ def main() -> int:
         type=Path,
         default=Path("tests/fixtures/multilingual_language_smoke_v1.json"),
     )
-    parser.add_argument("--output", type=Path, help="Optional JSON report path")
+    parser.add_argument(\n        "--split",\n        choices=("all", "train", "dev", "test", "smoke"),\n        help="Split to evaluate; reviewed datasets default to test, smoke datasets to all",\n    )\n    parser.add_argument("--output", type=Path, help="Optional JSON report path")
     args = parser.parse_args()
     try:
         corpus = json.loads(args.corpus.read_text(encoding="utf-8"))
-        report = evaluate(corpus)
+        report = evaluate(corpus, split=args.split)
         rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
