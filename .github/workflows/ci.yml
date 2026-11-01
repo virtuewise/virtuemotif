@@ -189,8 +189,31 @@ jobs:
       - name: Validate Remotion compositions
         run: npx remotion compositions src/index.ts
 
+      - name: Prepare visual review artifact directory
+        run: mkdir -p ../build/visual-review
+
       - name: Smoke-render audio-cue-driven Horizon composition
-        run: npx remotion still src/index.ts FurryHorizon /tmp/furry-horizon-smoke.png --frame=0
+        run: npx remotion still src/index.ts FurryHorizon ../build/visual-review/furry-horizon-smoke.png --frame=0
 
       - name: Smoke-render audio-cue-driven Rise composition
-        run: npx remotion still src/index.ts FurryRise /tmp/furry-rise-smoke.png --frame=0
+        run: npx remotion still src/index.ts FurryRise ../build/visual-review/furry-rise-smoke.png --frame=0
+
+      - name: Capture landscape visual review frame
+        run: npx remotion still src/index.ts SmartFurScene ../build/visual-review/smart-fur-landscape.png --frame=90
+
+      - name: Capture 4K visual review frame
+        run: npx remotion still src/index.ts SmartFurScene4K ../build/visual-review/smart-fur-4k.png --frame=90
+
+      - name: Capture portrait visual review frame
+        run: npx remotion still src/index.ts SmartFurSceneVertical ../build/visual-review/smart-fur-portrait.png --frame=90
+
+      - name: Capture square visual review frame
+        run: npx remotion still src/index.ts SmartFurSceneSquare ../build/visual-review/smart-fur-square.png --frame=90
+
+      - name: Upload Remotion visual review frames
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: remotion-visual-review-frames
+          path: ../build/visual-review/*.png
+          if-no-files-found: error
+          retention-days: 14
