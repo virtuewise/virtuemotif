@@ -49,3 +49,7 @@ timing/stems/
 Thumbs.db
 [Dd]esktop.ini
 .DS_Store
+
+# Local licensed datasets and provenance (never commit corpus files)
+.local-dataset-provenance/
+data/raw/
