@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import argparse
+import subprocess
+import tempfile
 from pathlib import Path
 
 from tools.audio_intelligence import analyze_file
@@ -19,7 +21,16 @@ def export_audio_cues(output_dir: Path, songs: dict[str, Path] | None = None) ->
     for song_id, audio_path in (songs or DEFAULT_SONGS).items():
         if not audio_path.is_file():
             raise FileNotFoundError(f"audio asset for {song_id!r} was not found: {audio_path}")
-        result = analyze_file(audio_path)
+        # libsndfile support for AAC varies by runner, so normalize source audio with FFmpeg.
+        with tempfile.TemporaryDirectory(prefix="virtuemotif-cues-") as temp_dir:
+            wav_path = Path(temp_dir) / f"{song_id}.wav"
+            subprocess.run(
+                ["ffmpeg", "-v", "error", "-i", str(audio_path), "-ac", "1", "-ar", "22050", "-f", "wav", str(wav_path)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            result = analyze_file(wav_path)
         output = output_dir / f"{song_id}.audio-intelligence.json"
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json_dumps(result), encoding="utf-8")
