@@ -17,7 +17,7 @@ concurrency:
 jobs:
   python-quality:
     name: Python lint, tests, and docs
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - name: Check out repository
@@ -32,14 +32,10 @@ jobs:
             requirements-dev.txt
             requirements-ci.txt
 
-      - name: Ensure FFmpeg and ffprobe
+      - name: Install FFmpeg
         run: |
-          if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
-            if ! sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install --yes ffmpeg; then
-              sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update
-              sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install --yes ffmpeg
-            fi
-          fi
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
           ffmpeg -version
           ffprobe -version
 
@@ -112,7 +108,7 @@ jobs:
 
   remotion-quality:
     name: Remotion type check and composition validation
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 25
     defaults:
       run:
@@ -142,16 +138,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Ensure FFmpeg for compressed audio cue export
+      - name: Install FFmpeg for compressed audio cue export
         run: |
-          if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
-            if ! sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install --yes ffmpeg; then
-              sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update
-              sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install --yes ffmpeg
-            fi
-          fi
-          ffmpeg -version
-          ffprobe -version
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
 
       - name: Generate versioned audio cues for Remotion
         run: |
