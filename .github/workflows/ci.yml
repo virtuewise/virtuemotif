@@ -111,7 +111,7 @@ jobs:
           cd ..
           python -m pip install --upgrade pip
           python -m pip install numpy soundfile
-          python tools/export_audio_cues.py
+          python -m tools.export_audio_cues
 
       - name: Test frame-time and audio-cue utilities
         run: node --experimental-strip-types --test ../tests/audio_cues.test.mjs
