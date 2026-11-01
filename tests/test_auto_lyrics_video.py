@@ -165,6 +165,7 @@ def test_validate_rendered_video_rejects_missing_output(tmp_path) -> None:
     with pytest.raises(FileNotFoundError, match="missing or empty"):
         validate_rendered_video(tmp_path / "missing.mp4", expected_duration=12.5)
 
+
 def test_export_song_audio_cues_uses_the_song_id_expected_by_film(monkeypatch, tmp_path) -> None:
     source = tmp_path / "song.m4a"
     fake_exporter = ModuleType("tools.export_audio_cues")
