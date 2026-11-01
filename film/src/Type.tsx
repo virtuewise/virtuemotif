@@ -55,7 +55,7 @@ export const LyricLine: React.FC<{
   const wordStarts = resolveWordTimings(text, wordTimes);
   const stagger = Math.min(0.14, 1.6 / Math.max(words.length, 1));
   const lastStart = wordStarts ? wordStarts[wordStarts.length - 1] : from + (words.length - 1) * stagger;
-  const inEnd = wt ? lastStart + 0.9 : from + 0.9 + words.length * stagger;
+  const inEnd = wordStarts ? lastStart + 0.9 : from + 0.9 + words.length * stagger;
   const outStart = to - 0.75;
   const exit = clamp((t - outStart) / 0.75);
 
