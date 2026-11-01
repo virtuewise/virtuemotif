@@ -1,7 +1,7 @@
 """Tests for converting ASR documents to Remotion Song JSON."""
 import pytest
 
-from tools.export_lyrics_song import convert_lyrics_document
+from tools.export_lyrics_song import build_remotion_props, convert_lyrics_document
 
 
 def test_export_preserves_language_word_timing_and_instrumental_gaps() -> None:
@@ -87,3 +87,8 @@ def test_export_rejects_word_timing_outside_segment() -> None:
 def test_export_requires_supported_schema_version() -> None:
     with pytest.raises(ValueError, match="schema_version 1"):
         convert_lyrics_document({"schema_version": 2, "segments": []}, audio="audio/song.wav")
+
+
+def test_remotion_props_wrap_song_for_generic_composition() -> None:
+    song = {"id": "sample", "duration": 12.5, "sections": []}
+    assert build_remotion_props(song) == {"song": song}
