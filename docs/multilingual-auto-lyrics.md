@@ -68,9 +68,11 @@ Omit `--language` to let the multilingual ASR model detect the language, or
 supply a language code to force one. The command copies the source audio into
 `film/public/audio/auto-lyrics/`, writes reviewable intermediate JSON under
 `timing/` and `film/src/data/`, and renders through the generic `AutoLyrics`
-composition. It refuses to replace an existing output video unless `--force`
-is supplied. Use only audio you have permission to process and redistribute;
-review machine-generated lyrics before publishing.
+composition. It probes the full media duration with `ffprobe` by default, so
+instrumental intros and outros are retained; pass `--duration` to override the
+probe when needed. It refuses to replace an existing output video unless
+`--force` is supplied. Use only audio you have permission to process and
+redistribute; review machine-generated lyrics before publishing.
 
 ## Export generated lyrics for Remotion
 
