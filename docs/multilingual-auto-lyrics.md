@@ -1,10 +1,10 @@
 # Multilingual auto-lyrics engine
 
-VirtueMotif's first multilingual lyric engine is in `tools/lyrics_engine.py`.
+VirtueMotif's multilingual lyric engine is in `tools/lyrics_engine.py`.
 It generates timestamped lyric segments and word timestamps using an optional
 multilingual speech-recognition backend. As the decoder yields segments, the CLI
-can emit JSON Lines events immediately; `--output` saves a complete versioned
-JSON document instead.
+emits JSON Lines events; `--output` saves a complete versioned JSON document
+with a confidence-aware language timeline.
 
 ## Install and run
 
@@ -38,10 +38,27 @@ under-resourced languages varies. Reliable production quality needs a
 representative audio test set, native-speaker review, and potentially
 language-specific model adaptation.
 
+## Confidence-aware language timeline
+
+When all segments have timestamps, `build_lyrics_document` includes a
+`language_timeline` object in the saved JSON. It preserves segment times,
+language labels, confidence signals, methods and text; summarizes label counts;
+and exposes candidate transitions between adjacent language labels. Unknown or
+mixed labels, short segments, missing confidence, and low confidence are flagged
+for human review. Existing segment data is retained rather than smoothed or
+rewritten.
+
+In live mode, the JSONL stream also emits a `language_transition_candidate`
+event whenever adjacent segments change language. Consumers should treat this
+as a candidate boundary, not definitive proof of a code-switch. Confidence values
+are model/heuristic signals, **not calibrated probabilities** unless separately
+validated. Incomplete legacy segment records remain supported but do not receive
+a fabricated timeline.
+
 The output sets `review_required: true`; machine transcriptions are not
-canonical lyrics until reviewed. The current CLI streams decoded segments from
-an audio file; live microphone capture and strict low-latency streaming are a
-separate adapter and are not claimed by this implementation.
+canonical lyrics until reviewed. The CLI streams decoded segments from audio
+files or microphone windows; latency depends on chunk size, hardware, and model,
+so the default five-second window is not a real-time guarantee.
 
 ## Browser worker versus real transcription
 
@@ -128,7 +145,6 @@ import or a hand-edited `Root.tsx` entry.
 The composition duration is derived from the supplied song's duration. Generated
 lyrics still require human review; this automation does not create translations
 or certify transcription accuracy.
-
 
 ## Repeatable language-identification smoke benchmark
 
