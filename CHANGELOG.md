@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Place FFmpeg audio inputs before output options so end-to-end video encoding with audio works reliably.
+
+### Added
+- Deterministic end-to-end render validation with `ffprobe` checks for audio/video streams, dimensions, frame rate, frame count, and duration.
+- Immutable GitHub Actions commit-SHA pins, pinned Python CI constraints, architecture decision records, asset provenance guidance, and release validation/rollback gates.
+- A repeatable synthetic render benchmark that reports timing, peak memory, output size, and validated media metadata as a short-lived CI artifact.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

@@ -1,0 +1,38 @@
+# Linux/Python 3.11 CI constraints snapshot.
+# Update deliberately with requirements-dev.txt and review the resulting CI run.
+# Direct and transitive packages are pinned to make CI dependency resolution repeatable.
+Jinja2==3.1.6
+MarkupSafe==3.0.4
+Pillow==13.0.0
+PyYAML==6.0.3
+ast-serialize==0.13.1
+black==26.10.1
+cffi==2.1.1
+cfgv==3.5.0
+click==8.5.0
+distlib==0.4.4
+filelock==4.2.6
+identify==2.6.20
+iniconfig==2.3.1
+isort==9.0.2
+librt==0.16.0
+markdown2==2.5.5
+mypy==2.4.1
+mypy-extensions==1.1.0
+nodeenv==1.12.0
+numpy==2.4.6
+packaging==26.3
+pathspec==1.1.1
+pdoc==16.0.0
+platformdirs==4.14.2
+pluggy==1.7.0
+pre-commit==4.7.0
+pycparser==3.12
+Pygments==2.21.0
+pytest==9.2.0
+python-discovery==1.9.0
+pytokens==0.4.1
+ruff==0.17.3
+soundfile==0.14.0
+typing-extensions==4.16.0
+virtualenv==21.15.2

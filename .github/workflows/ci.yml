@@ -21,14 +21,16 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: requirements-dev.txt
+          cache-dependency-path: |
+            requirements-dev.txt
+            requirements-ci.txt
 
       - name: Install FFmpeg
         run: |
@@ -40,16 +42,40 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements-dev.txt
+          python -m pip install -r requirements-dev.txt -c requirements-ci.txt
+          python -m pip check
+
+      - name: Validate JSON manifests have no duplicate keys
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          def reject_duplicate_keys(pairs):
+              result = {}
+              for key, value in pairs:
+                  if key in result:
+                      raise ValueError(f"duplicate JSON key: {key}")
+                  result[key] = value
+              return result
+
+          for name in ("package.json", "package-lock.json", "film/package.json", "film/package-lock.json"):
+              json.loads(Path(name).read_text(encoding="utf-8"), object_pairs_hook=reject_duplicate_keys)
+          PY
 
       - name: Lint maintained pipeline and CI tests with Ruff
         run: >-
           ruff check
           tools/make_video.py
+          tools/audio_intelligence.py
+          tools/lyrics_engine.py
+          tools/benchmark_render.py
           tools/make_tapsync.py
           tools/utils.py
           tools/export_audio_cues.py
           tools/effects
+          tests/test_audio_intelligence.py
+          tests/test_lyrics_engine.py
           tests/test_ci_smoke.py
 
       - name: Run Python tests
@@ -58,11 +84,22 @@ jobs:
       - name: Check Python syntax
         run: python -m compileall -q tools tests
 
+      - name: Run deterministic synthetic render benchmark
+        run: python -m tools.benchmark_render --duration-seconds 2 --width 160 --height 90 --fps 15 --output build/benchmark/render-baseline.json
+
+      - name: Upload synthetic render benchmark report
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: synthetic-render-benchmark
+          path: build/benchmark/render-baseline.json
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Build API documentation
-        run: python -m pdoc -o build/api-docs tools.make_video tools.make_tapsync tools.utils tools.effects
+        run: python -m pdoc -o build/api-docs tools.make_video tools.make_tapsync tools.utils tools.effects tools.benchmark_render
 
       - name: Upload API documentation artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: api-documentation
           path: build/api-docs/
@@ -78,10 +115,10 @@ jobs:
         working-directory: film
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: "24"
           cache: npm
@@ -97,7 +134,7 @@ jobs:
         run: npm ci
 
       - name: Set up Python for audio cue export
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "3.11"
 

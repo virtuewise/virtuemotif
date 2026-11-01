@@ -19,24 +19,37 @@ from tools.effects import EFFECT_REGISTRY
 
 
 def load_config(song_id: str) -> dict[str, Any]:
-    """Load default config combined with song-specific config."""
+    """Load and validate default config merged with a required song config."""
+    if (
+        not isinstance(song_id, str)
+        or not song_id.strip()
+        or Path(song_id).name != song_id
+        or song_id in {".", ".."}
+    ):
+        raise ValueError("song_id must be a non-empty file-safe identifier")
+
     defaults_path = Path("config/defaults.yaml")
-    song_path = Path(f"songs/{song_id}.yaml")
+    song_path = Path("songs") / f"{song_id}.yaml"
+    if not song_path.is_file():
+        raise FileNotFoundError(f"song configuration not found: {song_path}")
 
-    defaults = (
-        yaml.safe_load(defaults_path.read_text(encoding="utf-8"))
-        if defaults_path.exists()
-        else {}
-    )
-    song_cfg = (
-        yaml.safe_load(song_path.read_text(encoding="utf-8"))
-        if song_path.exists()
-        else {}
-    )
+    def read_mapping(path: Path, *, optional: bool = False) -> dict[str, Any]:
+        if optional and not path.is_file():
+            return {}
+        try:
+            parsed = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except (OSError, yaml.YAMLError) as exc:
+            raise ValueError(f"unable to read YAML configuration {path}: {exc}") from exc
+        if parsed is None:
+            return {}
+        if not isinstance(parsed, dict):
+            raise TypeError(f"configuration root must be a YAML mapping: {path}")
+        return parsed
 
+    defaults = read_mapping(defaults_path, optional=True)
+    song_cfg = read_mapping(song_path)
     cfg = {**defaults, **song_cfg}
-    if "song_id" not in cfg:
-        cfg["song_id"] = song_id
+    cfg.setdefault("song_id", song_id)
     return cfg
 
 
@@ -130,6 +143,9 @@ def encode_video(frames_dir: Path, cfg: dict[str, Any]) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{cfg['song_id']}.mp4"
 
+    # Declare every input before output options and the output path. FFmpeg treats
+    # options and inputs in command-line order, so appending an audio input after
+    # the output path can make otherwise valid audio/video renders fail.
     cmd = [
         "ffmpeg",
         "-y",
@@ -137,14 +153,15 @@ def encode_video(frames_dir: Path, cfg: dict[str, Any]) -> Path:
         str(fps),
         "-i",
         str(frames_dir / "frame_%05d.png"),
-        "-c:v",
-        "libx264",
-        "-pix_fmt",
-        "yuv420p",
-        str(out_path),
     ]
-    if cfg.get("audio_path") and Path(cfg["audio_path"]).exists():
-        cmd.extend(["-i", str(cfg["audio_path"]), "-c:a", "aac", "-shortest"])
+    audio_path = cfg.get("audio_path")
+    has_audio = bool(audio_path and Path(audio_path).is_file())
+    if has_audio:
+        cmd.extend(["-i", str(audio_path)])
+    cmd.extend(["-c:v", "libx264", "-pix_fmt", "yuv420p"])
+    if has_audio:
+        cmd.extend(["-c:a", "aac", "-shortest"])
+    cmd.append(str(out_path))
 
     subprocess.run(cmd, check=True)
     print(f"Video written to {out_path}")
