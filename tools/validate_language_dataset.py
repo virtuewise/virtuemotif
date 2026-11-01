@@ -44,6 +44,8 @@ def validate_corpus(corpus: Any) -> list[str]:
         examples = []
 
     seen_ids: set[str] = set()
+    source_splits: dict[str, set[str]] = {}
+    speaker_splits: dict[str, set[str]] = {}
     for index, example in enumerate(examples):
         prefix = f"examples[{index}]"
         if not isinstance(example, dict):
@@ -68,10 +70,16 @@ def validate_corpus(corpus: Any) -> list[str]:
         if not isinstance(split, str) or split not in ALLOWED_SPLITS:
             errors.append(f"{prefix}.split must be one of {sorted(ALLOWED_SPLITS)}")
         if status == REVIEWED_STATUS:
-            for field in ("source_id", "review_status", "consent_ref"):
+            for field in ("source_id", "speaker_id", "review_status", "consent_ref"):
                 value = example.get(field)
                 if not isinstance(value, str) or not value.strip():
                     errors.append(f"{prefix}.{field} is required for reviewed datasets")
+            source_id = example.get("source_id")
+            if isinstance(source_id, str) and source_id.strip() and isinstance(split, str):
+                source_splits.setdefault(source_id, set()).add(split)
+            speaker_id = example.get("speaker_id")
+            if isinstance(speaker_id, str) and speaker_id.strip() and isinstance(split, str):
+                speaker_splits.setdefault(speaker_id, set()).add(split)
             if example.get("review_status") != "native_speaker_reviewed":
                 errors.append(f"{prefix}.review_status must be 'native_speaker_reviewed'")
             reviewer_ids = example.get("reviewer_ids")
@@ -102,11 +110,16 @@ def validate_corpus(corpus: Any) -> list[str]:
         split_names = {
             example["split"]
             for example in examples
-            if isinstance(example, dict)
-            and isinstance(example.get("split"), str)
+            if isinstance(example, dict) and isinstance(example.get("split"), str)
         }
         if not {"train", "test"} <= split_names:
             errors.append("reviewed datasets must contain separate train and test splits")
+        for source_id, splits in source_splits.items():
+            if len(splits) > 1:
+                errors.append(f"source_id {source_id!r} crosses dataset splits")
+        for speaker_id, splits in speaker_splits.items():
+            if len(splits) > 1:
+                errors.append(f"speaker_id {speaker_id!r} crosses dataset splits")
 
     if status == SMOKE_STATUS:
         for index, example in enumerate(examples):
