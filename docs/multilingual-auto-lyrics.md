@@ -110,8 +110,17 @@ supply a language code to force one. The command copies the source audio into
 composition. It probes the full media duration with `ffprobe` by default, so
 instrumental intros and outros are retained; pass `--duration` to override the
 probe when needed. It refuses to replace an existing output video unless
-`--force` is supplied. Use only audio you have permission to process and
-redistribute; review machine-generated lyrics before publishing.
+`--force` is supplied.
+
+After rendering, the command probes the MP4 again and fails if the output is
+missing or empty, lacks either an audio or video stream, has unexpected 1920×1080
+dimensions or a non-30 fps rate, differs from the source duration by more than
+the configured tolerance, or has audio/video stream durations that drift beyond
+the sync tolerance. This metadata gate catches structural output failures; it
+does not replace listening to the result or reviewing lyric timing and visuals.
+
+Use only audio you have permission to process and redistribute; review
+machine-generated lyrics before publishing.
 
 ## Export generated lyrics for Remotion
 
