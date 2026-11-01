@@ -24,7 +24,7 @@ Add further languages only with an explicit label definition and review plan. Do
 4. Reviewers record uncertainty rather than forcing a language label for overlapping vocabulary or very short text.
 5. A steward adjudicates disagreements and records the decision without publishing personal information.
 6. Split by source/song and speaker before tuning; keep held-out test examples out of marker/threshold development.
-7. Run the schema validator and benchmark, then publish a report with dataset version, split, counts, limitations, and per-language metrics.
+7. Run the schema validator and benchmark, then publish a report with dataset version, split, counts, limitations, and per-language metrics. Before calling a dataset release-ready, run the fail-closed release gate below.
 
 ## 3. Minimum metadata
 
@@ -49,3 +49,15 @@ Keep raw consent records and contact details outside GitHub. Never publish priva
 - [ ] Dataset status and report accurately describe review coverage and remaining limitations.
 
 A filled checklist or metadata field is not independent proof that the underlying claim is true. A named data steward remains accountable for auditing records. If permission or label confidence is unclear, exclude the example or keep it private pending review.
+
+## 5. Run the release gate
+
+From the repository root, validate the schema and then run the release gate against the candidate corpus:
+
+```bash
+python -m tools.validate_language_dataset path/to/candidate.json
+python -m tools.language_release_gate path/to/candidate.json
+python -m tools.benchmark_language_id --corpus path/to/candidate.json --output language-report.json
+```
+
+The release gate blocks the synthetic smoke fixture and any corpus that fails the reviewed-dataset schema, required metadata, or source/speaker split checks. A successful result means **structurally valid according to declared metadata only**. It does not prove that rights, consent, reviewer qualifications, annotations, or representativeness are genuine; the data steward must independently audit the private provenance ledger. Never place raw consent records or contact details in the repository.
