@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 _LANGUAGE_NAMES = {"en": "English", "sn": "Shona", "nd": "isiNdebele", "zu": "isiZulu", "xh": "isiXhosa", "af": "Afrikaans", "sw": "Swahili"}
+SUPPORTED_TYPOGRAPHY_PRESETS = ("display", "editorial", "neon", "whisper")
 
 
 def _number(value: Any, field: str, index: int) -> float:
@@ -18,7 +19,7 @@ def _number(value: Any, field: str, index: int) -> float:
     return float(value)
 
 
-def _segments(document: dict[str, Any]) -> list[dict[str, Any]]:
+def _segments(document: dict[str, Any], typography_preset: str) -> list[dict[str, Any]]:
     raw_segments = document.get("segments")
     if not isinstance(raw_segments, list):
         raise TypeError("input document must contain a segments array")
@@ -39,7 +40,7 @@ def _segments(document: dict[str, Any]) -> list[dict[str, Any]]:
         confidence = min(1.0, max(0.0, _number(raw.get("language_confidence", 0), "language_confidence", index)))
         line: dict[str, Any] = {
             "text": text.strip(), "from": round(start, 3), "to": round(end, 3),
-            "language": language, "languageConfidence": round(confidence, 3), "style": "display",
+            "language": language, "languageConfidence": round(confidence, 3), "style": typography_preset,
         }
         words = raw.get("words") or []
         if not isinstance(words, list):
@@ -73,14 +74,17 @@ def convert_lyrics_document(
     document: dict[str, Any], *, audio: str, title: str | None = None,
     subtitle: str | None = None, artist: str | None = None,
     song_id: str | None = None, duration: float | None = None,
+    typography_preset: str = "display",
 ) -> dict[str, Any]:
     """Convert a schema-v1 ASR document to the Remotion Song data contract."""
     if not isinstance(document, dict) or document.get("schema_version") != 1:
         raise ValueError("input document must be a schema_version 1 object")
     if not isinstance(audio, str) or not audio.strip():
         raise ValueError("audio must be a non-empty path relative to film/public")
+    if typography_preset not in SUPPORTED_TYPOGRAPHY_PRESETS:
+        raise ValueError(f"unsupported typography preset: {typography_preset}")
 
-    lines = _segments(document)
+    lines = _segments(document, typography_preset)
     last_end = max((line["to"] for line in lines), default=0.0)
     if duration is None and document.get("duration") is not None:
         duration = _number(document["duration"], "duration", -1)
@@ -176,12 +180,19 @@ def main() -> int:
     parser.add_argument("--subtitle")
     parser.add_argument("--artist")
     parser.add_argument("--duration", type=float, help="Full audio duration in seconds")
+    parser.add_argument(
+        "--typography-preset",
+        choices=SUPPORTED_TYPOGRAPHY_PRESETS,
+        default="display",
+        help="Lyric visual preset: display, editorial, neon, or whisper",
+    )
     args = parser.parse_args()
     try:
         document = json.loads(args.input.read_text(encoding="utf-8"))
         song = convert_lyrics_document(
             document, audio=args.audio, title=args.title, subtitle=args.subtitle,
             artist=args.artist, song_id=args.song_id, duration=args.duration,
+            typography_preset=args.typography_preset,
         )
         if args.props_output is not None and args.props_output.resolve() == args.output.resolve():
             raise ValueError("--props-output must differ from --output")

@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from tools.export_lyrics_song import SUPPORTED_TYPOGRAPHY_PRESETS
+
 ROOT = Path(__file__).resolve().parents[1]
 FILM = ROOT / "film"
 
@@ -188,6 +190,12 @@ def main() -> int:
         default="landscape",
         help="Output format: landscape (1920x1080), portrait (1080x1920), square (1024x1024), or 4k (3840x2160)",
     )
+    parser.add_argument(
+        "--typography-preset",
+        choices=SUPPORTED_TYPOGRAPHY_PRESETS,
+        default="display",
+        help="Lyric visual preset: display, editorial, neon, or whisper",
+    )
     parser.add_argument("--force", action="store_true", help="Allow replacing an existing video")
     args = parser.parse_args()
 
@@ -229,6 +237,7 @@ def main() -> int:
             "--props-output", str(props_output),
             "--title", args.title or source.stem,
             "--artist", args.artist,
+            "--typography-preset", args.typography_preset,
         ]
         export.extend(["--duration", str(duration)])
         subprocess.run(export, cwd=ROOT, check=True)
