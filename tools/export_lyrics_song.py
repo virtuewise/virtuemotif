@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 
+
 _LANGUAGE_NAMES = {"en": "English", "sn": "Shona", "nd": "isiNdebele", "zu": "isiZulu", "xh": "isiXhosa", "af": "Afrikaans", "sw": "Swahili"}
 
 
@@ -22,11 +23,11 @@ def _number(value: Any, field: str, index: int) -> float:
 def _segments(document: dict[str, Any]) -> list[dict[str, Any]]:
     raw_segments = document.get("segments")
     if not isinstance(raw_segments, list):
-        raise ValueError("input document must contain a segments array")
+        raise TypeError("input document must contain a segments array")
     result = []
     for index, raw in enumerate(raw_segments):
         if not isinstance(raw, dict):
-            raise ValueError(f"segment {index}: expected an object")
+            raise TypeError(f"segment {index}: expected an object")
         text = raw.get("text")
         if not isinstance(text, str) or not text.strip():
             raise ValueError(f"segment {index}: text must be non-empty")
@@ -44,7 +45,7 @@ def _segments(document: dict[str, Any]) -> list[dict[str, Any]]:
         }
         words = raw.get("words") or []
         if not isinstance(words, list):
-            raise ValueError(f"segment {index}: words must be an array")
+            raise TypeError(f"segment {index}: words must be an array")
         converted_words = []
         for word_index, word in enumerate(words):
             if not isinstance(word, dict) or not isinstance(word.get("text"), str) or not word["text"].strip():
