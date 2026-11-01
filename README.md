@@ -1,7 +1,6 @@
 # virtuemotif
 
 [![CI](https://github.com/virtuewise/virtuemotif/actions/workflows/ci.yml/badge.svg)](https://github.com/virtuewise/virtuemotif/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 > Automated, audio-reactive lyric video rendering pipeline and motion typography engine.
@@ -103,6 +102,6 @@ Open `timing/tap-sync-<song_id>.html` in any modern web browser.
 
 ---
 
-## License
+## License status
 
-This project is licensed under the MIT License.
+The repository currently does not contain a root `LICENSE` file, so its license has not been verified from the repository contents. Do not assume the project is available under the MIT License until the rights holder confirms the intended license and a matching license file is added.
