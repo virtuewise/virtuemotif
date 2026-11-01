@@ -17,7 +17,7 @@ concurrency:
 jobs:
   python-quality:
     name: Python lint, tests, and docs
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - name: Check out repository
@@ -71,7 +71,7 @@ jobs:
 
   remotion-quality:
     name: Remotion type check and composition validation
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 25
     defaults:
       run:
