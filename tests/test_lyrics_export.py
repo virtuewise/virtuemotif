@@ -1,7 +1,11 @@
 """Tests for converting ASR documents to Remotion Song JSON."""
 import pytest
 
-from tools.export_lyrics_song import build_remotion_props, convert_lyrics_document
+from tools.export_lyrics_song import (
+    SUPPORTED_TYPOGRAPHY_PRESETS,
+    build_remotion_props,
+    convert_lyrics_document,
+)
 
 
 def test_export_preserves_language_word_timing_and_instrumental_gaps() -> None:
@@ -46,6 +50,7 @@ def test_export_preserves_language_word_timing_and_instrumental_gaps() -> None:
     first_line = song["sections"][1]["lines"][0]
     assert first_line["text"] == "Ndinoda rudo"
     assert first_line["language"] == "sn"
+    assert first_line["style"] == "display"
     assert first_line["words"][0] == {"w": "Ndinoda", "from": 4.0, "to": 4.5}
     assert any(section["label"] == "Instrumental interlude" for section in song["sections"])
 
@@ -87,6 +92,32 @@ def test_export_rejects_word_timing_outside_segment() -> None:
 def test_export_requires_supported_schema_version() -> None:
     with pytest.raises(ValueError, match="schema_version 1"):
         convert_lyrics_document({"schema_version": 2, "segments": []}, audio="audio/song.wav")
+
+
+def test_export_applies_selected_typography_preset_to_every_lyric_line() -> None:
+    document = {
+        "schema_version": 1,
+        "duration": 3,
+        "segments": [
+            {"start": 0.5, "end": 1.5, "text": "Rudo runako", "language": "sn"},
+            {"start": 2.0, "end": 2.8, "text": "Rise together", "language": "en"},
+        ],
+    }
+
+    song = convert_lyrics_document(document, audio="audio/song.wav", typography_preset="neon")
+    lines = [line for section in song["sections"] for line in section["lines"]]
+
+    assert [line["style"] for line in lines] == ["neon", "neon"]
+    assert set(SUPPORTED_TYPOGRAPHY_PRESETS) == {"display", "editorial", "neon", "whisper"}
+
+
+def test_export_rejects_unknown_typography_preset() -> None:
+    with pytest.raises(ValueError, match="unsupported typography preset"):
+        convert_lyrics_document(
+            {"schema_version": 1, "duration": 1, "segments": []},
+            audio="audio/song.wav",
+            typography_preset="glow",
+        )
 
 
 def test_remotion_props_wrap_song_for_generic_composition() -> None:
