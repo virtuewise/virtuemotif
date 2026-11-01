@@ -7,6 +7,7 @@ as a performance promise for production songs.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import platform
@@ -67,6 +68,29 @@ def _validate_av_sync(
         raise RuntimeError(f"audio/video start-time delta exceeds tolerance: {start_delta:.3f}s")
     return video_duration, audio_duration, start_delta
 
+def _validate_render_metadata(
+    video: dict[str, Any], duration_seconds: int, width: int, height: int, fps: int
+) -> int:
+    """Fail closed when encoded dimensions, rate, or frame count differ from the request."""
+    try:
+        frame_count = int(video["nb_read_frames"])
+        actual_width = int(video["width"])
+        actual_height = int(video["height"])
+        actual_rate = str(video["avg_frame_rate"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise RuntimeError("ffprobe returned missing or invalid render metadata") from exc
+    expected_frames = duration_seconds * fps
+    if frame_count != expected_frames:
+        raise RuntimeError(f"expected {expected_frames} frames, found {frame_count}")
+    if (actual_width, actual_height) != (width, height):
+        raise RuntimeError(
+            f"encoded dimensions {(actual_width, actual_height)} do not match requested {(width, height)}"
+        )
+    if actual_rate != f"{fps}/1":
+        raise RuntimeError(f"unexpected frame rate: {actual_rate}")
+    return frame_count
+
+
 def run_benchmark(duration_seconds: int, width: int, height: int, fps: int) -> dict[str, Any]:
     """Render deterministic synthetic audio and return measurements with metadata."""
     if duration_seconds < 1 or width < 16 or height < 16 or fps < 1:
@@ -109,24 +133,31 @@ def run_benchmark(duration_seconds: int, width: int, height: int, fps: int) -> d
         video_duration, audio_duration, av_start_delta = _validate_av_sync(
             video, audio, metadata["format"]["duration"], fps
         )
-        frame_count = int(video["nb_read_frames"])
-        if frame_count != duration_seconds * fps:
-            raise RuntimeError(
-                f"expected {duration_seconds * fps} frames, found {frame_count}"
-            )
-        if (int(video["width"]), int(video["height"])) != (width, height):
-            raise RuntimeError("encoded dimensions do not match the benchmark configuration")
-        if video["avg_frame_rate"] != f"{fps}/1":
-            raise RuntimeError(f"unexpected frame rate: {video['avg_frame_rate']}")
+        frame_count = _validate_render_metadata(
+            video, duration_seconds, width, height, fps
+        )
         ffmpeg_version = subprocess.run(
             ["ffmpeg", "-version"], check=True, capture_output=True, text=True
         ).stdout.splitlines()[0]
         peak_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         if sys.platform == "darwin":
             peak_rss /= 1024
+        config_fingerprint = hashlib.sha256(
+            json.dumps(
+                {"duration_seconds": duration_seconds, "width": width, "height": height,
+                 "fps": fps, "sample_rate": sample_rate, "tone_hz": 440},
+                sort_keys=True, separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        audio_sha256 = hashlib.sha256(audio_path.read_bytes()).hexdigest()
         return {
             "schema_version": 1,
             "fixture": "generated 440 Hz sine wave; no third-party media",
+            "reproducibility": {
+                "configuration_sha256": config_fingerprint,
+                "synthetic_audio_sha256": audio_sha256,
+                "note": "Fingerprints identify the requested config and generated input, not bit-identical encoded output across platforms.",
+            },
             "python": platform.python_version(),
             "platform": platform.platform(),
             "ffmpeg": ffmpeg_version,
