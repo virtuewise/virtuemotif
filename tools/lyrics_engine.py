@@ -45,7 +45,7 @@ def detect_text_language(text: str) -> dict[str, Any]:
     scores = {code: sum(word in markers for word in words) for code, markers in _LANGUAGE_MARKERS.items()}
     ranked = sorted(scores.items(), key=lambda item: (-item[1], item[0]))
     code, score = ranked[0]
-    second_code, second = ranked[1]
+    _, second = ranked[1]
     if score == 0:
         return {"language": "und", "confidence": 0.0, "method": "text-heuristic"}
     # Nguni varieties share substantial vocabulary. Do not force a language when
