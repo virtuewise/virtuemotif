@@ -57,9 +57,29 @@ Generate a versioned ASR document, then convert it into the exact Song JSON shap
 
 ```bash
 python -m tools.lyrics_engine path/to/song.wav --output timing/song.auto.json --model small
-python -m tools.export_lyrics_song timing/song.auto.json --audio audio/song.m4a --output film/src/data/song.auto.json --title "My Song" --artist "Artist"
+python -m tools.export_lyrics_song timing/song.auto.json --audio audio/song.m4a --output film/src/data/song.auto.json --props-output film/src/data/song.auto.props.json --title "My Song" --artist "Artist"
 ```
 
 The `--audio` value is a path relative to `film/public/`. You can pass `--duration` when you know the full audio duration, including an instrumental outro; otherwise the exporter uses the final recognized lyric end time or the input document's duration. Import the generated JSON into `film/src/Root.tsx` and register a composition to render it. Choose a new output path when you want to preserve an existing song file; the converter writes to the exact path you specify.
 
 The exported document preserves per-segment language and confidence, word timings when the ASR backend supplied them, and sets `reviewRequired: true` unless the input explicitly says otherwise. Generated lyric films show the detected language/confidence and a visible human-review warning. The exporter never invents word timings or translated subtitles.
+
+## Render generated lyrics without editing the React registry
+
+The Remotion root includes a generic `AutoLyrics` composition. The optional
+`--props-output` writes a wrapper JSON file with the exact `{ "song": ... }`
+shape that composition expects, so a newly generated song does not need a new
+import or a hand-edited `Root.tsx` entry.
+
+1. Put the source audio at the path used by `--audio` under `film/public/`
+   (for example, `film/public/audio/song.m4a` for `--audio audio/song.m4a`).
+2. Generate the Song JSON and props wrapper with the command above.
+3. From the `film/` directory, render it:
+
+   ```bash
+   npx remotion render src/index.ts AutoLyrics out/song.auto.mp4 --props src/data/song.auto.props.json
+   ```
+
+The composition duration is derived from the supplied song's duration. Generated
+lyrics still require human review; this automation does not create translations
+or certify transcription accuracy.

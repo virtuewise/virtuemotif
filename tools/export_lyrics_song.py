@@ -160,11 +160,17 @@ def convert_lyrics_document(
     }
 
 
+def build_remotion_props(song: dict[str, Any]) -> dict[str, Any]:
+    """Wrap Song data in the component-props shape expected by the AutoLyrics composition."""
+    return {"song": song}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Convert multilingual ASR output into Remotion Song JSON.")
     parser.add_argument("input", type=Path, help="Versioned JSON produced by tools.lyrics_engine")
     parser.add_argument("--audio", required=True, help="Path relative to film/public, e.g. audio/song.m4a")
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--props-output", type=Path, help="Optional Remotion props JSON for the generic AutoLyrics composition")
     parser.add_argument("--song-id")
     parser.add_argument("--title")
     parser.add_argument("--subtitle")
@@ -177,8 +183,14 @@ def main() -> int:
             document, audio=args.audio, title=args.title, subtitle=args.subtitle,
             artist=args.artist, song_id=args.song_id, duration=args.duration,
         )
+        if args.props_output is not None and args.props_output.resolve() == args.output.resolve():
+            raise ValueError("--props-output must differ from --output")
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(json.dumps(song, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+        args.output.write_text(json.dumps(song, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        if args.props_output is not None:
+            args.props_output.parent.mkdir(parents=True, exist_ok=True)
+            props = build_remotion_props(song)
+            args.props_output.write_text(json.dumps(props, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         print(f"export-lyrics-song: {exc}", file=sys.stderr)
         return 2
