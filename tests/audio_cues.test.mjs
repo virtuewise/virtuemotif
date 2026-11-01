@@ -19,6 +19,9 @@ test("validates schema version and malformed cue data", () => {
   assert.equal(parseAudioIntelligence({ ...valid, beats: [1, 0] }), null);
   assert.equal(parseAudioIntelligence({ ...valid, beats: [4.1] }), null);
   assert.equal(parseAudioIntelligence({ ...valid, events: [{ time: -1, type: "onset", strength: 1 }] }), null);
+  assert.equal(parseAudioIntelligence({ ...valid, tempo: { bpm: 120, confidence: 1.1 } }), null);
+  assert.equal(parseAudioIntelligence({ ...valid, energy_curve: [{ time: 0, rms: 1.1 }] }), null);
+  assert.equal(parseAudioIntelligence({ ...valid, events: [{ time: 1, type: "onset", strength: 1.1 }] }), null);
 });
 
 test("frame-to-time conversion is zero-based and clamps duration", () => {
