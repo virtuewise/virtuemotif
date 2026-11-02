@@ -2,9 +2,6 @@
 
 [![CI](https://github.com/virtuewise/virtuemotif/actions/workflows/ci.yml/badge.svg)](https://github.com/virtuewise/virtuemotif/actions/workflows/ci.yml)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![ASTRA-SH · Engine](https://img.shields.io/badge/ASTRA--SH-creative%20engine-8b6cf6?style=for-the-badge)](#features)
-[![ASTRA-SH · Playground](https://img.shields.io/badge/ASTRA--SH-live%20playground-16a6a1?style=for-the-badge)](https://virtuewise.github.io/virtuemotif/playground.html)
-[![ASTRA-SH · Horizon](https://img.shields.io/badge/ASTRA--SH-horizon%20preview-d69a45?style=for-the-badge)](#the-horizon--live-remotion-test)
 
 > An audio-reactive lyric-video and motion-typography engine, from multilingual lyrics to rendered film.
 
@@ -18,7 +15,7 @@ VirtueMotif synchronizes lyrics, language metadata, audio analysis, procedural v
 | **Playbook** | A practical path from setup to transcription, timing review, visual iteration, and final rendering. | [Open the Playbook](#playbook) |
 | **The Horizon — live Remotion test** | Run the actual Horizon composition in Remotion Studio, or render a reproducible MP4 from the command line. | [Run the Horizon test](#the-horizon--live-remotion-test) |
 
-### ASTRA-SH · The Horizon of Light (Tarisiro) — auto-preview
+### The Horizon of Light (Tarisiro) — auto-preview
 
 [![Open the interactive Horizon Playground](https://virtuewise.github.io/virtuemotif/media/horizon-preview.gif)](https://virtuewise.github.io/virtuemotif/playground.html)
 
