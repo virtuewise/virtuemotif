@@ -361,7 +361,6 @@ export function createHorizonWorld(): HorizonWorld {
     const night = /\b(night|stars?|moon|dark|shadow|dream)\b/.test(normalized);
     const waterFocus = /\b(river|water|sea|ocean|rain|flow|tears?)\b/.test(normalized);
     const landFocus = /\b(earth|land|mountain|roots?|home|ancestors?)\b/.test(normalized);
-    const travelFocus = /\b(road|journey|travel|home|return|walking|moving|together)\b/.test(normalized);
     const hopeFocus = /\b(hope|light|future|morning|rise|healing|peace|freedom|together)\b/.test(normalized)
       || /chorus|outro|final/i.test(section);
     const energy = THREE.MathUtils.clamp(cue.energy, 0, 1);
@@ -380,7 +379,8 @@ export function createHorizonWorld(): HorizonWorld {
     water.scale.y = 1 + pulse * 0.08;
     portal.visible = hopeFocus || landFocus;
     importedAssets.visible = true;
-    // Scene dressing is language-agnostic: imported vehicles remain present for every lyric language.\n    for (const asset of importedNodes) asset.root.visible = true;
+    // Keep imported scene dressing available independently of lyric language.
+    for (const asset of importedNodes) asset.root.visible = true;
     portal.scale.setScalar(0.96 + pulse * 0.1);
     portal.rotation.y = Math.sin(time * 0.08) * 0.035;
     stars.visible = night;
