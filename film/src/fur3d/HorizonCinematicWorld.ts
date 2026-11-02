@@ -13,7 +13,7 @@ const tracked = <T extends THREE.BufferGeometry | THREE.Material | THREE.Texture
 };
 
 const standard = (
-  resources: Array<THREE.BufferGeometry | THREE.Material>,
+  resources: Array<THREE.BufferGeometry | THREE.Material | THREE.Texture>,
   color: THREE.ColorRepresentation,
   options: THREE.MeshStandardMaterialParameters = {},
 ) => tracked(resources, new THREE.MeshStandardMaterial({
@@ -36,7 +36,7 @@ const smoothNoise = (x: number, z: number, seed: number) => {
 };
 
 function makeTerrain(
-  resources: Array<THREE.BufferGeometry | THREE.Material>,
+  resources: Array<THREE.BufferGeometry | THREE.Material | THREE.Texture>,
   options: { width: number; depth: number; segmentsX: number; segmentsY: number; base: number; amplitude: number; seed: number },
 ) {
   const geometry = tracked(resources, new THREE.PlaneGeometry(
@@ -315,9 +315,7 @@ export function createHorizonWorld(): HorizonWorld {
     const energy = THREE.MathUtils.clamp(cue.energy, 0, 1);
     const pulse = THREE.MathUtils.clamp(cue.beatPulse * 0.55 + cue.transitionIntensity * 0.28 + energy * 0.17, 0, 1);
 
-    (skyMaterial.uniforms.uNight.value as number) = THREE.MathUtils.damp(
-      skyMaterial.uniforms.uNight.value as number, night ? 1 : 0, 3, 1 / 30,
-    );
+    skyMaterial.uniforms.uNight.value = night ? 1 : 0;
     (skyMaterial.uniforms.uHorizon.value as THREE.Color).set(night ? "#34415f" : hopeFocus ? "#f2b77e" : "#c58b72");
     (skyMaterial.uniforms.uZenith.value as THREE.Color).set(night ? "#111b3b" : "#526b8c");
     sunGroup.scale.setScalar(0.96 + pulse * 0.1 + (hopeFocus ? 0.08 : 0));
