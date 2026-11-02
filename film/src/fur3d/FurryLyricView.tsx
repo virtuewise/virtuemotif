@@ -14,6 +14,7 @@ import { FilmGrain, Vignette } from "../Backdrop";
 import { estimateLyricCharacterEquivalent } from "../typography";
 import { combineTextFitAndMotionScale } from "./textFit";
 import { createHorizonWorld, type HorizonWorld } from "./HorizonCinematicWorld";
+import { directHorizonCamera } from "./HorizonCinematicDirection";
 
 /**
  * Props for the furry lyric view.
@@ -231,17 +232,13 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       }
     }
 
-    // Camera setup with responsive base distance
+    // Camera setup with responsive authored story blocking.
     const aspect = width / height;
-    const isPortrait = aspect < 1.0;
-    const baseZ = isPortrait ? 6.8 / Math.max(0.48, aspect * 1.3) : 6.8;
-    const cameraDrift = 0.35 + cueFrame.energy * 0.16;
-    const cameraLift = 0.18 + cueFrame.transitionIntensity * 0.08;
-    const camX = Math.sin(currentTime * 0.35) * cameraDrift;
-    const camY = Math.cos(currentTime * 0.25) * cameraLift;
-    const cameraPushIn = cueFrame.energy * 0.22 + cueFrame.beatPulse * 0.08;
-    camera.position.set(camX, camY, baseZ - cameraPushIn);
-    camera.lookAt(0, 0, 0);
+    const direction = directHorizonCamera(currentTime, activeLine?.text ?? displayText, activeSectionLabel, cueFrame, aspect);
+    camera.position.copy(direction.position);
+    camera.lookAt(direction.target);
+    camera.fov = direction.fov;
+    camera.updateProjectionMatrix();
 
     // Audio‑reactive wind and floating motion
     const beatPulse = cueFrame.beatPulse;
