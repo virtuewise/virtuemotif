@@ -123,6 +123,10 @@ jobs:
               # The entry file may be served through a host-level redirect; require HTTP success,
               # then validate the actual landing page and every linked API page below.
               "index.html": (),
+              "playground.html": ("Interactive test playground", "horizon-preview.mp4"),
+              "media/horizon-preview.gif": (),
+              "audio/horizon.m4a": (),
+              "data/horizon.json": (),
               "tools.html": ("tools/make_video.html",),
               "tools/make_video.html": ("make_video",),
               "tools/make_tapsync.html": ("make_tapsync",),
