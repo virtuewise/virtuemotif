@@ -29,7 +29,7 @@ Required actions: `idle`, `walk`, `turn`, `look_to_horizon`. Add additional auth
 
 ## Reproducible local staging
 
-Run `npm run stage:assets --workspace lyrical-film` from the repository root (or `npm run stage:assets` inside `film/`) to download the four pinned prototype GLBs into their manifest paths. The staging script verifies the binary GLB header, declared byte length and SHA-256, then records the exact digest and sets status to `staged-review`. It never marks an asset production-approved.
+Run `cd film && npm run stage:assets` to download the four pinned prototype GLBs into their manifest paths. The staging script verifies the binary GLB header, declared byte length and SHA-256, then records the exact digest and sets status to `staged-review`. It never marks an asset production-approved.
 
 Open each staged GLB in Blender and review topology, normals, scale, UVs, embedded textures, material response, visual quality and licence evidence. Only after that review may a maintainer change the row to `approved-local`; then run `npm run validate:assets:production`. The current tree/vehicle assets are explicitly low-poly scene-dressing prototypes, so staging them locally improves render reproducibility but does not satisfy the final hero-scenery quality bar. Replace them with higher-detail approved assets before close-up use.
 
@@ -37,4 +37,4 @@ Open each staged GLB in Blender and review topology, normals, scale, UVs, embedd
 
 `film/src/fur3d/HorizonCharacterPerformance.ts` is the deterministic animation adapter for the eventual artist-approved GLB. It requires authored `idle`, `walk`, `turn`, and `look_to_horizon` clips, selects a story action from lyric/section cues, seeks the animation mixer to absolute Remotion time, and applies restrained facial morph emphasis when compatible morph targets exist. The adapter deliberately throws if required clips are absent. It is not a model, does not fabricate facial geometry, and is not yet connected to the scene because the protagonist GLB has not been generated and approved.
 
-Run the focused regression suite with `npm run test:cinematic --workspace lyrical-film`. This command covers the world and character performance contracts; CI inclusion and browser-render validation remain separate acceptance gates.
+Run the focused regression suite with `cd film && npm run test:cinematic`. This command covers the world and character performance contracts; CI inclusion and browser-render validation remain separate acceptance gates.
