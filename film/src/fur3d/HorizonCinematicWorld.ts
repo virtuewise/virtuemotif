@@ -7,6 +7,11 @@ import { createHorizonCharacterPerformance, type HorizonCharacterPerformance } f
 export interface HorizonWorld {
   group: THREE.Group;
   ready: Promise<void>;
+  /** Per-asset load outcome; missing local production files must never fail silently. */
+  assetDiagnostics: {
+    loaded: string[];
+    failed: Array<{ asset: string; error: string }>;
+  };
   update: (time: number, cue: AudioCueFrame, lyric: string, section: string) => void;
   dispose: () => void;
 }
@@ -302,6 +307,7 @@ export function createHorizonWorld(): HorizonWorld {
   const importedNodes: Array<{ root: THREE.Group; kind: "tree" | "vehicle" | "hero" }> = [];
   let characterPerformance: HorizonCharacterPerformance | null = null;
   let disposed = false;
+  const assetDiagnostics: HorizonWorld["assetDiagnostics"] = { loaded: [], failed: [] };
   const assetDefinitions = [
     { name: "baobab-tree", url: staticFile("assets/world/baobab-tree.glb"), kind: "tree" as const, position: [-6.2, -5.9, -9.2] as const, scale: 0.62 },
     { name: "large-acacia-tree", url: staticFile("assets/world/large-acacia-tree.glb"), kind: "tree" as const, position: [6.2, -5.9, -10.0] as const, scale: 0.58 },
@@ -309,7 +315,8 @@ export function createHorizonWorld(): HorizonWorld {
     { name: "grand-touring-coupe", url: staticFile("assets/world/grand-touring-coupe.glb"), kind: "vehicle" as const, position: [4.3, -5.8, -5.8] as const, scale: 0.48 },
     { name: "horizon-human-protagonist", url: staticFile("assets/characters/horizon-protagonist.glb"), kind: "hero" as const, position: [0, -5.55, -5.4] as const, scale: 1.0 },
   ];
-  const ready = Promise.allSettled(assetDefinitions.map(async (definition) => {
+  const ready = Promise.all(assetDefinitions.map(async (definition) => {
+    try {
     const gltf = await assetLoader.loadAsync(definition.url);
     const root = gltf.scene;
     root.name = definition.name;
@@ -348,7 +355,18 @@ export function createHorizonWorld(): HorizonWorld {
     }
     importedAssets.add(root);
     importedNodes.push({ root, kind: definition.kind });
-  })).then(() => undefined);
+    assetDiagnostics.loaded.push(definition.name);
+    } catch (error) {
+      assetDiagnostics.failed.push({
+        asset: definition.name,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  })).then(() => {
+    if (assetDiagnostics.failed.length > 0) {
+      console.warn("[HorizonWorld] Local asset loading completed with failures.", assetDiagnostics.failed);
+    }
+  });
 
   const vegetation = add(new THREE.Group(), "native-vegetation");
   const trunkGeometry = tracked(resources, new THREE.CylinderGeometry(0.035, 0.075, 0.9, 7));
@@ -510,6 +528,7 @@ export function createHorizonWorld(): HorizonWorld {
   return {
     group,
     ready,
+    assetDiagnostics,
     update,
     dispose: () => {
       disposed = true;
