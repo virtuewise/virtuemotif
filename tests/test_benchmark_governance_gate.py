@@ -42,6 +42,9 @@ def test_reviewed_status_is_reported_only_for_structurally_valid_reviewed_corpus
             "review_status": "native_speaker_reviewed",
             "adjudication_policy": "Two independent reviews with adjudication.",
             "split_policy": "Sources and speakers remain isolated between train and test.",
+            "dataset_version": "test-fixture-1",
+            "annotation_protocol_version": "test-protocol-1",
+            "provenance_manifest_ref": "restricted://governance-gate-test-manifest",
         },
         "examples": [
             {
@@ -52,7 +55,7 @@ def test_reviewed_status_is_reported_only_for_structurally_valid_reviewed_corpus
                 "source_id": "source-train",
                 "speaker_id": "speaker-train",
                 "review_status": "native_speaker_reviewed",
-                "reviewer_ids": ["reviewer-a"],
+                "reviewer_ids": ["reviewer-a", "reviewer-b"],
                 "consent_ref": "private-record-a",
             },
             {
@@ -63,7 +66,7 @@ def test_reviewed_status_is_reported_only_for_structurally_valid_reviewed_corpus
                 "source_id": "source-test",
                 "speaker_id": "speaker-test",
                 "review_status": "native_speaker_reviewed",
-                "reviewer_ids": ["reviewer-a"],
+                "reviewer_ids": ["reviewer-a", "reviewer-b"],
                 "consent_ref": "private-record-b",
             },
         ],
