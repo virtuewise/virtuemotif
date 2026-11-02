@@ -11,6 +11,8 @@ on:
       - "site/index.html"
       - "site/tools.html"
       - "site/tools/**"
+      - "film/src/**"
+      - "film/public/audio/**"
       - "tools/**"
   workflow_dispatch:
 
@@ -78,6 +80,11 @@ jobs:
       - name: Install Remotion dependencies
         working-directory: film
         run: npm ci
+
+      - name: Install FFmpeg for Horizon audio analysis and GIF encoding
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
 
       - name: Prepare Horizon audio-reactive cues
         run: |
