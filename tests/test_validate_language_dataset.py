@@ -116,6 +116,22 @@ def test_reviewed_corpus_accepts_documented_governance_shape() -> None:
     assert validate_corpus(_valid_reviewed_corpus()) == []
 
 
+def test_generic_reviewed_corpus_does_not_require_release_cohort_sample_size() -> None:
+    corpus = _valid_reviewed_corpus()
+    governance = corpus["governance"]
+    assert isinstance(governance, dict)
+    governance.pop("minimum_test_examples_per_cohort")
+    examples = corpus["examples"]
+    assert isinstance(examples, list)
+    corpus["examples"] = [
+        example for example in examples
+        if example["language"] == "en" and (
+            example["split"] == "train" or example["id"] in {"test-en-0", "test-en-1"}
+        )
+    ]
+    assert validate_corpus(corpus) == []
+
+
 def test_reviewed_corpus_rejects_source_or_speaker_leakage() -> None:
     corpus = _valid_reviewed_corpus()
     examples = corpus["examples"]
