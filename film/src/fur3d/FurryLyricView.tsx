@@ -141,6 +141,11 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       const scene = new THREE.Scene();
       sceneRef.current = scene;
 
+      // Mount the cinematic environment before the lyric mesh so it remains behind typography.
+      const horizonWorld = createHorizonWorld();
+      horizonWorldRef.current = horizonWorld;
+      scene.add(horizonWorld.group);
+
       const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
       camera.position.set(0, 0, 6.8);
       cameraRef.current = camera;
@@ -271,13 +276,37 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       mesh.update(currentTime, audioDisplacement);
     }
 
-    // Advance the cinematic world from the same deterministic frame clock and lyric cues.\n    horizonWorldRef.current?.update(currentTime, cueFrame, activeLine?.text ?? displayText, activeSectionLabel);\n\n    // Publish the exact same frame cues used for the typography and scene motion.
+    // Advance the cinematic world from the same deterministic frame clock and lyric cues.
+    horizonWorldRef.current?.update(currentTime, cueFrame, activeLine?.text ?? displayText, activeSectionLabel);
+
+    // Publish the exact same frame cues used for the typography and scene motion.
     // Consumers can update their own shader uniforms before this frame is rendered.
     onAudioCueFrame?.(cueFrame);
 
     // Render the frame
     renderer.render(scene, camera);
   }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady, onAudioCueFrame, cueFrame.time, cueFrame.beatPulse, cueFrame.energy, cueFrame.transitionIntensity]);
+
+  // Release GPU resources when the composition unmounts.
+  useEffect(() => {
+    return () => {
+      const world = horizonWorldRef.current;
+      if (world) {
+        sceneRef.current?.remove(world.group);
+        world.dispose();
+        horizonWorldRef.current = null;
+      }
+      if (currentMeshRef.current) {
+        sceneRef.current?.remove(currentMeshRef.current.group);
+        currentMeshRef.current.dispose();
+        currentMeshRef.current = null;
+      }
+      rendererRef.current?.dispose();
+      rendererRef.current = null;
+      sceneRef.current = null;
+      cameraRef.current = null;
+    };
+  }, []);
 
   // Fade in/out based on lyric line progress or title entrance
   const lineProgress = activeLine
