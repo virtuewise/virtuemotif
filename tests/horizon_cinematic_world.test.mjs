@@ -51,3 +51,28 @@ test("Horizon environment responds deterministically to the same lyric and audio
   first.dispose();
   second.dispose();
 });
+
+
+test("Horizon world themes recognize Shona, Ndebele, and Zulu lyric vocabulary", () => {
+  const world = createHorizonWorld();
+
+  world.update(12, cue, "Ebusuku sikhumbula amanzi", "Verse");
+  assert.equal(world.group.getObjectByName("ancestral-stars").visible, true);
+  assert.equal(world.group.getObjectByName("river-of-light").visible, true);
+
+  world.update(24, cue, "Mvura inounza tariro nechiedza", "Verse");
+  assert.equal(world.group.getObjectByName("river-of-light").visible, true);
+  assert.equal(world.group.getObjectByName("journey-portal").visible, true);
+
+  world.update(36, cue, "Ekuseni ithemba nokukhanya", "Verse");
+  assert.equal(world.group.getObjectByName("journey-portal").visible, true);
+
+  world.dispose();
+});
+
+test("Imported world dressing is not gated by English-only travel keywords", () => {
+  const world = createHorizonWorld();
+  world.update(8, cue, "Siyahamba sonke", "Verse");
+  assert.equal(world.group.getObjectByName("licensed-world-assets").visible, true);
+  world.dispose();
+});
