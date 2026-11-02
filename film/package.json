@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "scripts": {
     "studio": "remotion studio src/index.ts",
-    "render": "remotion render src/index.ts"
+    "render": "remotion render src/index.ts",
+    "validate:assets": "node scripts/validate_world_assets.mjs",
+    "validate:assets:production": "node scripts/validate_world_assets.mjs --production"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.539",
