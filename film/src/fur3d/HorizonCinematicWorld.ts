@@ -220,8 +220,11 @@ export function createHorizonWorld(): HorizonWorld {
   const midMaterial = standard(resources, "#435b58", { roughness: 0.98 });
   const nearMaterial = standard(resources, "#263b32", { roughness: 0.96 });
   const far = add(new THREE.Mesh(farGeometry, farMaterial), "far-mountains");
+  far.receiveShadow = true;
   const mid = add(new THREE.Mesh(midGeometry, midMaterial), "middle-mountains");
+  mid.receiveShadow = true;
   const near = add(new THREE.Mesh(nearGeometry, nearMaterial), "near-ridge");
+  near.receiveShadow = true;
   far.position.set(0, -1.0, -16);
   mid.position.set(0, -1.0, -11.5);
   near.position.set(0, -1.0, -8.2);
@@ -251,6 +254,7 @@ export function createHorizonWorld(): HorizonWorld {
     roughness: 1,
   });
   const ground = add(new THREE.Mesh(groundGeometry, groundMaterial), "red-earth");
+  ground.receiveShadow = true;
   ground.position.set(0, -6.2, -7.2);
   ground.rotation.x = -0.04;
 
@@ -355,9 +359,11 @@ export function createHorizonWorld(): HorizonWorld {
     tree.scale.setScalar(scale);
     tree.rotation.z = (seeded(i + 240) - 0.5) * 0.18;
     const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+    trunk.castShadow = true;
     trunk.position.y = 0.4;
     tree.add(trunk);
     const crown = new THREE.Mesh(crownGeometry, leafMaterials[i % leafMaterials.length]);
+    crown.castShadow = true;
     crown.position.y = 1.05;
     crown.scale.set(1.0 + seeded(i + 290) * 0.4, 0.85 + seeded(i + 340) * 0.55, 0.9);
     tree.add(crown);
@@ -408,6 +414,13 @@ export function createHorizonWorld(): HorizonWorld {
   const ambient = add(new THREE.HemisphereLight("#d9e5ff", "#36241c", 1.05), "environment-hemisphere");
   const sunLight = add(new THREE.DirectionalLight("#ffd2a0", 2.0), "cinematic-key-light");
   sunLight.position.set(-4, 7, 5);
+  sunLight.castShadow = true;
+  sunLight.shadow.mapSize.set(1024, 1024);
+  sunLight.shadow.camera.left = -18;
+  sunLight.shadow.camera.right = 18;
+  sunLight.shadow.camera.top = 12;
+  sunLight.shadow.camera.bottom = -12;
+  sunLight.shadow.bias = -0.00015;
   const rimLight = add(new THREE.DirectionalLight("#91b7d0", 0.75), "cool-rim-light");
   rimLight.position.set(5, 2, -8);
 
