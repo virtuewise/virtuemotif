@@ -1,8 +1,10 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import type { AudioCueFrame } from "./audioCues";
 
 export interface HorizonWorld {
   group: THREE.Group;
+  ready: Promise<void>;
   update: (time: number, cue: AudioCueFrame, lyric: string, section: string) => void;
   dispose: () => void;
 }
@@ -231,6 +233,41 @@ export function createHorizonWorld(): HorizonWorld {
     portal.add(cap);
   }
 
+  // CC0 real-world scale assets from 3DAssets.dev. Loaded once per composition;
+  // the URLs are immutable and every GLB is self-contained (no runtime API lookup).
+  const importedAssets = add(new THREE.Group(), "licensed-world-assets");
+  const assetLoader = new GLTFLoader();
+  const importedResources = new Set<THREE.BufferGeometry | THREE.Material | THREE.Texture>();
+  const importedNodes: Array<{ root: THREE.Group; kind: "tree" | "vehicle" }> = [];
+  const assetDefinitions = [
+    { name: "baobab-tree", url: "https://cdn.3dassets.dev/assets/37714/v1/model.glb", kind: "tree" as const, position: [-11.2, -5.9, -9.2] as const, scale: 0.62 },
+    { name: "large-acacia-tree", url: "https://cdn.3dassets.dev/assets/37713/v1/model.glb", kind: "tree" as const, position: [10.8, -5.9, -10.0] as const, scale: 0.58 },
+    { name: "small-acacia-tree", url: "https://cdn.3dassets.dev/assets/37712/v1/model.glb", kind: "tree" as const, position: [-7.8, -5.8, -6.8] as const, scale: 0.72 },
+    { name: "grand-touring-coupe", url: "https://cdn.3dassets.dev/assets/18681/v1/model.glb", kind: "vehicle" as const, position: [7.0, -5.8, -5.8] as const, scale: 0.48 },
+  ];
+  const ready = Promise.allSettled(assetDefinitions.map(async (definition) => {
+    const gltf = await assetLoader.loadAsync(definition.url);
+    const root = gltf.scene;
+    root.name = definition.name;
+    root.position.set(...definition.position);
+    root.scale.setScalar(definition.scale);
+    root.traverse((node) => {
+      if (!(node instanceof THREE.Mesh)) return;
+      node.castShadow = true;
+      node.receiveShadow = true;
+      importedResources.add(node.geometry);
+      const materials = Array.isArray(node.material) ? node.material : [node.material];
+      for (const material of materials) {
+        importedResources.add(material);
+        for (const value of Object.values(material)) {
+          if (value instanceof THREE.Texture) importedResources.add(value);
+        }
+      }
+    });
+    importedAssets.add(root);
+    importedNodes.push({ root, kind: definition.kind });
+  })).then(() => undefined);
+
   const vegetation = add(new THREE.Group(), "native-vegetation");
   const trunkGeometry = tracked(resources, new THREE.CylinderGeometry(0.035, 0.075, 0.9, 7));
   const crownGeometry = tracked(resources, new THREE.IcosahedronGeometry(0.42, 1));
@@ -326,7 +363,7 @@ export function createHorizonWorld(): HorizonWorld {
     (waterMaterial.uniforms.uFocus.value as number) = waterFocus ? 1 : 0.25;
     water.visible = waterFocus || !landFocus;
     water.scale.y = 1 + pulse * 0.08;
-    portal.visible = hopeFocus || landFocus;
+    portal.visible = hopeFocus || landFocus;\n    importedAssets.visible = true;\n    for (const asset of importedNodes) asset.root.visible = asset.kind === "tree" || travelFocus;
     portal.scale.setScalar(0.96 + pulse * 0.1);
     portal.rotation.y = Math.sin(time * 0.08) * 0.035;
     stars.visible = night;
@@ -347,9 +384,11 @@ export function createHorizonWorld(): HorizonWorld {
 
   return {
     group,
+    ready,
     update,
     dispose: () => {
       for (const resource of resources) resource.dispose();
+      for (const resource of importedResources) resource.dispose();
       group.clear();
     },
   };
