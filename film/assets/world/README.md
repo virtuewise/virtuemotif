@@ -13,6 +13,12 @@ The Horizon cinematic environment currently has a **first-pass scene-dressing in
 
 3DAssets.dev documents its published GLBs as self-contained binary glTF files, metre-scale, +Y up, CC0 1.0, and compatible with Three.js `GLTFLoader`. The CDN URLs are immutable. Asset metadata and licence statements: [3DAssets.dev documentation](https://3dassets.dev/docs) and [API reference](https://3dassets.dev/docs/api).
 
+## Lyric-led environment cues
+
+The environment maps scene motifs from normalized lyric tokens rather than relying only on English. The first vocabulary set includes English, Shona, Ndebele, and isiZulu terms for night, water, land, and hope/light. Audio energy, beat pulses, and transition intensity remain language-independent and continue to drive the water shader, particles, lighting, and environmental motion. This is a small curated vocabulary, not a claim of complete semantic understanding or automatic translation; unknown words fall back to the neutral cinematic state.
+
+The red-earth ground uses deterministic generated albedo and detail maps (roughness/bump) so texture variation is reproducible across renders and does not depend on network-hosted texture services.
+
 ## Runtime and reproducibility
 
 - The four URLs are pinned in source; no live catalogue search or changing query is performed during a render.
