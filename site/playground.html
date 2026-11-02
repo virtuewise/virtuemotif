@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a27">
+  <meta name="description" content="Try the VirtueMotif Horizon of Light lyric timing and audio-reactive preview playground.">
+  <title>VirtueMotif · Horizon Playground</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b111b;--panel:#121e2b;--line:#263849;--muted:#a8b8c8;--gold:#f3c879;--cyan:#8ed8d0}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#34536a 0,transparent 55%),var(--bg);color:#f5f1e8;font:16px/1.55 Inter,ui-sans-serif,system-ui,sans-serif}
+    a{color:var(--cyan)}.wrap{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:34px 0 64px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}.brand{font-weight:800;letter-spacing:.12em;font-size:.9rem}.brand span{color:var(--gold)}
+    .pill{border:1px solid #476075;border-radius:99px;padding:6px 12px;color:var(--cyan);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+    h1{font-size:clamp(2.3rem,6vw,4.7rem);line-height:1.02;letter-spacing:-.045em;margin:12px 0}.sub{color:var(--muted);max-width:700px}
+    .hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:#101b28;box-shadow:0 24px 80px #0008}
+    .hero video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:linear-gradient(120deg,#142c3d,#d08c4b 55%,#111c2a)}
+    .hero .caption{padding:16px 20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
+    .grid{display:grid;grid-template-columns:1.3fr .7fr;gap:18px;margin-top:20px}.panel{background:linear-gradient(160deg,#172637,#101923);border:1px solid var(--line);border-radius:18px;padding:20px}
+    .panel h2{font-size:1.1rem;margin:0 0 12px}.lyric{font-size:clamp(1.35rem,3vw,2.2rem);line-height:1.25;min-height:104px;display:flex;align-items:center;color:#fff4dc}
+    .translation{color:var(--muted);min-height:28px}.meta{font-size:.82rem;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase}
+    .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px}.button{border:0;border-radius:999px;background:var(--gold);color:#18202a;font-weight:750;padding:10px 17px;cursor:pointer}.button.secondary{background:#24394a;color:#f3f1eb;border:1px solid #3b5366}
+    input[type=range]{width:100%;accent-color:var(--gold);cursor:pointer}.time{display:flex;justify-content:space-between;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.82rem}
+    .visualizer{height:70px;display:flex;align-items:center;gap:5px;justify-content:center;margin:12px 0}.visualizer i{display:block;width:5px;height:var(--h);border-radius:8px;background:linear-gradient(180deg,var(--gold),#b8794b);opacity:.85;transform-origin:center;animation:pulse var(--d) ease-in-out infinite alternate}
+    @keyframes pulse{to{transform:scaleY(.35);opacity:.55}}.section-list{display:grid;gap:8px;max-height:290px;overflow:auto}.section{display:flex;justify-content:space-between;gap:12px;padding:9px 11px;border:1px solid #2b4052;border-radius:10px;color:var(--muted);background:#0d1722;text-align:left;cursor:pointer}.section.active{border-color:var(--gold);color:#fff1d2;background:#33291f}
+    .hint{color:var(--muted);font-size:.86rem}.footer{margin-top:24px;color:var(--muted);font-size:.84rem}.footer a{margin-right:16px}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding-top:20px}.hero .caption{display:block}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header><div class="brand">VIRTUE<span>MOTIF</span> <span style="color:#8ed8d0">· ASTRA-SH</span></div><div class="pill">Interactive test playground</div></header>
+    <p class="meta">Reference song · The Horizon of Light (Tarisiro)</p>
+    <h1>See the words.<br>Feel the horizon.</h1>
+    <p class="sub">A browser-based test surface for the real Horizon song data: play the recording, scrub the timeline, inspect lyric-section changes and compare the animated Remotion preview.</p>
+    <section class="hero" aria-label="Animated Horizon of Light preview">
+      <video id="preview" autoplay muted loop playsinline poster="./media/horizon-poster.png">
+        <source src="./media/horizon-preview.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><strong>The Horizon of Light · Tarisiro</strong><span>Autoplay visual preview · muted by default</span></div>
+    </section>
+    <div class="grid">
+      <section class="panel">
+        <div class="meta" id="sectionLabel">Loading song data…</div>
+        <div class="lyric" id="lyric" aria-live="polite">Preparing the Horizon timeline</div>
+        <div class="translation" id="translation"></div>
+        <div class="visualizer" id="visualizer" aria-hidden="true"></div>
+        <div class="time"><span id="current">0:00</span><span id="duration">0:00</span></div>
+        <input id="seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek song timeline">
+        <div class="controls">
+          <button class="button" id="play">Play song</button>
+          <button class="button secondary" id="restart">Restart</button>
+          <label class="hint"><input id="autoScroll" type="checkbox" checked> Follow current section</label>
+        </div>
+        <audio id="audio" preload="metadata" src="./audio/horizon.m4a"></audio>
+        <p class="hint">The recording starts only after you press Play. Browser autoplay policies block unmuted audio; the visual preview above starts muted.</p>
+      </section>
+      <aside class="panel">
+        <h2>Song playbook</h2>
+        <p class="hint">Choose a section to jump the audio and lyric timeline to that point.</p>
+        <div class="section-list" id="sections"></div>
+      </aside>
+    </div>
+    <p class="footer">This is an interactive browser companion for testing song data and timing. For the full editable Remotion compositions, <a href="https://github.com/virtuewise/virtuemotif#playground">open the local Remotion Studio instructions</a>. Automated previews do not replace human review or rights clearance.</p>
+  </main>
+<script>
+(async()=>{
+  const $=id=>document.getElementById(id), audio=$("audio"), seek=$("seek");
+  const fmt=s=>{if(!Number.isFinite(s))return"0:00";const m=Math.floor(s/60),v=Math.floor(s%60);return m+":"+String(v).padStart(2,"0")};
+  const response=await fetch("./data/horizon.json");if(!response.ok)throw new Error("Song data could not be loaded");const song=await response.json();
+  const sections=song.sections||[], flat=sections.flatMap(section=>(section.lines||[]).map(line=>({...line,section}))).sort((a,b)=>a.from-b.from);
+  $("duration").textContent=fmt(song.duration);seek.max=String(song.duration);audio.addEventListener("loadedmetadata",()=>{$("duration").textContent=fmt(audio.duration||song.duration);});
+  const list=$("sections");
+  sections.forEach(section=>{const b=document.createElement("button");b.className="section";b.type="button";b.innerHTML="<span></span><small>"+fmt(section.start)+"</small>";b.firstChild.textContent=section.label;b.addEventListener("click",()=>{audio.currentTime=section.start;audio.play().catch(()=>{});});list.append(b);});
+  const bars=$("visualizer");for(let i=0;i<42;i++){const bar=document.createElement("i");bar.style.setProperty("--h",(18+Math.abs(Math.sin(i*1.7))*48)+"px");bar.style.setProperty("--d",(0.35+(i%9)*0.08)+"s");bars.append(bar);}
+  function update(){const t=audio.currentTime||0;seek.value=String(t);$("current").textContent=fmt(t);const line=flat.find(x=>t>=x.from&&t<=x.to);const section=sections.find(x=>t>=x.start&&t<x.end);
+    $("sectionLabel").textContent=section?section.label:"Instrumental / transition";
+    $("lyric").textContent=line?line.text:(section?"Instrumental passage":"Ready when you are");
+    $("translation").textContent=line&&line.translation&&!line.translation.startsWith("[")?line.translation:"";
+    [...list.children].forEach((b,i)=>{const active=sections[i]===section;b.classList.toggle("active",active);if(active&&$("autoScroll").checked)b.scrollIntoView({block:"nearest",behavior:"smooth"});});
+  }
+  audio.addEventListener("timeupdate",update);audio.addEventListener("seeked",update);audio.addEventListener("ended",()=>{$("play").textContent="Play song";});
+  seek.addEventListener("input",()=>{audio.currentTime=Number(seek.value);update();});
+  $("play").addEventListener("click",async()=>{if(audio.paused){try{await audio.play();$("play").textContent="Pause song";}catch(e){$("lyric").textContent="Audio could not start. Check your browser's playback permission.";}}else{audio.pause();$("play").textContent="Play song";}});
+  audio.addEventListener("pause",()=>{$("play").textContent="Play song";});audio.addEventListener("play",()=>{$("play").textContent="Pause song";});
+  $("restart").addEventListener("click",()=>{audio.currentTime=0;audio.pause();update();});
+  update();
+})().catch(error=>{document.getElementById("lyric").textContent="Playground setup error: "+error.message;});
+</script>
+</body>
+</html>
