@@ -7,7 +7,7 @@ export interface HorizonWorld {
   dispose: () => void;
 }
 
-const tracked = <T extends THREE.BufferGeometry | THREE.Material>(items: T[], item: T): T => {
+const tracked = <T extends THREE.BufferGeometry | THREE.Material | THREE.Texture>(items: Array<THREE.BufferGeometry | THREE.Material | THREE.Texture>, item: T): T => {
   items.push(item);
   return item;
 };
@@ -49,7 +49,7 @@ function makeTerrain(
     const edge = Math.min(1, Math.max(0, (z + options.depth * 0.5) / options.depth));
     const ridge = smoothNoise(x, z, options.seed);
     const peaks = Math.pow(Math.max(0, Math.sin(x * 0.19 + options.seed) * 0.5 + 0.5), 2.2);
-    position.setZ(i, options.base + ridge * options.amplitude + peaks * options.amplitude * 0.42 + edge * 0.08);
+    position.setY(i, options.base + ridge * options.amplitude + peaks * options.amplitude * 0.42 + edge * 0.08);
   }
   geometry.computeVertexNormals();
   return geometry;
@@ -115,7 +115,7 @@ void main() {
 export function createHorizonWorld(): HorizonWorld {
   const group = new THREE.Group();
   group.name = "HorizonCinematicWorld";
-  const resources: Array<THREE.BufferGeometry | THREE.Material> = [];
+  const resources: Array<THREE.BufferGeometry | THREE.Material | THREE.Texture> = [];
   const add = <T extends THREE.Object3D>(object: T, name: string): T => {
     object.name = name;
     group.add(object);
@@ -177,7 +177,7 @@ export function createHorizonWorld(): HorizonWorld {
   far.position.set(0, -1.0, -16);
   mid.position.set(0, -1.0, -11.5);
   near.position.set(0, -1.0, -8.2);
-  far.rotation.x = -0.08; mid.rotation.x = -0.08; near.rotation.x = -0.08;
+
 
   const groundGeometry = tracked(resources, new THREE.PlaneGeometry(48, 24, 96, 48));
   const groundPosition = groundGeometry.getAttribute("position") as THREE.BufferAttribute;
@@ -306,7 +306,7 @@ export function createHorizonWorld(): HorizonWorld {
   rimLight.position.set(5, 2, -8);
 
   const update = (time: number, cue: AudioCueFrame, lyric: string, section: string) => {
-    const normalized = `${lyric} ${section}`.normalize("NFKC").toLocaleLowerCase();
+    const normalized = `${lyric} ${section}`.normalize("NFKC").toLowerCase();
     const night = /\b(night|stars?|moon|dark|shadow|dream)\b/.test(normalized);
     const waterFocus = /\b(river|water|sea|ocean|rain|flow|tears?)\b/.test(normalized);
     const landFocus = /\b(earth|land|mountain|roots?|home|ancestors?)\b/.test(normalized);
