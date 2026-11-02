@@ -1,6 +1,6 @@
 # Horizon world asset sources
 
-The Horizon cinematic environment uses a small, explicitly curated set of external GLB assets. These are loaded through Three.js `GLTFLoader` and are separate from the lyric/timing pipeline.
+The Horizon cinematic environment currently has a **first-pass scene-dressing integration**, not a final photoreal asset pack. The selected GLBs are low-poly, real-world-scale African vegetation and a detailed vehicle model. They establish the asset-loading pipeline and can serve as distant/background dressing; they do not yet meet the hero-asset realism bar for close-up cinematic shots. These are loaded through Three.js `GLTFLoader` and are separate from the lyric/timing pipeline.
 
 ## Integrated CC0 assets
 
@@ -21,15 +21,19 @@ The Horizon cinematic environment uses a small, explicitly curated set of extern
 - Imported geometry, materials and textures are disposed with the world.
 - External hosting is a current runtime dependency. For fully offline/reproducible production, mirror the approved GLBs into the repository's static asset directory after validating their bytes and record checksums; do not silently substitute different model revisions.
 
-## Human characters: deliberately not substituted yet
+## Human characters: recommended production path
 
-The current curated integration does **not** claim to include a photorealistic human character. 3DAssets.dev's visible realistic-character results include astronaut and tactical/static-pose models that do not fit the grounded human storytelling needed by Horizon. Blender Studio has production-rigged characters, and MakeHuman provides an open human-character authoring workflow, but each candidate must be checked for its individual downloadable asset licence, rig, texture quality, facial quality, and redistribution terms before it is shipped.
+The current scene does **not** yet contain a human character. The visible realistic-character catalogue results I inspected include astronaut/tactical/static-pose figures, which do not fit Horizon's grounded human storytelling. They are intentionally excluded.
+
+The most actionable open pipeline is **[MPFB2 (MakeHuman for Blender)](https://github.com/makehumancommunity/mpfb2/)**. MPFB2 creates human meshes, supports parametric body shaping, automatic rigging, skin/eye materials and asset-based clothing. Its source code is GPLv3+, while the bundled graphical assets (base meshes, targets, clothes, rigs, poses, textures) are CC0 1.0; the project states that generated output is not restricted by the add-on's source-code licence. See the [MPFB licence](https://github.com/makehumancommunity/mpfb2/blob/master/LICENSE.md), [export guide](https://www.makehumancommunity.org/mpfb/docs/exporting/index.html), and [rigging/material guidance](https://www.makehumancommunity.org/mpfb/docs/index.html). For export, use the GameEngine material, bake shape keys, remove helper objects, and validate the resulting rig/skin weights in Three.js. This is a generator pipeline, not a ready-made photoreal character: a character artist still needs to author believable faces, hair, clothing, textures and expressions.
+
+A second candidate is [Blender Studio's Rain rig](https://studio.blender.org/characters/rain/v3/), a free, fully rigged CC-BY character with facial controls. It is stylized rather than photorealistic and requires the credit `Rain Rig (CC) Blender Foundation | studio.blender.org`; use it only where that art direction is appropriate.
 
 Next character gate:
-1. Select a production-quality, non-tactical human model with a usable rig and facial/cloth detail.
-2. Confirm the exact asset licence permits bundling and commercial use.
-3. Verify skeleton, skinning, materials, animation clips, scale and texture dependencies.
-4. Add a reproducible local asset copy plus checksum and attribution record.
-5. Retarget a small set of story actions (walk, turn, reach, embrace, look toward horizon) and validate at portrait and landscape framing.
+1. Generate or select a grounded human character with varied body proportions, detailed face, hair, layered clothing and facial shape keys.
+2. Confirm the exact source assets and generated textures are licensed for bundling and commercial use.
+3. Export a self-contained GLB with PBR materials, armature, skinning, facial blend shapes and named animation clips.
+4. Add a reproducible local asset copy plus SHA-256 checksum and licence record.
+5. Retarget story actions (walk, turn, reach, embrace, look toward horizon) and validate at portrait and landscape framing.
 
 No third-party model should be downloaded, republished, or bundled unless its exact licence and provenance are verified.
