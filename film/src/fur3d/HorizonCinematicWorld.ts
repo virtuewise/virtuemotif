@@ -30,6 +30,38 @@ const seeded = (n: number) => {
   return x - Math.floor(x);
 };
 
+function makeGroundTexture(
+  resources: Array<THREE.BufferGeometry | THREE.Material | THREE.Texture>,
+  seed: number,
+  detailOnly = false,
+) {
+  const size = 128;
+  const data = new Uint8Array(size * size * 4);
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const broad = Math.sin(x * 0.17 + seed) * Math.cos(y * 0.13 - seed * 0.7);
+      const fine = Math.sin(x * 0.91 + y * 0.67 + seed * 1.9) * 0.32;
+      const grain = Math.cos(x * 2.3 - y * 1.7 + seed * 2.7) * 0.12;
+      const value = THREE.MathUtils.clamp(224 + (broad * 0.5 + fine + grain) * 34, 160, 255);
+      const index = (y * size + x) * 4;
+      data[index] = detailOnly ? value : Math.min(255, value + 4);
+      data[index + 1] = value;
+      data[index + 2] = detailOnly ? value : Math.max(0, value - 8);
+      data[index + 3] = 255;
+    }
+  }
+  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(8, 5);
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  if (!detailOnly) texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return tracked(resources, texture);
+}
+
 const hasLyricCue = (text: string, terms: readonly string[]) => {
   const words = new Set(text.split(/[^\p{L}\p{N}]+/u).filter(Boolean));
   return terms.some((term) => words.has(term));
@@ -206,7 +238,16 @@ export function createHorizonWorld(): HorizonWorld {
   }
   groundGeometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
   groundGeometry.computeVertexNormals();
-  const groundMaterial = standard(resources, "#ffffff", { vertexColors: true, roughness: 1 });
+  const earthAlbedo = makeGroundTexture(resources, 5.7);
+  const earthDetail = makeGroundTexture(resources, 9.3, true);
+  const groundMaterial = standard(resources, "#ffffff", {
+    vertexColors: true,
+    map: earthAlbedo,
+    roughnessMap: earthDetail,
+    bumpMap: earthDetail,
+    bumpScale: 0.075,
+    roughness: 1,
+  });
   const ground = add(new THREE.Mesh(groundGeometry, groundMaterial), "red-earth");
   ground.position.set(0, -6.2, -7.2);
   ground.rotation.x = -0.04;
