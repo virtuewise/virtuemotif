@@ -31,7 +31,7 @@ const seeded = (n: number) => {
 };
 
 const hasLyricCue = (text: string, terms: readonly string[]) => {
-  const words = new Set(text.split(/[^\\p{L}\\p{N}]+/u).filter(Boolean));
+  const words = new Set(text.split(/[^\p{L}\p{N}]+/u).filter(Boolean));
   return terms.some((term) => words.has(term));
 };
 
