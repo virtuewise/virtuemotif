@@ -17,12 +17,16 @@ def _corpus(status=REVIEWED_STATUS):
             "review_status": "native_speaker_reviewed",
             "adjudication_policy": "Two independent reviews; disagreements adjudicated.",
             "split_policy": "Source and speaker groups are isolated between train and test.",
+            "dataset_version": "test-fixture-1",
+            "annotation_protocol_version": "test-protocol-1",
+            "provenance_manifest_ref": "restricted://alignment-test-manifest",
         },
         "examples": [
             {
                 "id": "test-en", "text": "hello world", "language": "en", "split": "test",
                 "source_id": "source-test", "speaker_id": "speaker-test",
-                "review_status": "native_speaker_reviewed", "reviewer_ids": ["reviewer-a"],
+                "review_status": "native_speaker_reviewed",
+                "reviewer_ids": ["reviewer-a", "reviewer-b"],
                 "consent_ref": "private-ledger:test",
                 "words": [
                     {"text": "hello", "start": 0.1, "end": 0.4},
@@ -32,7 +36,8 @@ def _corpus(status=REVIEWED_STATUS):
             {
                 "id": "train-sn", "text": "mangwanani mose", "language": "sn", "split": "train",
                 "source_id": "source-train", "speaker_id": "speaker-train",
-                "review_status": "native_speaker_reviewed", "reviewer_ids": ["reviewer-a"],
+                "review_status": "native_speaker_reviewed",
+                "reviewer_ids": ["reviewer-a", "reviewer-b"],
                 "consent_ref": "private-ledger:train",
                 "words": [{"text": "mangwanani", "start": 0.0, "end": 0.4}],
             },
