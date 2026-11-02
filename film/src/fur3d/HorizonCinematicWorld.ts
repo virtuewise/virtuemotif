@@ -7,165 +7,344 @@ export interface HorizonWorld {
   dispose: () => void;
 }
 
-const makeMaterial = (color: string, options: THREE.MeshStandardMaterialParameters = {}) =>
-  new THREE.MeshStandardMaterial({ color, roughness: 0.82, metalness: 0.08, ...options });
+const tracked = <T extends THREE.BufferGeometry | THREE.Material>(items: T[], item: T): T => {
+  items.push(item);
+  return item;
+};
 
-function ridgeGeometry(seed: number, baseY: number, peak: number): THREE.BufferGeometry {
-  const points: THREE.Vector2[] = [new THREE.Vector2(-18, -9)];
-  for (let i = 0; i <= 48; i += 1) {
-    const x = -18 + (36 * i) / 48;
-    const wave = Math.sin(i * 0.57 + seed) * 0.55 + Math.sin(i * 0.19 + seed * 2) * 0.9;
-    const summit = Math.max(0, 1 - Math.abs(x - (seed - 2) * 2.4) / 5) * peak;
-    points.push(new THREE.Vector2(x, baseY + wave + summit));
+const standard = (
+  resources: Array<THREE.BufferGeometry | THREE.Material>,
+  color: THREE.ColorRepresentation,
+  options: THREE.MeshStandardMaterialParameters = {},
+) => tracked(resources, new THREE.MeshStandardMaterial({
+  color,
+  roughness: 0.86,
+  metalness: 0.02,
+  ...options,
+}));
+
+const seeded = (n: number) => {
+  const x = Math.sin(n * 127.1 + 311.7) * 43758.5453123;
+  return x - Math.floor(x);
+};
+
+const smoothNoise = (x: number, z: number, seed: number) => {
+  const a = Math.sin(x * 0.31 + seed) * Math.cos(z * 0.23 - seed * 0.7);
+  const b = Math.sin(x * 0.83 - z * 0.51 + seed * 1.3) * 0.34;
+  const c = Math.cos(x * 0.13 + z * 0.41 + seed) * 0.52;
+  return a * 0.72 + b + c;
+};
+
+function makeTerrain(
+  resources: Array<THREE.BufferGeometry | THREE.Material>,
+  options: { width: number; depth: number; segmentsX: number; segmentsY: number; base: number; amplitude: number; seed: number },
+) {
+  const geometry = tracked(resources, new THREE.PlaneGeometry(
+    options.width, options.depth, options.segmentsX, options.segmentsY,
+  ));
+  const position = geometry.getAttribute("position") as THREE.BufferAttribute;
+  for (let i = 0; i < position.count; i += 1) {
+    const x = position.getX(i);
+    const z = position.getY(i);
+    const edge = Math.min(1, Math.max(0, (z + options.depth * 0.5) / options.depth));
+    const ridge = smoothNoise(x, z, options.seed);
+    const peaks = Math.pow(Math.max(0, Math.sin(x * 0.19 + options.seed) * 0.5 + 0.5), 2.2);
+    position.setZ(i, options.base + ridge * options.amplitude + peaks * options.amplitude * 0.42 + edge * 0.08);
   }
-  points.push(new THREE.Vector2(18, -9));
-  const shape = new THREE.Shape(points);
-  return new THREE.ShapeGeometry(shape, 2);
+  geometry.computeVertexNormals();
+  return geometry;
 }
 
-/** Deterministic, lyric-led 3D world for the Horizon film. All motion is derived from Remotion time. */
+const skyVertex = `
+varying vec3 vDirection;
+void main() {
+  vDirection = normalize(position);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+
+const skyFragment = `
+uniform vec3 uHorizon;
+uniform vec3 uZenith;
+uniform float uNight;
+varying vec3 vDirection;
+void main() {
+  float h = clamp(vDirection.y * 0.5 + 0.48, 0.0, 1.0);
+  h = smoothstep(0.0, 1.0, h);
+  vec3 day = mix(uHorizon, uZenith, pow(h, 0.82));
+  vec3 night = mix(vec3(0.025, 0.045, 0.105), vec3(0.004, 0.012, 0.035), h);
+  gl_FragColor = vec4(mix(day, night, uNight), 1.0);
+}`;
+
+const waterVertex = `
+varying vec2 vUv;
+varying vec3 vWorld;
+uniform float uTime;
+uniform float uEnergy;
+void main() {
+  vUv = uv;
+  vec3 p = position;
+  float wave = sin(p.x * 2.4 + uTime * 1.2) * 0.025
+    + sin(p.x * 5.7 - uTime * 0.8) * 0.012;
+  p.z += wave * (0.35 + uEnergy);
+  vec4 world = modelMatrix * vec4(p, 1.0);
+  vWorld = world.xyz;
+  gl_Position = projectionMatrix * viewMatrix * world;
+}`;
+
+const waterFragment = `
+uniform float uTime;
+uniform float uEnergy;
+uniform float uFocus;
+varying vec2 vUv;
+varying vec3 vWorld;
+void main() {
+  vec2 p = vUv * vec2(18.0, 5.0);
+  float rippleA = sin(p.x * 1.7 + uTime * 1.8 + sin(p.y * 2.0)) * 0.5 + 0.5;
+  float rippleB = sin(p.x * 3.8 - uTime * 1.1 + p.y * 4.0) * 0.5 + 0.5;
+  float glint = pow(max(0.0, rippleA * rippleB), 5.0);
+  float fresnel = pow(1.0 - abs(normalize(cameraPosition - vWorld).z), 2.0);
+  vec3 deep = vec3(0.018, 0.12, 0.17);
+  vec3 reflectedSky = mix(vec3(0.08, 0.25, 0.31), vec3(0.48, 0.34, 0.25), uFocus);
+  vec3 color = mix(deep, reflectedSky, 0.22 + fresnel * 0.48);
+  color += vec3(0.24, 0.62, 0.68) * glint * (0.22 + uEnergy * 0.55);
+  float alpha = 0.76 + glint * 0.18;
+  gl_FragColor = vec4(color, alpha);
+}`;
+
+/** A deterministic procedural environment. Every animated value is a pure function of Remotion time/cues. */
 export function createHorizonWorld(): HorizonWorld {
   const group = new THREE.Group();
   group.name = "HorizonCinematicWorld";
   const resources: Array<THREE.BufferGeometry | THREE.Material> = [];
-
-  const addMesh = (geometry: THREE.BufferGeometry, material: THREE.Material, z: number, name: string) => {
-    resources.push(geometry, material);
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.z = z;
-    mesh.name = name;
-    group.add(mesh);
-    return mesh;
+  const add = <T extends THREE.Object3D>(object: T, name: string): T => {
+    object.name = name;
+    group.add(object);
+    return object;
   };
 
-  const sky = addMesh(new THREE.SphereGeometry(38, 32, 20), new THREE.MeshBasicMaterial({
-    color: "#111a35", side: THREE.BackSide,
-  }), -18, "cinematic-sky");
+  const skyMaterial = tracked(resources, new THREE.ShaderMaterial({
+    vertexShader: skyVertex,
+    fragmentShader: skyFragment,
+    side: THREE.BackSide,
+    depthWrite: false,
+    uniforms: {
+      uHorizon: { value: new THREE.Color("#e7a66f") },
+      uZenith: { value: new THREE.Color("#354e72") },
+      uNight: { value: 0 },
+    },
+  }));
+  add(new THREE.Mesh(tracked(resources, new THREE.SphereGeometry(42, 48, 32)), skyMaterial), "cinematic-sky");
 
-  const sunMaterial = new THREE.MeshBasicMaterial({ color: "#ffd58a" });
-  const sun = addMesh(new THREE.SphereGeometry(1.12, 40, 32), sunMaterial, -10.2, "horizon-sun");
-  sun.position.set(0.1, 1.45, -10.2);
-  const sunHalo = addMesh(new THREE.SphereGeometry(1.72, 32, 24), new THREE.MeshBasicMaterial({
-    color: "#f7ad58", transparent: true, opacity: 0.16, side: THREE.BackSide,
-  }), -10.1, "sun-halo");
-  sunHalo.position.copy(sun.position);
+  const sunGroup = add(new THREE.Group(), "horizon-sun");
+  sunGroup.position.set(0.7, 1.25, -14);
+  const sunMaterial = new THREE.MeshBasicMaterial({ color: "#ffe0a2", toneMapped: false });
+  tracked(resources, sunMaterial);
+  const sun = new THREE.Mesh(tracked(resources, new THREE.SphereGeometry(0.82, 48, 32)), sunMaterial);
+  sunGroup.add(sun);
+  const haloMaterial = new THREE.SpriteMaterial({
+    map: (() => {
+      const data = new Uint8Array(64 * 64 * 4);
+      for (let y = 0; y < 64; y += 1) for (let x = 0; x < 64; x += 1) {
+        const d = Math.hypot((x - 31.5) / 31.5, (y - 31.5) / 31.5);
+        const i = (y * 64 + x) * 4;
+        data[i] = 255; data[i + 1] = 194; data[i + 2] = 125;
+        data[i + 3] = Math.round(Math.pow(Math.max(0, 1 - d), 2.8) * 190);
+      }
+      const texture = new THREE.DataTexture(data, 64, 64, THREE.RGBAFormat);
+      texture.needsUpdate = true;
+      return texture;
+    })(),
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    toneMapped: false,
+  });
+  tracked(resources, haloMaterial);
+  if (haloMaterial.map) tracked(resources, haloMaterial.map);
+  const halo = new THREE.Sprite(haloMaterial);
+  halo.scale.set(7.5, 7.5, 1);
+  sunGroup.add(halo);
 
-  const far = addMesh(ridgeGeometry(2, -2.9, 2.5), makeMaterial("#34465f"), -12.5, "far-mountains");
-  const mid = addMesh(ridgeGeometry(5, -3.6, 1.8), makeMaterial("#1b3944"), -9.4, "middle-mountains");
-  const near = addMesh(ridgeGeometry(8, -4.35, 1.0), makeMaterial("#10272c"), -6.7, "near-ridge");
-  far.material = far.material;
-  mid.material = mid.material;
-  near.material = near.material;
+  const farGeometry = makeTerrain(resources, { width: 44, depth: 13, segmentsX: 120, segmentsY: 38, base: -2.2, amplitude: 0.85, seed: 2.1 });
+  const midGeometry = makeTerrain(resources, { width: 42, depth: 12, segmentsX: 120, segmentsY: 38, base: -3.1, amplitude: 0.72, seed: 8.4 });
+  const nearGeometry = makeTerrain(resources, { width: 40, depth: 11, segmentsX: 120, segmentsY: 38, base: -4.1, amplitude: 0.56, seed: 15.2 });
+  const farMaterial = standard(resources, "#718096", { roughness: 1, flatShading: false });
+  const midMaterial = standard(resources, "#435b58", { roughness: 0.98 });
+  const nearMaterial = standard(resources, "#263b32", { roughness: 0.96 });
+  const far = add(new THREE.Mesh(farGeometry, farMaterial), "far-mountains");
+  const mid = add(new THREE.Mesh(midGeometry, midMaterial), "middle-mountains");
+  const near = add(new THREE.Mesh(nearGeometry, nearMaterial), "near-ridge");
+  far.position.set(0, -1.0, -16);
+  mid.position.set(0, -1.0, -11.5);
+  near.position.set(0, -1.0, -8.2);
+  far.rotation.x = -0.08; mid.rotation.x = -0.08; near.rotation.x = -0.08;
 
-  const ground = addMesh(new THREE.PlaneGeometry(38, 18), makeMaterial("#241e28"), -5.9, "red-earth");
-  ground.position.set(0, -7.2, -5.9);
+  const groundGeometry = tracked(resources, new THREE.PlaneGeometry(48, 24, 96, 48));
+  const groundPosition = groundGeometry.getAttribute("position") as THREE.BufferAttribute;
+  const colors: number[] = [];
+  for (let i = 0; i < groundPosition.count; i += 1) {
+    const x = groundPosition.getX(i);
+    const y = groundPosition.getY(i);
+    const n = smoothNoise(x, y, 5.7);
+    groundPosition.setZ(i, n * 0.12 + Math.sin(x * 0.7 + y * 0.3) * 0.035);
+    const shade = THREE.MathUtils.clamp(0.52 + n * 0.11 + seeded(i) * 0.09, 0.25, 0.78);
+    colors.push(0.31 * shade, 0.19 * shade, 0.13 * shade);
+  }
+  groundGeometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  groundGeometry.computeVertexNormals();
+  const groundMaterial = standard(resources, "#ffffff", { vertexColors: true, roughness: 1 });
+  const ground = add(new THREE.Mesh(groundGeometry, groundMaterial), "red-earth");
+  ground.position.set(0, -6.2, -7.2);
+  ground.rotation.x = -0.04;
 
-  const riverCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.5, -7.0, -5.65),
-    new THREE.Vector3(-1.5, -5.7, -7.2),
-    new THREE.Vector3(0.8, -4.9, -8.8),
-    new THREE.Vector3(0.2, -3.8, -10.4),
-    new THREE.Vector3(1.0, -2.8, -12.2),
-  ]);
-  const river = addMesh(new THREE.TubeGeometry(riverCurve, 72, 0.105, 10, false), new THREE.MeshBasicMaterial({
-    color: "#70c7cf", transparent: true, opacity: 0.72,
-  }), 0, "river-of-light");
+  const waterMaterial = tracked(resources, new THREE.ShaderMaterial({
+    vertexShader: waterVertex,
+    fragmentShader: waterFragment,
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      uTime: { value: 0 },
+      uEnergy: { value: 0 },
+      uFocus: { value: 0 },
+    },
+  }));
+  const water = add(new THREE.Mesh(tracked(resources, new THREE.PlaneGeometry(15, 3.2, 96, 24)), waterMaterial), "river-of-light");
+  water.position.set(0.1, -4.85, -6.65);
+  water.rotation.x = -0.11;
 
-  const arch = new THREE.Group();
-  arch.name = "journey-portal";
-  const archMaterial = makeMaterial("#e9b96c", { emissive: "#8a4e22", emissiveIntensity: 0.75, metalness: 0.62, roughness: 0.28 });
-  resources.push(archMaterial);
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.45, 0.075, 14, 72), archMaterial);
-  ring.scale.y = 1.32;
-  arch.add(ring);
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 0.65, 12), archMaterial);
-  base.position.set(-1.42, -1.82, 0);
-  arch.add(base);
-  const base2 = base.clone();
-  base2.position.x = 1.42;
-  arch.add(base2);
-  arch.position.set(0, -0.65, -8.3);
-  group.add(arch);
-
-  const treeMaterial = makeMaterial("#08191d");
-  resources.push(treeMaterial);
-  for (let i = 0; i < 26; i += 1) {
-    const x = -12.5 + i * 1.0;
-    const height = 0.55 + ((Math.sin(i * 7.13) + 1) * 0.5) * 1.25;
-    const tree = new THREE.Mesh(new THREE.ConeGeometry(0.24 + height * 0.1, height, 6), treeMaterial);
-    tree.position.set(x, -4.75 + height * 0.48, -6.1 - (i % 3) * 0.12);
-    tree.rotation.z = Math.sin(i * 2.7) * 0.13;
-    group.add(tree);
-    resources.push(tree.geometry);
+  const portal = add(new THREE.Group(), "journey-portal");
+  portal.position.set(0.7, -0.5, -12.4);
+  const gold = standard(resources, "#d9ae70", {
+    metalness: 0.72, roughness: 0.24,
+    emissive: "#70401d", emissiveIntensity: 0.42,
+  });
+  const ring = new THREE.Mesh(tracked(resources, new THREE.TorusGeometry(1.18, 0.055, 20, 112)), gold);
+  ring.scale.y = 1.35;
+  portal.add(ring);
+  const pillarGeometry = tracked(resources, new THREE.CylinderGeometry(0.075, 0.12, 1.65, 16, 1));
+  for (const x of [-1.17, 1.17]) {
+    const pillar = new THREE.Mesh(pillarGeometry, gold);
+    pillar.position.set(x, -1.05, 0);
+    portal.add(pillar);
+    const cap = new THREE.Mesh(tracked(resources, new THREE.SphereGeometry(0.15, 16, 12)), gold);
+    cap.position.set(x, -0.22, 0);
+    portal.add(cap);
   }
 
-  const starPositions = new Float32Array(420 * 3);
-  for (let i = 0; i < 420; i += 1) {
-    const angle = i * 2.399963;
-    const radius = 3 + (i % 19) * 0.63;
-    starPositions[i * 3] = Math.cos(angle) * radius;
-    starPositions[i * 3 + 1] = 1.5 + Math.sin(angle) * radius * 0.54;
-    starPositions[i * 3 + 2] = -13.8 - (i % 7) * 0.35;
+  const vegetation = add(new THREE.Group(), "native-vegetation");
+  const trunkGeometry = tracked(resources, new THREE.CylinderGeometry(0.035, 0.075, 0.9, 7));
+  const crownGeometry = tracked(resources, new THREE.IcosahedronGeometry(0.42, 1));
+  const trunkMaterial = standard(resources, "#493326", { roughness: 1 });
+  const leafMaterials = [
+    standard(resources, "#263b2c", { roughness: 1 }),
+    standard(resources, "#40503a", { roughness: 1 }),
+    standard(resources, "#596044", { roughness: 1 }),
+  ];
+  for (let i = 0; i < 58; i += 1) {
+    const x = -15 + seeded(i + 20) * 30;
+    const scale = 0.45 + seeded(i + 80) * 1.0;
+    const z = -6.0 - seeded(i + 140) * 1.8;
+    const tree = new THREE.Group();
+    tree.position.set(x, -5.25 + seeded(i + 190) * 0.5, z);
+    tree.scale.setScalar(scale);
+    tree.rotation.z = (seeded(i + 240) - 0.5) * 0.18;
+    const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+    trunk.position.y = 0.4;
+    tree.add(trunk);
+    const crown = new THREE.Mesh(crownGeometry, leafMaterials[i % leafMaterials.length]);
+    crown.position.y = 1.05;
+    crown.scale.set(1.0 + seeded(i + 290) * 0.4, 0.85 + seeded(i + 340) * 0.55, 0.9);
+    tree.add(crown);
+    vegetation.add(tree);
   }
-  const starGeometry = new THREE.BufferGeometry();
-  starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
-  const starMaterial = new THREE.PointsMaterial({ color: "#fff0c7", size: 0.035, transparent: true, opacity: 0.8, sizeAttenuation: true });
-  resources.push(starGeometry, starMaterial);
-  const stars = new THREE.Points(starGeometry, starMaterial);
-  stars.name = "ancestral-stars";
-  group.add(stars);
 
-  const dustPositions = new Float32Array(180 * 3);
-  for (let i = 0; i < 180; i += 1) {
+  const starPositions = new Float32Array(520 * 3);
+  for (let i = 0; i < 520; i += 1) {
     const a = i * 2.399963;
-    dustPositions[i * 3] = Math.cos(a) * (1.5 + (i % 13) * 0.22);
-    dustPositions[i * 3 + 1] = -2.5 + Math.sin(a) * (1.0 + (i % 9) * 0.19);
-    dustPositions[i * 3 + 2] = -4.8 - (i % 11) * 0.38;
+    const radius = 3.2 + seeded(i + 400) * 17;
+    starPositions[i * 3] = Math.cos(a) * radius;
+    starPositions[i * 3 + 1] = 1.0 + Math.sin(a) * radius * 0.54;
+    starPositions[i * 3 + 2] = -18 - seeded(i + 500) * 2;
   }
-  const dustGeometry = new THREE.BufferGeometry();
-  dustGeometry.setAttribute("position", new THREE.BufferAttribute(dustPositions, 3));
-  const dustMaterial = new THREE.PointsMaterial({ color: "#f7c879", size: 0.045, transparent: true, opacity: 0.65 });
-  resources.push(dustGeometry, dustMaterial);
-  const dust = new THREE.Points(dustGeometry, dustMaterial);
-  dust.name = "golden-journey-particles";
-  group.add(dust);
+  const starsGeometry = tracked(resources, new THREE.BufferGeometry());
+  starsGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+  const starsMaterial = tracked(resources, new THREE.PointsMaterial({
+    color: "#fff0d2", size: 0.045, transparent: true, opacity: 0.02,
+    sizeAttenuation: true, depthWrite: false,
+  }));
+  const stars = add(new THREE.Points(starsGeometry, starsMaterial), "ancestral-stars");
 
-  const ambient = new THREE.AmbientLight("#9cb4d0", 0.7);
-  group.add(ambient);
-  const sunLight = new THREE.PointLight("#ffc477", 2.2, 22);
-  sunLight.position.set(0, 1.4, -7.5);
-  group.add(sunLight);
+  const particleCount = 220;
+  const particlePositions = new Float32Array(particleCount * 3);
+  for (let i = 0; i < particleCount; i += 1) {
+    const a = i * 2.399963;
+    const r = 1.8 + seeded(i + 600) * 7.5;
+    particlePositions[i * 3] = Math.cos(a) * r;
+    particlePositions[i * 3 + 1] = -3.6 + Math.sin(a) * 2.2;
+    particlePositions[i * 3 + 2] = -5.2 - seeded(i + 700) * 7;
+  }
+  const particleGeometry = tracked(resources, new THREE.BufferGeometry());
+  particleGeometry.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
+  const particleMaterial = tracked(resources, new THREE.PointsMaterial({
+    color: "#ffd18a", size: 0.055, transparent: true, opacity: 0.58,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  }));
+  const particles = add(new THREE.Points(particleGeometry, particleMaterial), "golden-journey-particles");
+
+  const hazeMaterial = new THREE.MeshBasicMaterial({
+    color: "#e5b59a", transparent: true, opacity: 0.12, depthWrite: false,
+    blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  });
+  tracked(resources, hazeMaterial);
+  const haze = add(new THREE.Mesh(tracked(resources, new THREE.PlaneGeometry(38, 5)), hazeMaterial), "atmospheric-haze");
+  haze.position.set(0, -1.9, -9.8);
+
+  const ambient = add(new THREE.HemisphereLight("#d9e5ff", "#36241c", 1.05), "environment-hemisphere");
+  const sunLight = add(new THREE.DirectionalLight("#ffd2a0", 2.0), "cinematic-key-light");
+  sunLight.position.set(-4, 7, 5);
+  const rimLight = add(new THREE.DirectionalLight("#91b7d0", 0.75), "cool-rim-light");
+  rimLight.position.set(5, 2, -8);
 
   const update = (time: number, cue: AudioCueFrame, lyric: string, section: string) => {
-    const words = `${lyric} ${section}`.toLowerCase();
-    const night = /star|night|shadow|moon/.test(words);
-    const riverFocus = /river|sea|water|flow|trace/.test(words);
-    const mountainFocus = /mountain|mist|spirit|roots|past/.test(words);
-    const hopeFocus = /hope|future|light|morning|healing|harmony|peace|sun/.test(words);
-    const pulse = cue.beatPulse * 0.22 + cue.energy * 0.08 + cue.transitionIntensity * 0.12;
+    const normalized = `${lyric} ${section}`.normalize("NFKC").toLocaleLowerCase();
+    const night = /\b(night|stars?|moon|dark|shadow|dream)\b/.test(normalized);
+    const waterFocus = /\b(river|water|sea|ocean|rain|flow|tears?)\b/.test(normalized);
+    const landFocus = /\b(earth|land|mountain|roots?|home|ancestors?)\b/.test(normalized);
+    const hopeFocus = /\b(hope|light|future|morning|rise|healing|peace|freedom|together)\b/.test(normalized)
+      || /chorus|outro|final/i.test(section);
+    const energy = THREE.MathUtils.clamp(cue.energy, 0, 1);
+    const pulse = THREE.MathUtils.clamp(cue.beatPulse * 0.55 + cue.transitionIntensity * 0.28 + energy * 0.17, 0, 1);
 
-    sky.material = sky.material;
-    (sky.material as THREE.MeshBasicMaterial).color.set(night ? "#071126" : hopeFocus ? "#382b42" : "#17243c");
-    sun.scale.setScalar(0.88 + (hopeFocus ? 0.18 : 0) + pulse * 0.16);
-    sun.position.y = 1.2 + Math.sin(time * 0.12) * 0.16 + (hopeFocus ? 0.32 : 0);
-    sunMaterial.color.set(night ? "#d6ddff" : "#ffd58a");
-    sunHalo.scale.setScalar(1 + pulse * 0.55);
-    (sunHalo.material as THREE.MeshBasicMaterial).opacity = night ? 0.1 : 0.13 + pulse * 0.12;
-    arch.visible = hopeFocus || /chorus|outro|final/.test(section.toLowerCase());
-    arch.rotation.y = Math.sin(time * 0.12) * 0.045;
-    arch.scale.setScalar(0.96 + pulse * 0.12);
-    river.visible = riverFocus || !mountainFocus;
-    (river.material as THREE.MeshBasicMaterial).opacity = riverFocus ? 0.9 : 0.48;
-    stars.visible = night || time < 44;
-    starMaterial.opacity = night ? 0.95 : 0.36;
-    dust.rotation.y = time * 0.018;
-    dust.rotation.z = Math.sin(time * 0.17) * 0.025;
-    far.position.x = Math.sin(time * 0.025) * 0.18;
-    mid.position.x = Math.sin(time * 0.04 + 1) * 0.28;
-    near.position.x = Math.sin(time * 0.055 + 2) * 0.38;
-    sunLight.intensity = 1.6 + pulse * 2.1 + (hopeFocus ? 0.5 : 0);
-    sunLight.color.set(night ? "#9bb8ff" : mountainFocus ? "#d4a6ff" : "#ffc477");
-    group.rotation.y = Math.sin(time * 0.035) * 0.018;
+    (skyMaterial.uniforms.uNight.value as number) = THREE.MathUtils.damp(
+      skyMaterial.uniforms.uNight.value as number, night ? 1 : 0, 3, 1 / 30,
+    );
+    (skyMaterial.uniforms.uHorizon.value as THREE.Color).set(night ? "#34415f" : hopeFocus ? "#f2b77e" : "#c58b72");
+    (skyMaterial.uniforms.uZenith.value as THREE.Color).set(night ? "#111b3b" : "#526b8c");
+    sunGroup.scale.setScalar(0.96 + pulse * 0.1 + (hopeFocus ? 0.08 : 0));
+    sunGroup.position.y = 1.15 + Math.sin(time * 0.035) * 0.12 + (hopeFocus ? 0.24 : 0);
+    sunMaterial.color.set(night ? "#c6d9ff" : "#ffe0a2");
+    (waterMaterial.uniforms.uTime.value as number) = time;
+    (waterMaterial.uniforms.uEnergy.value as number) = energy;
+    (waterMaterial.uniforms.uFocus.value as number) = waterFocus ? 1 : 0.25;
+    water.visible = waterFocus || !landFocus;
+    water.scale.y = 1 + pulse * 0.08;
+    portal.visible = hopeFocus || landFocus;
+    portal.scale.setScalar(0.96 + pulse * 0.1);
+    portal.rotation.y = Math.sin(time * 0.08) * 0.035;
+    stars.visible = night;
+    starsMaterial.opacity = night ? 0.86 : 0.02;
+    particles.rotation.y = time * (0.008 + energy * 0.012);
+    particles.rotation.z = Math.sin(time * 0.13) * 0.025;
+    vegetation.rotation.z = Math.sin(time * 0.55) * (0.006 + energy * 0.009);
+    far.position.x = Math.sin(time * 0.012) * 0.12;
+    mid.position.x = Math.sin(time * 0.019 + 1.1) * 0.2;
+    near.position.x = Math.sin(time * 0.027 + 2.2) * 0.28;
+    hazeMaterial.opacity = 0.07 + energy * 0.035 + (night ? 0.025 : 0);
+    sunLight.intensity = (night ? 0.45 : 1.8) + energy * 0.55 + pulse * 0.3;
+    sunLight.color.set(night ? "#9bb7e8" : hopeFocus ? "#ffe0b2" : "#f1b88c");
+    ambient.intensity = night ? 0.52 : 1.05;
+    rimLight.intensity = night ? 1.05 : 0.65;
+    group.rotation.y = Math.sin(time * 0.018) * 0.012;
   };
 
   return {
