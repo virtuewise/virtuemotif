@@ -250,7 +250,7 @@ export function createHorizonWorld(): HorizonWorld {
     const gltf = await assetLoader.loadAsync(definition.url);
     const root = gltf.scene;
     root.name = definition.name;
-    root.position.set(...definition.position);
+    root.position.set(definition.position[0], definition.position[1], definition.position[2]);
     root.scale.setScalar(definition.scale);
     root.traverse((node) => {
       if (!(node instanceof THREE.Mesh)) return;
@@ -380,7 +380,7 @@ export function createHorizonWorld(): HorizonWorld {
     water.scale.y = 1 + pulse * 0.08;
     portal.visible = hopeFocus || landFocus;
     importedAssets.visible = true;
-    for (const asset of importedNodes) asset.root.visible = asset.kind === "tree" || travelFocus;
+    // Scene dressing is language-agnostic: imported vehicles remain present for every lyric language.\n    for (const asset of importedNodes) asset.root.visible = true;
     portal.scale.setScalar(0.96 + pulse * 0.1);
     portal.rotation.y = Math.sin(time * 0.08) * 0.035;
     stars.visible = night;
