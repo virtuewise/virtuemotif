@@ -161,6 +161,8 @@ void main() {
 export function createHorizonWorld(): HorizonWorld {
   const group = new THREE.Group();
   group.name = "HorizonCinematicWorld";
+  // Lift the landscape into the camera frustum while preserving the lyric title at world origin.
+  group.position.y = 3.3;
   const resources: Array<THREE.BufferGeometry | THREE.Material | THREE.Texture> = [];
   const add = <T extends THREE.Object3D>(object: T, name: string): T => {
     object.name = name;
@@ -182,7 +184,7 @@ export function createHorizonWorld(): HorizonWorld {
   add(new THREE.Mesh(tracked(resources, new THREE.SphereGeometry(42, 48, 32)), skyMaterial), "cinematic-sky");
 
   const sunGroup = add(new THREE.Group(), "horizon-sun");
-  sunGroup.position.set(0.7, 1.25, -14);
+  sunGroup.position.set(0.7, -2.05, -14);
   const sunMaterial = new THREE.MeshBasicMaterial({ color: "#ffe0a2", toneMapped: false });
   tracked(resources, sunMaterial);
   const sun = new THREE.Mesh(tracked(resources, new THREE.SphereGeometry(0.82, 48, 32)), sunMaterial);
@@ -268,7 +270,7 @@ export function createHorizonWorld(): HorizonWorld {
   water.rotation.x = -0.11;
 
   const portal = add(new THREE.Group(), "journey-portal");
-  portal.position.set(0.7, -0.5, -12.4);
+  portal.position.set(0.7, -2.5, -12.4);
   const gold = standard(resources, "#d9ae70", {
     metalness: 0.72, roughness: 0.24,
     emissive: "#70401d", emissiveIntensity: 0.42,
@@ -367,7 +369,7 @@ export function createHorizonWorld(): HorizonWorld {
     const a = i * 2.399963;
     const radius = 3.2 + seeded(i + 400) * 17;
     starPositions[i * 3] = Math.cos(a) * radius;
-    starPositions[i * 3 + 1] = 1.0 + Math.sin(a) * radius * 0.54;
+    starPositions[i * 3 + 1] = -2.3 + Math.sin(a) * radius * 0.54;
     starPositions[i * 3 + 2] = -18 - seeded(i + 500) * 2;
   }
   const starsGeometry = tracked(resources, new THREE.BufferGeometry());
@@ -384,7 +386,7 @@ export function createHorizonWorld(): HorizonWorld {
     const a = i * 2.399963;
     const r = 1.8 + seeded(i + 600) * 7.5;
     particlePositions[i * 3] = Math.cos(a) * r;
-    particlePositions[i * 3 + 1] = -3.6 + Math.sin(a) * 2.2;
+    particlePositions[i * 3 + 1] = -6.9 + Math.sin(a) * 2.2;
     particlePositions[i * 3 + 2] = -5.2 - seeded(i + 700) * 7;
   }
   const particleGeometry = tracked(resources, new THREE.BufferGeometry());
@@ -401,7 +403,7 @@ export function createHorizonWorld(): HorizonWorld {
   });
   tracked(resources, hazeMaterial);
   const haze = add(new THREE.Mesh(tracked(resources, new THREE.PlaneGeometry(38, 5)), hazeMaterial), "atmospheric-haze");
-  haze.position.set(0, -1.9, -9.8);
+  haze.position.set(0, -5.2, -9.8);
 
   const ambient = add(new THREE.HemisphereLight("#d9e5ff", "#36241c", 1.05), "environment-hemisphere");
   const sunLight = add(new THREE.DirectionalLight("#ffd2a0", 2.0), "cinematic-key-light");
