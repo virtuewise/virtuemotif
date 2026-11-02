@@ -235,9 +235,12 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
     const aspect = width / height;
     const isPortrait = aspect < 1.0;
     const baseZ = isPortrait ? 6.8 / Math.max(0.48, aspect * 1.3) : 6.8;
-    const camX = Math.sin(currentTime * 0.35) * 0.35;
-    const camY = Math.cos(currentTime * 0.25) * 0.18;
-    camera.position.set(camX, camY, baseZ);
+    const cameraDrift = 0.35 + cueFrame.energy * 0.16;
+    const cameraLift = 0.18 + cueFrame.transitionIntensity * 0.08;
+    const camX = Math.sin(currentTime * 0.35) * cameraDrift;
+    const camY = Math.cos(currentTime * 0.25) * cameraLift;
+    const cameraPushIn = cueFrame.energy * 0.22 + cueFrame.beatPulse * 0.08;
+    camera.position.set(camX, camY, baseZ - cameraPushIn);
     camera.lookAt(0, 0, 0);
 
     // Audio‑reactive wind and floating motion
