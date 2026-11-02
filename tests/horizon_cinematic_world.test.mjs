@@ -21,6 +21,8 @@ test("Horizon cinematic world mounts named environment layers and disposes GPU r
   assert.ok(names.includes("middle-mountains"));
   assert.ok(names.includes("near-ridge"));
   assert.ok(names.includes("red-earth"));
+  assert.ok(names.includes("foreground-rocks"));
+  assert.equal(world.group.getObjectByName("foreground-rocks").count, 42);
   assert.ok(names.includes("river-of-light"));
   assert.ok(names.includes("journey-portal"));
   assert.ok(names.includes("ancestral-stars"));
