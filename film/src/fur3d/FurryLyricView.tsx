@@ -135,6 +135,8 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
         powerPreference: "high-performance",
       });
       renderer.setPixelRatio(1.0);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.setSize(width, height);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.15;
