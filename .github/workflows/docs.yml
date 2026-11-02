@@ -61,6 +61,36 @@ jobs:
           # Keep this list aligned with the import-safe modules built in CI.
           python -m pdoc -o build/site tools.make_video tools.make_tapsync tools.utils tools.effects tools.benchmark_render
 
+      - name: Copy interactive Horizon playground and source media
+        run: |
+          mkdir -p build/site/data build/site/audio build/site/media
+          cp site/playground.html build/site/playground.html
+          cp film/src/data/horizon.json build/site/data/horizon.json
+          cp film/public/audio/horizon.m4a build/site/audio/horizon.m4a
+
+      - name: Set up Node.js for the Remotion preview
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: film/package-lock.json
+
+      - name: Install Remotion dependencies
+        working-directory: film
+        run: npm ci
+
+      - name: Prepare Horizon audio-reactive cues
+        run: |
+          python -m pip install numpy soundfile
+          python -m tools.export_audio_cues
+
+      - name: Render an autoplay Horizon preview clip
+        working-directory: film
+        run: |
+          npx remotion still src/index.ts FurryHorizon ../build/site/media/horizon-poster.png --frame=1350 --timeout=120000
+          npx remotion render src/index.ts FurryHorizon ../build/site/media/horizon-preview.mp4 --frames=1320-1500 --codec=h264 --crf=24 --timeout=120000
+          ffmpeg -y -i ../build/site/media/horizon-preview.mp4 -vf "fps=12,scale=960:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128[p];[s1][p]paletteuse" ../build/site/media/horizon-preview.gif
+
       - name: Check generated documentation links
         run: python .github/scripts/check_docs_links.py build/site
 
