@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { staticFile } from "remotion";
 import type { AudioCueFrame } from "./audioCues";
+import { createHorizonCharacterPerformance, type HorizonCharacterPerformance } from "./HorizonCharacterPerformance";
 
 export interface HorizonWorld {
   group: THREE.Group;
@@ -292,18 +294,20 @@ export function createHorizonWorld(): HorizonWorld {
     portal.add(cap);
   }
 
-  // CC0 real-world scale assets from 3DAssets.dev. Loaded once per composition;
-  // the URLs are immutable and every GLB is self-contained (no runtime API lookup).
+  // All production GLBs are loaded from the app's local public directory.
+  // No third-party CDN request is made during a deterministic render.
   const importedAssets = add(new THREE.Group(), "licensed-world-assets");
   const assetLoader = new GLTFLoader();
   const importedResources = new Set<THREE.BufferGeometry | THREE.Material | THREE.Texture>();
-  const importedNodes: Array<{ root: THREE.Group; kind: "tree" | "vehicle" }> = [];
+  const importedNodes: Array<{ root: THREE.Group; kind: "tree" | "vehicle" | "hero" }> = [];
+  let characterPerformance: HorizonCharacterPerformance | null = null;
   let disposed = false;
   const assetDefinitions = [
-    { name: "baobab-tree", url: "https://cdn.3dassets.dev/assets/37714/v1/model.glb", kind: "tree" as const, position: [-6.2, -5.9, -9.2] as const, scale: 0.62 },
-    { name: "large-acacia-tree", url: "https://cdn.3dassets.dev/assets/37713/v1/model.glb", kind: "tree" as const, position: [6.2, -5.9, -10.0] as const, scale: 0.58 },
-    { name: "small-acacia-tree", url: "https://cdn.3dassets.dev/assets/37712/v1/model.glb", kind: "tree" as const, position: [-8.0, -5.8, -6.8] as const, scale: 0.72 },
-    { name: "grand-touring-coupe", url: "https://cdn.3dassets.dev/assets/18681/v1/model.glb", kind: "vehicle" as const, position: [4.3, -5.8, -5.8] as const, scale: 0.48 },
+    { name: "baobab-tree", url: staticFile("assets/world/baobab-tree.glb"), kind: "tree" as const, position: [-6.2, -5.9, -9.2] as const, scale: 0.62 },
+    { name: "large-acacia-tree", url: staticFile("assets/world/large-acacia-tree.glb"), kind: "tree" as const, position: [6.2, -5.9, -10.0] as const, scale: 0.58 },
+    { name: "small-acacia-tree", url: staticFile("assets/world/small-acacia-tree.glb"), kind: "tree" as const, position: [-8.0, -5.8, -6.8] as const, scale: 0.72 },
+    { name: "grand-touring-coupe", url: staticFile("assets/world/grand-touring-coupe.glb"), kind: "vehicle" as const, position: [4.3, -5.8, -5.8] as const, scale: 0.48 },
+    { name: "horizon-human-protagonist", url: staticFile("assets/characters/horizon-protagonist.glb"), kind: "hero" as const, position: [0, -5.55, -5.4] as const, scale: 1.0 },
   ];
   const ready = Promise.allSettled(assetDefinitions.map(async (definition) => {
     const gltf = await assetLoader.loadAsync(definition.url);
@@ -324,7 +328,12 @@ export function createHorizonWorld(): HorizonWorld {
         }
       }
     });
+    if (definition.kind === "hero") {
+      // An unrigged or incomplete character is rejected rather than rendered as a static prop.
+      characterPerformance = createHorizonCharacterPerformance(root, gltf.animations);
+    }
     if (disposed) {
+      if (definition.kind === "hero") characterPerformance?.dispose();
       root.traverse((node) => {
         if (node instanceof THREE.Mesh) {
           node.geometry.dispose();
@@ -479,6 +488,7 @@ export function createHorizonWorld(): HorizonWorld {
     importedAssets.visible = true;
     // Keep imported scene dressing available independently of lyric language.
     for (const asset of importedNodes) asset.root.visible = true;
+    characterPerformance?.update(time, lyric, section, energy);
     portal.scale.setScalar(0.96 + pulse * 0.1);
     portal.rotation.y = Math.sin(time * 0.08) * 0.035;
     stars.visible = night;
@@ -503,6 +513,8 @@ export function createHorizonWorld(): HorizonWorld {
     update,
     dispose: () => {
       disposed = true;
+      characterPerformance?.dispose();
+      characterPerformance = null;
       for (const resource of resources) resource.dispose();
       for (const resource of importedResources) resource.dispose();
       group.clear();
