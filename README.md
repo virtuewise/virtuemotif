@@ -1,100 +1,138 @@
-# virtuemotif
+# VirtueMotif
 
 [![CI](https://github.com/virtuewise/virtuemotif/actions/workflows/ci.yml/badge.svg)](https://github.com/virtuewise/virtuemotif/actions/workflows/ci.yml)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-> Automated, audio-reactive lyric video rendering pipeline and motion typography engine.
+> An audio-reactive lyric-video and motion-typography engine, from multilingual lyrics to rendered film.
 
-**virtuemotif** is an extensible visual platform that synchronizes lyrical typography, procedural textures, and audio waveform analysis to produce production-grade lyric videos and motion graphic sequences.
+VirtueMotif synchronizes lyrics, language metadata, audio analysis, procedural visuals, and Remotion compositions. It includes a Python production pipeline and a React/TypeScript motion-design studio.
+
+## Start here
+
+| Destination | What it is | Open |
+| --- | --- | --- |
+| **Playground** | Explore the Remotion compositions, switch between visual experiments, scrub frames, and preview the Horizon scenes locally. | [Launch the Playground](#playground) |
+| **Playbook** | A practical path from setup to transcription, timing review, visual iteration, and final rendering. | [Open the Playbook](#playbook) |
+| **The Horizon — live Remotion test** | Run the actual Horizon composition in Remotion Studio, or render a reproducible MP4 from the command line. | [Run the Horizon test](#the-horizon--live-remotion-test) |
+
+> **Live-preview note:** the Remotion Playground runs locally in your browser. This repository does not currently publish a hosted, always-on Remotion preview. The commands below launch the real compositions from `film/src/Root.tsx`; they are not screenshots or simulated demos.
 
 ---
 
-## Architecture Overview
+## Playground
 
-```mermaid
-flowchart TD
-    A[Song Config: songs/example.yaml] --> B[Pipeline Orchestrator: tools.make_video]
-    C[Base Config: config/defaults.yaml] --> B
-    D[Audio File: .m4a / .wav] --> E[Audio Analysis & Chunking: tools.utils]
-    E --> B
-    B --> F[Effect Registry & Plugins: tools/effects]
-    F --> G[Frame Renderer: Pillow & Shaders]
-    G --> H[FFmpeg Video Encoder]
-    H --> I[Final MP4 Video: out/example.mp4]
+The Playground is the Remotion Studio bundled with the project. It gives you a live preview, timeline scrubbing, and composition selection while the code and song data remain editable in the repository.
+
+### Launch it
+
+Requirements: Node.js **24** and npm.
+
+```bash
+git clone https://github.com/virtuewise/virtuemotif.git
+cd virtuemotif/film
+npm ci
+npm run studio
 ```
 
+Remotion Studio opens in your browser. Select a composition from the composition list:
+
+| Composition | What to explore |
+| --- | --- |
+| `FurryHorizon` | 3D fur-motion typography using the Horizon song data and `goldenHorizon` preset |
+| `Horizon` | Classic 2D lyric-film composition |
+| `SmartFurScene` | Audio-reactive 3D motion-typography scene |
+| `SmartFurScene4K` | 3840 × 2160 output profile |
+| `SmartFurSceneVertical` | 1080 × 1920 portrait profile |
+| `SmartFurSceneSquare` | 1024 × 1024 square profile |
+| `FurWaveSynth`, `NeonPulseCityscape`, `ParticleRainfall` | Individual visual systems and effect experiments |
+| `AutoLyrics`, `AutoLyricsPortrait`, `AutoLyricsSquare`, `AutoLyrics4K` | Generic lyric compositions used by the auto-lyrics pipeline |
+
+To experiment with a different lyric sequence, edit the song data in [`film/src/data/horizon.json`](film/src/data/horizon.json) or [`film/src/data/rise.json`](film/src/data/rise.json), then return to Studio. Keep word timings ordered and non-overlapping; the lyric export and render validators intentionally reject malformed timing.
+
+### Where to change things
+
+- Song content and timing: `film/src/data/*.json`
+- Composition registration and dimensions: `film/src/Root.tsx`
+- Main film components: `film/src/HorizonFilm.tsx`
+- 3D scene components: `film/src/fur3d/`
+- Typography and fitting utilities: `film/src/typography.ts`
+
 ---
 
-## Features
+## The Horizon — live Remotion test
 
-- **Configuration-Driven Generation**: Define songs in declarative YAML (`songs/<song_id>.yaml`) combining audio sources, lyrics, style presets, and effect chains.
-- **Plug-and-Play Effect Engine**: Subclass `VisualEffect` in `tools/effects/` and register custom visual effects with arbitrary parameters.
-- **Phoneme & Lyrical Alignment**: Automated speech-recognition (ASR) extraction, acoustic alignment, and manual tap-sync interface (`tools/make_tapsync.py`).
-- **Multilingual Auto-Lyrics Engine**: Optional multilingual ASR with timestamped segments, word timings, language metadata, and JSONL streaming output (`tools/lyrics_engine.py`); see [`docs/multilingual-auto-lyrics.md`](docs/multilingual-auto-lyrics.md).
-- **Audio Intelligence Engine**: Beat-grid estimation, energy contours, and timestamped onset/transition cues for future beat-aware typography and visual effects (`tools/audio_intelligence.py`); see [`docs/audio-intelligence.md`](docs/audio-intelligence.md).
-- **Procedural Texture Synthesis**: Dynamic film-grain, paper-fibre textures, and torn-paper alpha masks generated on-the-fly (`tools/make_textures.py`).
-- **Remotion React Lyric Frontend**: Interactive web-based rendering environment in `film/` powered by Remotion, React, and TypeScript.
-- **Inspection & Validation Suite**: Frame validation, RGB color balance checks, bounding box analysis, and audio stem correlation.
-- **Comprehensive API Documentation**: Auto-generated documentation for the toolchain hosted under `site/`.
+The Horizon is registered as both the classic `Horizon` composition and the 3D `FurryHorizon` composition. The following commands run the real Remotion project with the included Horizon data.
 
----
+### 1. Open the live preview
 
-## Directory Structure
+From the repository root:
 
-```text
-├── .github/workflows/    # GitHub Actions CI workflow
-├── config/               # Default settings & global presets
-├── docs/                 # Architectural documentation & tool guides
-│   └── tools/            # Markdown usage guides for every script
-├── film/                 # Remotion React lyric video project
-│   ├── public/           # Fonts, textures, and audio assets
-│   └── src/              # React components (Backdrop, Type, HorizonFilm)
-├── lyrics/               # Structured lyric transcriptions (JSON)
-├── site/                 # API documentation landing pages and generated output
-├── songs/                # Song configuration YAML files
-├── timing/               # Lyrical timestamps, alignment data, and tap-sync tools
-└── tools/                # Python audio analysis, effects & video pipeline
-    ├── effects/          # Visual effect plugins & registry
-    ├── make_video.py     # Main orchestration CLI
-    └── utils.py          # Shared audio/frame helpers
+```bash
+cd film
+npm ci
+npm run studio
 ```
 
+Choose **FurryHorizon** to inspect the 3D scene, or **Horizon** to inspect the classic film composition. Scrub the timeline to review lyric changes and transitions.
+
+### 2. Render a Horizon MP4
+
+From the `film/` directory:
+
+```bash
+npx remotion render src/index.ts FurryHorizon ../out/horizon-furry.mp4
+```
+
+For the classic 2D composition:
+
+```bash
+npx remotion render src/index.ts Horizon ../out/horizon-classic.mp4
+```
+
+### 3. Run the CI-style frame smoke test
+
+This renders a still frame from the same composition registration used by CI:
+
+```bash
+npx remotion still src/index.ts FurryHorizon ../out/horizon-smoke.png --frame=0
+```
+
+The repository CI also type-checks the Remotion project, validates composition registration, and captures visual-review frames for landscape, portrait, square, and 4K profiles. These automated checks establish that compositions load and render; they do **not** replace human review of the complete film, audio synchronization, typography, or media rights.
+
+**Media rights:** use the included Horizon material as a development/test fixture only unless you have independently confirmed permission for the underlying composition, recording, performances, lyrics, and intended distribution. A successful render does not establish licensing or publication rights.
+
 ---
 
-## Supported development environment
+## Playbook
 
-- Python **3.11** for the Python pipeline and tests.
-- Node.js **24** and npm for the Remotion application in `film/`.
-- FFmpeg and `ffprobe` for media decoding, encoding, and output validation.
-- GitHub Actions runs on Ubuntu 26.04; CI applies the exact Python 3.11 constraints in `requirements-ci.txt` to the declared dependencies in `requirements-dev.txt` and uses `film/package-lock.json` for the Node dependency graph.
+### 1. Set up the Python pipeline
 
-See [Contributing](CONTRIBUTING.md) for reproducible setup and validation commands, [Architecture](docs/architecture.md) for data contracts, [asset provenance](docs/assets-and-provenance.md) for media rights status, and the [release checklist](docs/release-checklist.md) for release gates.
-
-## Quick Start
-
-### 1. Installation
-
-Clone the repository and install developer dependencies:
+Use Python **3.11**, FFmpeg, and ffprobe.
 
 ```bash
 git clone https://github.com/virtuewise/virtuemotif.git
 cd virtuemotif
+python -m venv .venv
+# Activate the environment, then:
+python -m pip install --upgrade pip
 python -m pip install -r requirements-dev.txt
+ffmpeg -version
+ffprobe -version
 ```
 
-### 2. Render a Video
+### 2. Generate a lyric video from a song configuration
 
-Generate a lyric video using the orchestration pipeline:
+Create or adapt a song configuration under `songs/`, then run:
 
 ```bash
-python -m tools.make_video example
+python -m tools.make_video <song_id>
 ```
 
-Output frames and the encoded MP4 video will be written to `out/example/` and `out/example.mp4`.
+Rendered frames and the encoded MP4 are written under `out/`. Configuration examples and tool-specific options are documented in [`docs/tools/`](docs/tools/).
 
-### 3. Generate a Video from Audio Automatically
+### 3. Generate lyrics automatically from audio
 
-Install the optional multilingual ASR backend and Remotion dependencies, then run the full transcription-to-render pipeline:
+Install the optional ASR dependencies and the Remotion project dependencies:
 
 ```bash
 python -m pip install "faster-whisper>=1.1" numpy soundfile
@@ -103,30 +141,99 @@ python -m tools.make_auto_lyrics_video "path/to/song.m4a" \
   --output out/song.mp4 --title "My Song" --artist "Artist"
 ```
 
-The command detects the language unless `--language` is supplied, probes the full audio duration with `ffprobe`, and renders the generic `AutoLyrics` composition. Use only audio you have permission to process and redistribute, and review the generated lyrics before publishing. Pass `--force` only when you intend to replace an existing output video. See the [multilingual auto-lyrics guide](docs/multilingual-auto-lyrics.md) for limitations and details.
+The pipeline detects the language unless `--language` is supplied, probes the audio duration with ffprobe, and renders the generic `AutoLyrics` composition. Review the transcript, language labels, and word timings before publication. ASR output is a draft, not guaranteed ground truth.
 
-### 4. Generate Tap-Sync Timing Page
+See the [multilingual AutoLyrics guide](docs/multilingual-auto-lyrics.md) for language detection, timestamp validation, code-switch handling, and known limitations.
 
-To interactively align lyrics by tapping along to the audio:
+### 4. Correct timing with Tap-Sync
 
 ```bash
 python -m tools.make_tapsync
 ```
 
-Open `timing/tap-sync-<song_id>.html` in any modern web browser.
+Open the generated `timing/tap-sync-<song_id>.html` page and tap along with the audio to align lyric timing.
+
+### 5. Inspect audio intelligence and visual behavior
+
+- [Audio intelligence](docs/audio-intelligence.md): beat grid, energy contours, onset and transition cues.
+- [Multilingual AutoLyrics](docs/multilingual-auto-lyrics.md): ASR, language metadata, timing, and review boundaries.
+- [Architecture](docs/architecture.md): pipeline and data contracts.
+- [Asset provenance](docs/assets-and-provenance.md): media source and rights status.
+
+### 6. Validate before sharing a render
+
+Run the relevant local checks:
+
+```bash
+python -m pytest -q
+python -m tools.validate_language_dataset
+cd film
+npm ci
+npx tsc --noEmit
+npx remotion compositions src/index.ts
+```
+
+For a full release decision, follow the [release checklist](docs/release-checklist.md). Synthetic smoke fixtures and automated frame captures are engineering checks—not evidence of real-world multilingual accuracy or human visual approval.
 
 ---
 
-## Documentation
+## Architecture overview
 
-- **Tool Guides**: Browse comprehensive guides for each tool in [`docs/tools/`](docs/tools/).
-- **API Reference**: Browse the [published API reference](https://virtuewise.github.io/virtuemotif/index.html). To build it locally, run `python -m pdoc -o build/api-docs tools`.
-- **Project planning**: See [`docs/project-management.md`](docs/project-management.md) for the board workflow, saved-view design, priorities, and contribution standards. Open the [GitHub Projects page](https://github.com/virtuewise/virtuemotif/projects) to view the live board.
-- **Contributing Guidelines**: See [`CONTRIBUTING.md`](CONTRIBUTING.md) for style and development practices.
-- **Release History**: See [`CHANGELOG.md`](CHANGELOG.md).
+```mermaid
+flowchart TD
+    A[Song config and lyric data] --> B[Pipeline orchestrator]
+    C[Audio file] --> D[Audio analysis and ASR]
+    D --> E[Language and word-timing review]
+    E --> B
+    B --> F[Effect registry and motion systems]
+    F --> G[Python renderer or Remotion compositions]
+    G --> H[FFmpeg and media validation]
+    H --> I[Reviewable video output]
+```
 
----
+## Features
+
+- **Configuration-driven generation:** declarative song configuration combines audio sources, lyrics, style presets, and effect chains.
+- **Extensible effect engine:** register custom visual effects in `tools/effects/`.
+- **Multilingual AutoLyrics:** optional ASR with timestamped segments, word timings, language metadata, and JSONL streaming output.
+- **Audio intelligence:** beat-grid estimation, energy contours, and timestamped onset/transition cues.
+- **Motion typography:** classic 2D and GPU-accelerated 3D Remotion scenes, including landscape, portrait, square, and 4K compositions.
+- **Timing and inspection:** Tap-Sync, frame validation, render benchmarks, and visual-review artifacts.
+- **Unicode-aware text layout:** grapheme-aware fitting for multilingual text and complex glyph sequences.
+
+## Repository map
+
+```text
+├── .github/workflows/    # CI, security, and release workflows
+├── config/               # Default settings and global presets
+├── docs/                 # Architecture, playbooks, governance, and tool guides
+├── film/                 # Remotion React/TypeScript project
+│   └── src/              # Compositions, data, typography, and 3D scenes
+├── lyrics/               # Structured lyric transcriptions
+├── songs/                # Song configuration files
+├── timing/               # Lyric timestamps and Tap-Sync tools
+└── tools/                # Python ASR, audio analysis, validation, and rendering
+```
+
+## Development environment
+
+- Python **3.11** for the Python pipeline and tests.
+- Node.js **24** and npm for the Remotion application in `film/`.
+- FFmpeg and `ffprobe` for media decoding, encoding, and output validation.
+
+See [Contributing](CONTRIBUTING.md) for reproducible setup and development practices. GitHub Actions runs the automated Python and Remotion validation workflows.
+
+## Documentation and project links
+
+- [Tool guides](docs/tools/)
+- [Published API reference](https://virtuewise.github.io/virtuemotif/index.html)
+- [Project management](docs/project-management.md)
+- [GitHub Projects board](https://github.com/virtuewise/virtuemotif/projects)
+- [Contributing guidelines](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Release checklist](docs/release-checklist.md)
+- [Changelog](CHANGELOG.md)
 
 ## License status
 
-The repository currently does not contain a root `LICENSE` file, so its license has not been verified from the repository contents. Do not assume the project is available under the MIT License until the rights holder confirms the intended license and a matching license file is added.
+The repository currently does not contain a root `LICENSE` file, so the project's license has not been verified from repository contents. Do not assume the project is available under MIT or another open-source license until the rights holder confirms the intended license and a matching license file is added.
