@@ -370,6 +370,36 @@ export function createHorizonWorld(): HorizonWorld {
     vegetation.add(tree);
   }
 
+  const rockGeometry = tracked(resources, new THREE.IcosahedronGeometry(1, 1));
+  const rockMaterial = standard(resources, "#77614c", {
+    roughness: 0.98,
+    flatShading: true,
+    vertexColors: true,
+  });
+  const rocks = add(new THREE.InstancedMesh(rockGeometry, rockMaterial, 42), "foreground-rocks");
+  rocks.castShadow = true;
+  rocks.receiveShadow = true;
+  const rockTransform = new THREE.Object3D();
+  for (let i = 0; i < 42; i += 1) {
+    const side = i % 2 === 0 ? -1 : 1;
+    const x = side * (3.8 + seeded(i + 820) * 4.1);
+    const z = -5.2 - seeded(i + 880) * 4.8;
+    const scale = 0.16 + seeded(i + 940) * 0.48;
+    rockTransform.position.set(x, -5.95 + scale * 0.28, z);
+    rockTransform.rotation.set(
+      seeded(i + 1000) * 0.7,
+      seeded(i + 1060) * Math.PI * 2,
+      seeded(i + 1120) * 0.45,
+    );
+    rockTransform.scale.set(scale * 1.35, scale * 0.7, scale);
+    rockTransform.updateMatrix();
+    rocks.setMatrixAt(i, rockTransform.matrix);
+    const shade = 0.72 + seeded(i + 1180) * 0.42;
+    rocks.setColorAt(i, new THREE.Color("#9a8066").multiplyScalar(shade));
+  }
+  rocks.instanceMatrix.needsUpdate = true;
+  if (rocks.instanceColor) rocks.instanceColor.needsUpdate = true;
+
   const starPositions = new Float32Array(520 * 3);
   for (let i = 0; i < 520; i += 1) {
     const a = i * 2.399963;
