@@ -13,6 +13,8 @@ const cue = {
 test("Horizon cinematic world mounts named environment layers and disposes GPU resources", () => {
   const world = createHorizonWorld();
   const names = world.group.children.map((child) => child.name);
+  assert.equal(world.group.position.y, 3.3);
+  assert.ok(world.group.getObjectByName("red-earth").receiveShadow);
 
   assert.ok(names.includes("cinematic-sky"));
   assert.ok(names.includes("far-mountains"));
