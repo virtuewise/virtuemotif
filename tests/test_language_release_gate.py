@@ -7,6 +7,31 @@ from tools.validate_language_dataset import REVIEWED_STATUS
 
 SMOKE_CORPUS = Path("tests/fixtures/multilingual_language_smoke_v1.json")
 
+GOVERNANCE = {
+    "rights_status": "rights_cleared",
+    "consent_status": "documented",
+    "review_status": "native_speaker_reviewed",
+    "adjudication_policy": "Two independent labels; disagreements are adjudicated.",
+    "split_policy": "Group by source and speaker before split assignment.",
+    "dataset_version": "test-fixture-1",
+    "annotation_protocol_version": "test-protocol-1",
+    "provenance_manifest_ref": "restricted://release-gate-test-manifest",
+}
+
+
+def _reviewed_example(example_id, split, speaker_id, source_id):
+    return {
+        "id": example_id,
+        "text": "Example reviewed sentence",
+        "language": "en",
+        "split": split,
+        "source_id": source_id,
+        "speaker_id": speaker_id,
+        "review_status": "native_speaker_reviewed",
+        "consent_ref": f"private-ledger:{example_id}",
+        "reviewer_ids": ["reviewer-a", "reviewer-b"],
+    }
+
 
 def test_synthetic_smoke_fixture_is_never_release_eligible() -> None:
     corpus = json.loads(SMOKE_CORPUS.read_text(encoding="utf-8"))
@@ -37,36 +62,10 @@ def test_release_gate_accepts_structurally_valid_reviewed_metadata() -> None:
         "dataset_id": "reviewed-structure-test",
         "status": REVIEWED_STATUS,
         "labels": ["en"],
-        "governance": {
-            "rights_status": "rights_cleared",
-            "consent_status": "documented",
-            "review_status": "native_speaker_reviewed",
-            "adjudication_policy": "Two independent labels; steward resolves disagreements.",
-            "split_policy": "Group by source and speaker before split assignment.",
-        },
+        "governance": GOVERNANCE,
         "examples": [
-            {
-                "id": "train-1",
-                "text": "Example training sentence",
-                "language": "en",
-                "split": "train",
-                "source_id": "source-a",
-                "speaker_id": "speaker-a",
-                "review_status": "native_speaker_reviewed",
-                "consent_ref": "private-ledger:consent-a",
-                "reviewer_ids": ["reviewer-a", "reviewer-b"],
-            },
-            {
-                "id": "test-1",
-                "text": "Example held-out sentence",
-                "language": "en",
-                "split": "test",
-                "source_id": "source-b",
-                "speaker_id": "speaker-b",
-                "review_status": "native_speaker_reviewed",
-                "consent_ref": "private-ledger:consent-b",
-                "reviewer_ids": ["reviewer-a", "reviewer-b"],
-            },
+            _reviewed_example("train-1", "train", "speaker-a", "source-a"),
+            _reviewed_example("test-1", "test", "speaker-b", "source-b"),
         ],
     }
     assert release_errors(corpus) == []
@@ -78,27 +77,13 @@ def test_release_gate_rejects_cross_split_speaker_leakage() -> None:
         "dataset_id": "leakage-test",
         "status": REVIEWED_STATUS,
         "labels": ["en"],
-        "governance": {
-            "rights_status": "rights_cleared",
-            "consent_status": "documented",
-            "review_status": "native_speaker_reviewed",
-            "adjudication_policy": "Two independent labels.",
-            "split_policy": "Group by source and speaker.",
-        },
+        "governance": GOVERNANCE,
         "examples": [
-            {
-                "id": "train-1", "text": "Training example", "language": "en",
-                "split": "train", "source_id": "source-a", "speaker_id": "speaker-a",
-                "review_status": "native_speaker_reviewed", "consent_ref": "ref-a",
-                "reviewer_ids": ["reviewer-a"],
-            },
-            {
-                "id": "test-1", "text": "Held out example", "language": "en",
-                "split": "test", "source_id": "source-b", "speaker_id": "speaker-a",
-                "review_status": "native_speaker_reviewed", "consent_ref": "ref-b",
-                "reviewer_ids": ["reviewer-a"],
-            },
+            _reviewed_example("train-1", "train", "speaker-a", "source-a"),
+            _reviewed_example("test-1", "test", "speaker-a", "source-b"),
         ],
     }
-    assert any("speaker_id 'speaker-a' crosses dataset splits" in error
-               for error in release_errors(corpus))
+    assert any(
+        "speaker_id 'speaker-a' crosses dataset splits" in error
+        for error in release_errors(corpus)
+    )
