@@ -80,3 +80,13 @@ test("Imported world dressing is not gated by English-only travel keywords", () 
   assert.equal(world.group.getObjectByName("licensed-world-assets").visible, true);
   world.dispose();
 });
+
+
+test("Horizon production asset requests are local and include the protagonist contract", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const source = await readFile(new URL("../film/src/fur3d/HorizonCinematicWorld.ts", import.meta.url), "utf8");
+  assert.match(source, /staticFile\("assets\/world\/baobab-tree\.glb"\)/);
+  assert.match(source, /staticFile\("assets\/characters\/horizon-protagonist\.glb"\)/);
+  assert.match(source, /createHorizonCharacterPerformance\(root, gltf\.animations\)/);
+  assert.doesNotMatch(source, /https:\/\/cdn\.3dassets\.dev/);
+});
