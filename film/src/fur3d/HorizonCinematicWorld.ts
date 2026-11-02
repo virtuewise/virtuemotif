@@ -239,6 +239,7 @@ export function createHorizonWorld(): HorizonWorld {
   const assetLoader = new GLTFLoader();
   const importedResources = new Set<THREE.BufferGeometry | THREE.Material | THREE.Texture>();
   const importedNodes: Array<{ root: THREE.Group; kind: "tree" | "vehicle" }> = [];
+  let disposed = false;
   const assetDefinitions = [
     { name: "baobab-tree", url: "https://cdn.3dassets.dev/assets/37714/v1/model.glb", kind: "tree" as const, position: [-11.2, -5.9, -9.2] as const, scale: 0.62 },
     { name: "large-acacia-tree", url: "https://cdn.3dassets.dev/assets/37713/v1/model.glb", kind: "tree" as const, position: [10.8, -5.9, -10.0] as const, scale: 0.58 },
@@ -264,6 +265,19 @@ export function createHorizonWorld(): HorizonWorld {
         }
       }
     });
+    if (disposed) {
+      root.traverse((node) => {
+        if (node instanceof THREE.Mesh) {
+          node.geometry.dispose();
+          const materials = Array.isArray(node.material) ? node.material : [node.material];
+          for (const material of materials) {
+            for (const value of Object.values(material)) if (value instanceof THREE.Texture) value.dispose();
+            material.dispose();
+          }
+        }
+      });
+      return;
+    }
     importedAssets.add(root);
     importedNodes.push({ root, kind: definition.kind });
   })).then(() => undefined);
@@ -387,6 +401,7 @@ export function createHorizonWorld(): HorizonWorld {
     ready,
     update,
     dispose: () => {
+      disposed = true;
       for (const resource of resources) resource.dispose();
       for (const resource of importedResources) resource.dispose();
       group.clear();
