@@ -13,6 +13,7 @@ import { Song, Line } from "../HorizonFilm";
 import { FilmGrain, Vignette } from "../Backdrop";
 import { estimateLyricCharacterEquivalent } from "../typography";
 import { combineTextFitAndMotionScale } from "./textFit";
+import { createHorizonWorld, type HorizonWorld } from "./HorizonCinematicWorld";
 
 /**
  * Props for the furry lyric view.
@@ -83,6 +84,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const currentMeshRef = useRef<FurMeshGroup | null>(null);
   const currentTextRef = useRef<string>("");
+  const horizonWorldRef = useRef<HorizonWorld | null>(null);
 
   const currentTime = frame / fps;
   const cueFrame = evaluateAudioCues(frame, fps, audioCues);
@@ -269,7 +271,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       mesh.update(currentTime, audioDisplacement);
     }
 
-    // Publish the exact same frame cues used for the typography and scene motion.
+    // Advance the cinematic world from the same deterministic frame clock and lyric cues.\n    horizonWorldRef.current?.update(currentTime, cueFrame, activeLine?.text ?? displayText, activeSectionLabel);\n\n    // Publish the exact same frame cues used for the typography and scene motion.
     // Consumers can update their own shader uniforms before this frame is rendered.
     onAudioCueFrame?.(cueFrame);
 
