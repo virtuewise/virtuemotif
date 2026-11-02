@@ -45,6 +45,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
   const { fps, width, height } = useVideoConfig();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [audioCues, setAudioCues] = useState<AudioIntelligence | null>(null);
+  const [worldAssetsReady, setWorldAssetsReady] = useState(false);
   const cueRenderHandle = useMemo(() => delayRender("Loading versioned audio intelligence cues"), [song.id]);
   const worldAssetRenderHandle = useMemo(() => delayRender("Loading licensed cinematic world assets"), []);
   const worldAssetsReleasedRef = useRef(false);
@@ -153,6 +154,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       void horizonWorld.ready.finally(() => {
         if (!worldAssetsReleasedRef.current) {
           worldAssetsReleasedRef.current = true;
+          setWorldAssetsReady(true);
           continueRender(worldAssetRenderHandle);
         }
       });
@@ -295,7 +297,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
 
     // Render the frame
     renderer.render(scene, camera);
-  }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady, onAudioCueFrame, cueFrame.time, cueFrame.beatPulse, cueFrame.energy, cueFrame.transitionIntensity, worldAssetRenderHandle]);
+  }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady, onAudioCueFrame, cueFrame.time, cueFrame.beatPulse, cueFrame.energy, cueFrame.transitionIntensity, worldAssetRenderHandle, worldAssetsReady]);
 
   // Release GPU resources when the composition unmounts.
   useEffect(() => {
