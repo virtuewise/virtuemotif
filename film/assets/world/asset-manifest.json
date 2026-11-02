@@ -54,7 +54,7 @@
       "file": "film/public/assets/characters/horizon-protagonist.glb",
       "source": "MPFB2-generated project asset",
       "license": "CC0-1.0",
-      "licenseEvidence": "MPFB2 bundled graphical asset licence; retain generated-output provenance",
+      "licenseEvidence": "https://github.com/makehumancommunity/mpfb2/blob/master/LICENSE.md",
       "sha256": null,
       "status": "not-generated"
     }
