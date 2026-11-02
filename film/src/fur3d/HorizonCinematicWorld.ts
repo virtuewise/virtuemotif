@@ -241,10 +241,10 @@ export function createHorizonWorld(): HorizonWorld {
   const importedNodes: Array<{ root: THREE.Group; kind: "tree" | "vehicle" }> = [];
   let disposed = false;
   const assetDefinitions = [
-    { name: "baobab-tree", url: "https://cdn.3dassets.dev/assets/37714/v1/model.glb", kind: "tree" as const, position: [-11.2, -5.9, -9.2] as const, scale: 0.62 },
-    { name: "large-acacia-tree", url: "https://cdn.3dassets.dev/assets/37713/v1/model.glb", kind: "tree" as const, position: [10.8, -5.9, -10.0] as const, scale: 0.58 },
-    { name: "small-acacia-tree", url: "https://cdn.3dassets.dev/assets/37712/v1/model.glb", kind: "tree" as const, position: [-7.8, -5.8, -6.8] as const, scale: 0.72 },
-    { name: "grand-touring-coupe", url: "https://cdn.3dassets.dev/assets/18681/v1/model.glb", kind: "vehicle" as const, position: [7.0, -5.8, -5.8] as const, scale: 0.48 },
+    { name: "baobab-tree", url: "https://cdn.3dassets.dev/assets/37714/v1/model.glb", kind: "tree" as const, position: [-6.2, -5.9, -9.2] as const, scale: 0.62 },
+    { name: "large-acacia-tree", url: "https://cdn.3dassets.dev/assets/37713/v1/model.glb", kind: "tree" as const, position: [6.2, -5.9, -10.0] as const, scale: 0.58 },
+    { name: "small-acacia-tree", url: "https://cdn.3dassets.dev/assets/37712/v1/model.glb", kind: "tree" as const, position: [-8.0, -5.8, -6.8] as const, scale: 0.72 },
+    { name: "grand-touring-coupe", url: "https://cdn.3dassets.dev/assets/18681/v1/model.glb", kind: "vehicle" as const, position: [4.3, -5.8, -5.8] as const, scale: 0.48 },
   ];
   const ready = Promise.allSettled(assetDefinitions.map(async (definition) => {
     const gltf = await assetLoader.loadAsync(definition.url);
