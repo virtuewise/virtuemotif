@@ -13,6 +13,8 @@ import { Song, Line } from "../HorizonFilm";
 import { FilmGrain, Vignette } from "../Backdrop";
 import { estimateLyricCharacterEquivalent } from "../typography";
 import { combineTextFitAndMotionScale } from "./textFit";
+import { createHorizonWorld, type HorizonWorld } from "./HorizonCinematicWorld";
+import { directHorizonCamera } from "./HorizonCinematicDirection";
 
 /**
  * Props for the furry lyric view.
@@ -43,7 +45,10 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
   const { fps, width, height } = useVideoConfig();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [audioCues, setAudioCues] = useState<AudioIntelligence | null>(null);
+  const [worldAssetsReady, setWorldAssetsReady] = useState(false);
   const cueRenderHandle = useMemo(() => delayRender("Loading versioned audio intelligence cues"), [song.id]);
+  const worldAssetRenderHandle = useMemo(() => delayRender("Loading licensed cinematic world assets"), []);
+  const worldAssetsReleasedRef = useRef(false);
 
   // Cue files are generated from the same audio engine used by the Python pipeline.
   // Missing, stale, or invalid data deliberately falls back to deterministic motion.
@@ -83,6 +88,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const currentMeshRef = useRef<FurMeshGroup | null>(null);
   const currentTextRef = useRef<string>("");
+  const horizonWorldRef = useRef<HorizonWorld | null>(null);
 
   const currentTime = frame / fps;
   const cueFrame = evaluateAudioCues(frame, fps, audioCues);
@@ -119,7 +125,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
 
   // Main three.js setup – runs once per frame to stay in sync with Remotion
   useLayoutEffect(() => {
-    if (!canvasRef.current || !font) return;
+    if (!canvasRef.current) return;
     const canvas = canvasRef.current;
 
     // Initialise renderer / scene / camera once
@@ -131,6 +137,8 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
         powerPreference: "high-performance",
       });
       renderer.setPixelRatio(1.0);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.setSize(width, height);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.15;
@@ -138,6 +146,18 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
 
       const scene = new THREE.Scene();
       sceneRef.current = scene;
+
+      // Mount the cinematic environment before the lyric mesh so it remains behind typography.
+      const horizonWorld = createHorizonWorld();
+      horizonWorldRef.current = horizonWorld;
+      scene.add(horizonWorld.group);
+      void horizonWorld.ready.finally(() => {
+        if (!worldAssetsReleasedRef.current) {
+          worldAssetsReleasedRef.current = true;
+          setWorldAssetsReady(true);
+          continueRender(worldAssetRenderHandle);
+        }
+      });
 
       const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
       camera.position.set(0, 0, 6.8);
@@ -170,7 +190,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
     const renderer = rendererRef.current!;
 
     // Re‑create fur mesh when the displayed text changes
-    if (currentTextRef.current !== displayText) {
+    if (font && currentTextRef.current !== displayText) {
       if (currentMeshRef.current) {
         scene.remove(currentMeshRef.current.group);
         currentMeshRef.current.dispose();
@@ -214,14 +234,13 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       }
     }
 
-    // Camera setup with responsive base distance
+    // Camera setup with responsive authored story blocking.
     const aspect = width / height;
-    const isPortrait = aspect < 1.0;
-    const baseZ = isPortrait ? 6.8 / Math.max(0.48, aspect * 1.3) : 6.8;
-    const camX = Math.sin(currentTime * 0.35) * 0.35;
-    const camY = Math.cos(currentTime * 0.25) * 0.18;
-    camera.position.set(camX, camY, baseZ);
-    camera.lookAt(0, 0, 0);
+    const direction = directHorizonCamera(currentTime, activeLine?.text ?? displayText, activeSectionLabel, cueFrame, aspect);
+    camera.position.copy(direction.position);
+    camera.lookAt(direction.target);
+    camera.fov = direction.fov;
+    camera.updateProjectionMatrix();
 
     // Audio‑reactive wind and floating motion
     const beatPulse = cueFrame.beatPulse;
@@ -269,13 +288,41 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       mesh.update(currentTime, audioDisplacement);
     }
 
+    // Advance the cinematic world from the same deterministic frame clock and lyric cues.
+    horizonWorldRef.current?.update(currentTime, cueFrame, activeLine?.text ?? displayText, activeSectionLabel);
+
     // Publish the exact same frame cues used for the typography and scene motion.
     // Consumers can update their own shader uniforms before this frame is rendered.
     onAudioCueFrame?.(cueFrame);
 
     // Render the frame
     renderer.render(scene, camera);
-  }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady, onAudioCueFrame, cueFrame.time, cueFrame.beatPulse, cueFrame.energy, cueFrame.transitionIntensity]);
+  }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady, onAudioCueFrame, cueFrame.time, cueFrame.beatPulse, cueFrame.energy, cueFrame.transitionIntensity, worldAssetRenderHandle, worldAssetsReady]);
+
+  // Release GPU resources when the composition unmounts.
+  useEffect(() => {
+    return () => {
+      const world = horizonWorldRef.current;
+      if (!worldAssetsReleasedRef.current) {
+        worldAssetsReleasedRef.current = true;
+        continueRender(worldAssetRenderHandle);
+      }
+      if (world) {
+        sceneRef.current?.remove(world.group);
+        world.dispose();
+        horizonWorldRef.current = null;
+      }
+      if (currentMeshRef.current) {
+        sceneRef.current?.remove(currentMeshRef.current.group);
+        currentMeshRef.current.dispose();
+        currentMeshRef.current = null;
+      }
+      rendererRef.current?.dispose();
+      rendererRef.current = null;
+      sceneRef.current = null;
+      cameraRef.current = null;
+    };
+  }, [worldAssetRenderHandle]);
 
   // Fade in/out based on lyric line progress or title entrance
   const lineProgress = activeLine

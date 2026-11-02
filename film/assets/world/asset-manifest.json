@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "policy": {
+    "productionRequiresLocalFiles": true,
+    "productionRequiresSha256": true,
+    "productionRequiresVerifiedLicense": true,
+    "rejectUnknownLicense": true,
+    "rejectUnapprovedExternalRuntimeUrls": true
+  },
+  "assets": [
+    {
+      "id": "baobab-tree",
+      "role": "background-vegetation",
+      "file": "film/public/assets/world/baobab-tree.glb",
+      "source": "https://3dassets.dev/assets/37714",
+      "license": "CC0-1.0",
+      "licenseEvidence": "https://3dassets.dev/docs",
+      "sha256": null,
+      "status": "remote-prototype-only"
+    },
+    {
+      "id": "large-acacia-tree",
+      "role": "background-vegetation",
+      "file": "film/public/assets/world/large-acacia-tree.glb",
+      "source": "https://3dassets.dev/assets/37713",
+      "license": "CC0-1.0",
+      "licenseEvidence": "https://3dassets.dev/docs",
+      "sha256": null,
+      "status": "remote-prototype-only"
+    },
+    {
+      "id": "small-acacia-tree",
+      "role": "foreground-vegetation",
+      "file": "film/public/assets/world/small-acacia-tree.glb",
+      "source": "https://3dassets.dev/assets/37712",
+      "license": "CC0-1.0",
+      "licenseEvidence": "https://3dassets.dev/docs",
+      "sha256": null,
+      "status": "remote-prototype-only"
+    },
+    {
+      "id": "grand-touring-coupe",
+      "role": "background-vehicle",
+      "file": "film/public/assets/world/grand-touring-coupe.glb",
+      "source": "https://3dassets.dev/assets/18681",
+      "license": "CC0-1.0",
+      "licenseEvidence": "https://3dassets.dev/docs",
+      "sha256": null,
+      "status": "remote-prototype-only"
+    },
+    {
+      "id": "horizon-human-protagonist",
+      "role": "hero-character",
+      "file": "film/public/assets/characters/horizon-protagonist.glb",
+      "source": "MPFB2-generated project asset",
+      "license": "CC0-1.0",
+      "licenseEvidence": "https://github.com/makehumancommunity/mpfb2/blob/master/LICENSE.md",
+      "sha256": null,
+      "status": "not-generated"
+    }
+  ]
+}
