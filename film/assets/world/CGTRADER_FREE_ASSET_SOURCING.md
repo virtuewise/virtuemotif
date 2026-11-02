@@ -64,7 +64,7 @@ Budget constraint: free downloads only; no paid assets or subscriptions.
 
 ## Excluded
 
-- African Man Rigged (model ID 1965781 / listing title "African Man Rigged") is displayed at USD 79, so it violates the free-only budget.
+- African Man Rigged (listing title "African Man Rigged") is displayed at USD 79, so it violates the free-only budget.
 - Do not use the generic low-poly tree pack or any other free listing unless its exact license and download contents are recorded.
 - Do not use assets with Editorial-only terms for commercial VirtueMotif output.
 
