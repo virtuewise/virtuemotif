@@ -10,6 +10,7 @@ const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
 const production = process.argv.includes("--production");
 const failures = [];
 const warnings = [];
+const approvedLicenses = new Set(["CC0-1.0", "CC-BY-4.0", "CC-BY-3.0", "CC-BY-SA-4.0"]);
 
 for (const asset of manifest.assets ?? []) {
   if (!asset.id || !asset.file || !asset.license || !asset.source) {
@@ -25,7 +26,8 @@ for (const asset of manifest.assets ?? []) {
     failures.push(`[${asset.id}] path escapes repository root`);
     continue;
   }
-  if (!asset.licenseEvidence) failures.push(`[${asset.id}] missing licence evidence URL`);
+  if (!asset.licenseEvidence || !/^https:\/\//i.test(asset.licenseEvidence)) failures.push(`[${asset.id}] missing valid HTTPS licence evidence`);
+  if (!approvedLicenses.has(asset.license)) failures.push(`[${asset.id}] unapproved or unknown licence identifier: ${asset.license}`);
   if (!asset.sha256 || !/^[a-f0-9]{64}$/i.test(asset.sha256)) {
     const message = `[${asset.id}] SHA-256 is not pinned`;
     (production ? failures : warnings).push(message);
