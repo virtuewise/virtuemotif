@@ -132,6 +132,7 @@ jobs:
               "index.html": (),
               "playground.html": ("Interactive test playground", "horizon-preview.mp4"),
               "media/horizon-preview.gif": (),
+              "media/horizon-preview.mp4": (),
               "audio/horizon.m4a": (),
               "data/horizon.json": (),
               "tools.html": ("tools/make_video.html",),
@@ -148,9 +149,11 @@ jobs:
                       with urlopen(request, timeout=10) as response:
                           if response.status != 200:
                               raise HTTPError(base + path, response.status, "unexpected HTTP status", response.headers, None)
-                          body = response.read().decode("utf-8", errors="replace")
+                          body = response.read()
                           final_url = response.geturl()
-                      if markers and not any(marker in body for marker in markers):
+                      if markers and not any(
+                          marker in body.decode("utf-8", errors="replace") for marker in markers
+                      ):
                           raise SystemExit(f"{path} (resolved to {final_url}): expected one of {markers!r} in published content")
                   print(f"Published documentation smoke test passed: {base}")
                   break
