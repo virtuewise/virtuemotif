@@ -90,3 +90,13 @@ test("Horizon production asset requests are local and include the protagonist co
   assert.match(source, /createHorizonCharacterPerformance\(root, gltf\.animations\)/);
   assert.doesNotMatch(source, /https:\/\/cdn\.3dassets\.dev/);
 });
+
+
+test("Horizon world reports local asset failures instead of silently swallowing them", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const source = await readFile(new URL("../film/src/fur3d/HorizonCinematicWorld.ts", import.meta.url), "utf8");
+  assert.match(source, /assetDiagnostics:\s*\{/);
+  assert.match(source, /assetDiagnostics\.loaded\.push\(definition\.name\)/);
+  assert.match(source, /assetDiagnostics\.failed\.push\(/);
+  assert.match(source, /Local asset loading completed with failures/);
+});
