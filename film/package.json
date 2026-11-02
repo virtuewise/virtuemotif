@@ -8,7 +8,7 @@
     "validate:assets": "node scripts/validate_world_assets.mjs",
     "validate:assets:production": "node scripts/validate_world_assets.mjs --production",
     "stage:assets": "node scripts/stage_world_assets.mjs",
-    "test:cinematic": "node --test ../tests/horizon_cinematic_world.test.mjs ../tests/horizon_character_performance.test.mjs"
+    "test:cinematic": "node --test ../tests/horizon_cinematic_world.test.mjs ../tests/horizon_character_performance.test.mjs ../tests/horizon_cinematic_direction.test.mjs"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.539",
