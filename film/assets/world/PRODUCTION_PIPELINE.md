@@ -41,6 +41,11 @@ This is a first authored blocking pass, not a completed shot-by-shot director's 
 
 ## Story-driven protagonist runtime contract
 
-`film/src/fur3d/HorizonCharacterPerformance.ts` is the deterministic animation adapter for the eventual artist-approved GLB. It requires authored `idle`, `walk`, `turn`, and `look_to_horizon` clips, selects a story action from lyric/section cues, seeks the animation mixer to absolute Remotion time, and applies restrained facial morph emphasis when compatible morph targets exist. The adapter deliberately throws if required clips are absent. It is not a model, does not fabricate facial geometry, and is not yet connected to the scene because the protagonist GLB has not been generated and approved.
+`film/src/fur3d/HorizonCharacterPerformance.ts` is the deterministic animation adapter for the eventual artist-approved GLB. It requires authored `idle`, `walk`, `turn`, and `look_to_horizon` clips, selects a story action from lyric/section cues, seeks the animation mixer to absolute Remotion time, and applies restrained facial morph emphasis when compatible morph targets exist. The adapter deliberately throws if required clips are absent. It is not a model and does not fabricate facial geometry. The runtime now attempts to load the protagonist from the local film/public/assets/characters/horizon-protagonist.glb path and connects the adapter when a valid rigged GLB is present. Until that file is generated and approved, the character remains unavailable; no placeholder human is rendered.
 
 Run the focused regression suite with `cd film && npm run test:cinematic`. This command covers the world and character performance contracts; CI inclusion and browser-render validation remain separate acceptance gates.
+
+
+## Local-only runtime asset loading
+
+The Three.js world loads scenery and the protagonist only from Remotion's local public/assets directory via staticFile. It no longer requests prototype GLBs from a third-party CDN during rendering. Missing local files are treated as optional unavailable scene dressing by the asset-readiness barrier; this is a development fallback, not production acceptance. Stage and review assets locally, pin their hashes, and run the production validator before release.
