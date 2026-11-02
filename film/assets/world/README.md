@@ -13,6 +13,10 @@ The Horizon cinematic environment currently has a **first-pass scene-dressing in
 
 3DAssets.dev documents its published GLBs as self-contained binary glTF files, metre-scale, +Y up, CC0 1.0, and compatible with Three.js `GLTFLoader`. The CDN URLs are immutable. Asset metadata and licence statements: [3DAssets.dev documentation](https://3dassets.dev/docs) and [API reference](https://3dassets.dev/docs/api).
 
+## Cinematic composition and depth
+
+The environment root is vertically framed into the existing lyric composition camera, leaving the lyric title at the screen origin while placing the terrain, waterline, vegetation, rocks, and imported props within the lower visual field. The directional key light casts soft shadows onto terrain and vegetation; the Remotion renderer enables PCF soft-shadow filtering. A deterministic instanced rock field adds foreground scale cues without allocating a separate mesh per rock. Camera drift and push-in are derived from the same audio cue frame as the lyric typography, so identical frame inputs remain reproducible.
+
 ## Lyric-led environment cues
 
 The environment maps scene motifs from normalized lyric tokens rather than relying only on English. The first vocabulary set includes English, Shona, Ndebele, and isiZulu terms for night, water, land, and hope/light. Audio energy, beat pulses, and transition intensity remain language-independent and continue to drive the water shader, particles, lighting, and environmental motion. This is a small curated vocabulary, not a claim of complete semantic understanding or automatic translation; unknown words fall back to the neutral cinematic state.
