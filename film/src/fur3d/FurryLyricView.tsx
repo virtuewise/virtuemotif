@@ -45,6 +45,8 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [audioCues, setAudioCues] = useState<AudioIntelligence | null>(null);
   const cueRenderHandle = useMemo(() => delayRender("Loading versioned audio intelligence cues"), [song.id]);
+  const worldAssetRenderHandle = useMemo(() => delayRender("Loading licensed cinematic world assets"), []);
+  const worldAssetsReleasedRef = useRef(false);
 
   // Cue files are generated from the same audio engine used by the Python pipeline.
   // Missing, stale, or invalid data deliberately falls back to deterministic motion.
@@ -145,6 +147,12 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       const horizonWorld = createHorizonWorld();
       horizonWorldRef.current = horizonWorld;
       scene.add(horizonWorld.group);
+      void horizonWorld.ready.finally(() => {
+        if (!worldAssetsReleasedRef.current) {
+          worldAssetsReleasedRef.current = true;
+          continueRender(worldAssetRenderHandle);
+        }
+      });
 
       const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
       camera.position.set(0, 0, 6.8);
@@ -285,12 +293,16 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
 
     // Render the frame
     renderer.render(scene, camera);
-  }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady, onAudioCueFrame, cueFrame.time, cueFrame.beatPulse, cueFrame.energy, cueFrame.transitionIntensity]);
+  }, [font, displayText, activePreset, currentTime, width, height, onSceneReady, onMeshReady, onAudioCueFrame, cueFrame.time, cueFrame.beatPulse, cueFrame.energy, cueFrame.transitionIntensity, worldAssetRenderHandle]);
 
   // Release GPU resources when the composition unmounts.
   useEffect(() => {
     return () => {
       const world = horizonWorldRef.current;
+      if (!worldAssetsReleasedRef.current) {
+        worldAssetsReleasedRef.current = true;
+        continueRender(worldAssetRenderHandle);
+      }
       if (world) {
         sceneRef.current?.remove(world.group);
         world.dispose();
@@ -306,7 +318,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
       sceneRef.current = null;
       cameraRef.current = null;
     };
-  }, []);
+  }, [worldAssetRenderHandle]);
 
   // Fade in/out based on lyric line progress or title entrance
   const lineProgress = activeLine
