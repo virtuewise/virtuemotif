@@ -30,6 +30,18 @@ const seeded = (n: number) => {
   return x - Math.floor(x);
 };
 
+const hasLyricCue = (text: string, terms: readonly string[]) => {
+  const words = new Set(text.split(/[^\\p{L}\\p{N}]+/u).filter(Boolean));
+  return terms.some((term) => words.has(term));
+};
+
+const LYRIC_CUES = {
+  night: ["night", "star", "stars", "moon", "dark", "shadow", "dream", "usiku", "ebusuku", "ubusuku"],
+  water: ["river", "water", "sea", "ocean", "rain", "flow", "tears", "mvura", "amanzi"],
+  land: ["earth", "land", "mountain", "root", "roots", "home", "ancestor", "ancestors", "nyika", "umhlaba", "ikhaya"],
+  hope: ["hope", "light", "future", "morning", "rise", "healing", "peace", "freedom", "together", "tariro", "chiedza", "ithemba", "ukukhanya", "ekuseni"],
+} as const;
+
 const smoothNoise = (x: number, z: number, seed: number) => {
   const a = Math.sin(x * 0.31 + seed) * Math.cos(z * 0.23 - seed * 0.7);
   const b = Math.sin(x * 0.83 - z * 0.51 + seed * 1.3) * 0.34;
@@ -358,10 +370,10 @@ export function createHorizonWorld(): HorizonWorld {
 
   const update = (time: number, cue: AudioCueFrame, lyric: string, section: string) => {
     const normalized = `${lyric} ${section}`.normalize("NFKC").toLowerCase();
-    const night = /\b(night|stars?|moon|dark|shadow|dream)\b/.test(normalized);
-    const waterFocus = /\b(river|water|sea|ocean|rain|flow|tears?)\b/.test(normalized);
-    const landFocus = /\b(earth|land|mountain|roots?|home|ancestors?)\b/.test(normalized);
-    const hopeFocus = /\b(hope|light|future|morning|rise|healing|peace|freedom|together)\b/.test(normalized)
+    const night = hasLyricCue(normalized, LYRIC_CUES.night);
+    const waterFocus = hasLyricCue(normalized, LYRIC_CUES.water);
+    const landFocus = hasLyricCue(normalized, LYRIC_CUES.land);
+    const hopeFocus = hasLyricCue(normalized, LYRIC_CUES.hope)
       || /chorus|outro|final/i.test(section);
     const energy = THREE.MathUtils.clamp(cue.energy, 0, 1);
     const pulse = THREE.MathUtils.clamp(cue.beatPulse * 0.55 + cue.transitionIntensity * 0.28 + energy * 0.17, 0, 1);
