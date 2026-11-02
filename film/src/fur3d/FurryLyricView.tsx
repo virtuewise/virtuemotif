@@ -123,7 +123,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
 
   // Main three.js setup – runs once per frame to stay in sync with Remotion
   useLayoutEffect(() => {
-    if (!canvasRef.current || !font) return;
+    if (!canvasRef.current) return;
     const canvas = canvasRef.current;
 
     // Initialise renderer / scene / camera once
@@ -185,7 +185,7 @@ export const FurryLyricView: React.FC<FurryLyricViewProps> = ({
     const renderer = rendererRef.current!;
 
     // Re‑create fur mesh when the displayed text changes
-    if (currentTextRef.current !== displayText) {
+    if (font && currentTextRef.current !== displayText) {
       if (currentMeshRef.current) {
         scene.remove(currentMeshRef.current.group);
         currentMeshRef.current.dispose();
