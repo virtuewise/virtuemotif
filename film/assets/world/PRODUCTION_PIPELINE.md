@@ -33,6 +33,12 @@ Run `cd film && npm run stage:assets` to download the four pinned prototype GLBs
 
 Open each staged GLB in Blender and review topology, normals, scale, UVs, embedded textures, material response, visual quality and licence evidence. Only after that review may a maintainer change the row to `approved-local`; then run `npm run validate:assets:production`. The current tree/vehicle assets are explicitly low-poly scene-dressing prototypes, so staging them locally improves render reproducibility but does not satisfy the final hero-scenery quality bar. Replace them with higher-detail approved assets before close-up use.
 
+## Authored cinematic camera direction
+
+`film/src/fur3d/HorizonCinematicDirection.ts` defines deterministic establishing, journey, memory, revelation and intimate camera setups. It maps curated English, Shona, Ndebele and isiZulu story cues plus chorus/outro structure into composition, focal target and lens choices, then modulates push-in and camera breathing from the same frame-synchronous energy and beat cues. `FurryLyricView` now uses this director instead of its former generic orbit. The direction regression suite checks repeatability, multilingual revelation cues and portrait framing.
+
+This is a first authored blocking pass, not a completed shot-by-shot director's storyboard. Final shot timing, actor blocking, eyelines, lens selection and transitions require review against the complete song edit and the approved protagonist performance.
+
 ## Story-driven protagonist runtime contract
 
 `film/src/fur3d/HorizonCharacterPerformance.ts` is the deterministic animation adapter for the eventual artist-approved GLB. It requires authored `idle`, `walk`, `turn`, and `look_to_horizon` clips, selects a story action from lyric/section cues, seeks the animation mixer to absolute Remotion time, and applies restrained facial morph emphasis when compatible morph targets exist. The adapter deliberately throws if required clips are absent. It is not a model, does not fabricate facial geometry, and is not yet connected to the scene because the protagonist GLB has not been generated and approved.
