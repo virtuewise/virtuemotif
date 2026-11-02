@@ -2,6 +2,9 @@
 
 [![CI](https://github.com/virtuewise/virtuemotif/actions/workflows/ci.yml/badge.svg)](https://github.com/virtuewise/virtuemotif/actions/workflows/ci.yml)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![ASTRA-SH · Engine](https://img.shields.io/badge/ASTRA--SH-creative%20engine-8b6cf6?style=for-the-badge)](#features)
+[![ASTRA-SH · Playground](https://img.shields.io/badge/ASTRA--SH-live%20playground-16a6a1?style=for-the-badge)](https://virtuewise.github.io/virtuemotif/playground.html)
+[![ASTRA-SH · Horizon](https://img.shields.io/badge/ASTRA--SH-horizon%20preview-d69a45?style=for-the-badge)](#the-horizon--live-remotion-test)
 
 > An audio-reactive lyric-video and motion-typography engine, from multilingual lyrics to rendered film.
 
@@ -11,19 +14,27 @@ VirtueMotif synchronizes lyrics, language metadata, audio analysis, procedural v
 
 | Destination | What it is | Open |
 | --- | --- | --- |
-| **Playground** | Explore the Remotion compositions, switch between visual experiments, scrub frames, and preview the Horizon scenes locally. | [Launch the Playground](#playground) |
+| **Playground** | Play the Horizon test song, scrub its real lyric timeline, jump between sections, and watch the auto-preview in your browser. | [Open the live Playground](https://virtuewise.github.io/virtuemotif/playground.html) |
 | **Playbook** | A practical path from setup to transcription, timing review, visual iteration, and final rendering. | [Open the Playbook](#playbook) |
 | **The Horizon — live Remotion test** | Run the actual Horizon composition in Remotion Studio, or render a reproducible MP4 from the command line. | [Run the Horizon test](#the-horizon--live-remotion-test) |
 
-> **Live-preview note:** the Remotion Playground runs locally in your browser. This repository does not currently publish a hosted, always-on Remotion preview. The commands below launch the real compositions from `film/src/Root.tsx`; they are not screenshots or simulated demos.
+### ASTRA-SH · The Horizon of Light (Tarisiro) — auto-preview
+
+[![Open the interactive Horizon Playground](https://virtuewise.github.io/virtuemotif/media/horizon-preview.gif)](https://virtuewise.github.io/virtuemotif/playground.html)
+
+<sub>Animated preview generated from the real `FurryHorizon` Remotion composition. Select the image to open the browser playground with song playback, lyric-synced seeking, section navigation, and the full timeline.</sub>
+
+> **Two complementary test surfaces:** the hosted [Horizon browser playground](https://virtuewise.github.io/virtuemotif/playground.html) lets anyone test the song, lyric timeline, and section navigation without installing anything. The full Remotion Studio remains the editable local environment for changing compositions, props, and frame-level motion.
 
 ---
 
 ## Playground
 
-The Playground is the Remotion Studio bundled with the project. It gives you a live preview, timeline scrubbing, and composition selection while the code and song data remain editable in the repository.
+The hosted [Horizon browser playground](https://virtuewise.github.io/virtuemotif/playground.html) is the zero-install test surface: it autoplays a muted Remotion preview, lets you play the Horizon recording, scrub the full song timeline, follow lyric changes, and jump between sections. The browser playground is built from the same `horizon.json` song data and audio asset used by the Remotion project.
 
-### Launch it
+For source-level experimentation, Remotion Studio gives you a live composition preview, timeline scrubbing, and composition selection while the code and song data remain editable in the repository.
+
+### Launch Remotion Studio
 
 Requirements: Node.js **24** and npm.
 
@@ -61,7 +72,7 @@ To experiment with a different lyric sequence, edit the song data in [`film/src/
 
 ## The Horizon — live Remotion test
 
-The Horizon is registered as both the classic `Horizon` composition and the 3D `FurryHorizon` composition. The following commands run the real Remotion project with the included Horizon data.
+The Horizon is registered as both the classic `Horizon` composition and the 3D `FurryHorizon` composition. The [hosted playground](https://virtuewise.github.io/virtuemotif/playground.html) is the fastest public test; the following commands run the full editable Remotion project with the included Horizon data.
 
 ### 1. Open the live preview
 
@@ -97,7 +108,7 @@ This renders a still frame from the same composition registration used by CI:
 npx remotion still src/index.ts FurryHorizon ../out/horizon-smoke.png --frame=0
 ```
 
-The repository CI also type-checks the Remotion project, validates composition registration, and captures visual-review frames for landscape, portrait, square, and 4K profiles. These automated checks establish that compositions load and render; they do **not** replace human review of the complete film, audio synchronization, typography, or media rights.
+The documentation deployment also renders a short `FurryHorizon` MP4/GIF preview from the registered composition and publishes the browser playground with the source song data and audio. The repository CI type-checks the Remotion project, validates composition registration, and captures visual-review frames for landscape, portrait, square, and 4K profiles. These automated checks establish that compositions load and render; they do **not** replace human review of the complete film, audio synchronization, typography, or media rights.
 
 **Media rights:** use the included Horizon material as a development/test fixture only unless you have independently confirmed permission for the underlying composition, recording, performances, lyrics, and intended distribution. A successful render does not establish licensing or publication rights.
 

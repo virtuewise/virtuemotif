@@ -11,6 +11,8 @@ on:
       - "site/index.html"
       - "site/tools.html"
       - "site/tools/**"
+      - "film/src/**"
+      - "film/public/audio/**"
       - "tools/**"
   workflow_dispatch:
 
@@ -61,6 +63,41 @@ jobs:
           # Keep this list aligned with the import-safe modules built in CI.
           python -m pdoc -o build/site tools.make_video tools.make_tapsync tools.utils tools.effects tools.benchmark_render
 
+      - name: Copy interactive Horizon playground and source media
+        run: |
+          mkdir -p build/site/data build/site/audio build/site/media
+          cp site/playground.html build/site/playground.html
+          cp film/src/data/horizon.json build/site/data/horizon.json
+          cp film/public/audio/horizon.m4a build/site/audio/horizon.m4a
+
+      - name: Set up Node.js for the Remotion preview
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: film/package-lock.json
+
+      - name: Install Remotion dependencies
+        working-directory: film
+        run: npm ci
+
+      - name: Install FFmpeg for Horizon audio analysis and GIF encoding
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+
+      - name: Prepare Horizon audio-reactive cues
+        run: |
+          python -m pip install numpy soundfile
+          python -m tools.export_audio_cues
+
+      - name: Render an autoplay Horizon preview clip
+        working-directory: film
+        run: |
+          npx remotion still src/index.ts FurryHorizon ../build/site/media/horizon-poster.png --frame=1350 --timeout=120000
+          npx remotion render src/index.ts FurryHorizon ../build/site/media/horizon-preview.mp4 --frames=1320-1500 --codec=h264 --crf=24 --timeout=120000
+          ffmpeg -y -i ../build/site/media/horizon-preview.mp4 -vf "fps=12,scale=960:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128[p];[s1][p]paletteuse" ../build/site/media/horizon-preview.gif
+
       - name: Check generated documentation links
         run: python .github/scripts/check_docs_links.py build/site
 
@@ -93,6 +130,11 @@ jobs:
               # The entry file may be served through a host-level redirect; require HTTP success,
               # then validate the actual landing page and every linked API page below.
               "index.html": (),
+              "playground.html": ("Interactive test playground", "horizon-preview.mp4"),
+              "media/horizon-preview.gif": (),
+              "media/horizon-preview.mp4": (),
+              "audio/horizon.m4a": (),
+              "data/horizon.json": (),
               "tools.html": ("tools/make_video.html",),
               "tools/make_video.html": ("make_video",),
               "tools/make_tapsync.html": ("make_tapsync",),
@@ -107,9 +149,11 @@ jobs:
                       with urlopen(request, timeout=10) as response:
                           if response.status != 200:
                               raise HTTPError(base + path, response.status, "unexpected HTTP status", response.headers, None)
-                          body = response.read().decode("utf-8", errors="replace")
+                          body = response.read()
                           final_url = response.geturl()
-                      if markers and not any(marker in body for marker in markers):
+                      if markers and not any(
+                          marker in body.decode("utf-8", errors="replace") for marker in markers
+                      ):
                           raise SystemExit(f"{path} (resolved to {final_url}): expected one of {markers!r} in published content")
                   print(f"Published documentation smoke test passed: {base}")
                   break
