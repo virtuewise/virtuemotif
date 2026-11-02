@@ -386,7 +386,7 @@ export function createHorizonWorld(): HorizonWorld {
     const a = i * 2.399963;
     const r = 1.8 + seeded(i + 600) * 7.5;
     particlePositions[i * 3] = Math.cos(a) * r;
-    particlePositions[i * 3 + 1] = -6.9 + Math.sin(a) * 2.2;
+    particlePositions[i * 3 + 1] = -3.6 + Math.sin(a) * 2.2;
     particlePositions[i * 3 + 2] = -5.2 - seeded(i + 700) * 7;
   }
   const particleGeometry = tracked(resources, new THREE.BufferGeometry());
@@ -425,7 +425,7 @@ export function createHorizonWorld(): HorizonWorld {
     (skyMaterial.uniforms.uHorizon.value as THREE.Color).set(night ? "#34415f" : hopeFocus ? "#f2b77e" : "#c58b72");
     (skyMaterial.uniforms.uZenith.value as THREE.Color).set(night ? "#111b3b" : "#526b8c");
     sunGroup.scale.setScalar(0.96 + pulse * 0.1 + (hopeFocus ? 0.08 : 0));
-    sunGroup.position.y = 1.15 + Math.sin(time * 0.035) * 0.12 + (hopeFocus ? 0.24 : 0);
+    sunGroup.position.y = -2.15 + Math.sin(time * 0.035) * 0.12 + (hopeFocus ? 0.24 : 0);
     sunMaterial.color.set(night ? "#c6d9ff" : "#ffe0a2");
     (waterMaterial.uniforms.uTime.value as number) = time;
     (waterMaterial.uniforms.uEnergy.value as number) = energy;
