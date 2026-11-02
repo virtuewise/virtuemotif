@@ -66,20 +66,32 @@ def test_reviewed_corpus_requires_governance_and_per_example_provenance() -> Non
 def _valid_reviewed_corpus() -> dict[str, object]:
     languages = ["sn", "nd", "zu", "en", "mul"]
     examples = []
-    for split in ("train", "test"):
-        for language in languages:
-            example_id = f"{split}-{language}"
+    for language in languages:
+        for index in range(30):
+            example_id = f"test-{language}-{index}"
             examples.append({
                 "id": example_id,
-                "text": f"reviewed {language} sample phrase",
+                "text": f"reviewed {language} sample phrase {index}",
                 "language": language,
-                "split": split,
+                "split": "test",
                 "source_id": f"source-{example_id}",
                 "speaker_id": f"speaker-{example_id}",
                 "review_status": "native_speaker_reviewed",
-                "reviewer_ids": ["reviewer-pseudo-1"],
+                "reviewer_ids": ["reviewer-pseudo-1", "reviewer-pseudo-2"],
                 "consent_ref": f"private-consent-record-{example_id}",
             })
+        example_id = f"train-{language}"
+        examples.append({
+            "id": example_id,
+            "text": f"training {language} phrase",
+            "language": language,
+            "split": "train",
+            "source_id": f"source-{example_id}",
+            "speaker_id": f"speaker-{example_id}",
+            "review_status": "native_speaker_reviewed",
+            "reviewer_ids": ["reviewer-pseudo-1", "reviewer-pseudo-2"],
+            "consent_ref": f"private-consent-record-{example_id}",
+        })
     return {
         "schema_version": 1,
         "dataset_id": "reviewed-test",
@@ -91,6 +103,11 @@ def _valid_reviewed_corpus() -> dict[str, object]:
             "review_status": "native_speaker_reviewed",
             "adjudication_policy": "Two independent annotations; disagreements adjudicated.",
             "split_policy": "Source/song/speaker groups do not cross train and test.",
+            "dataset_version": "1.0.0",
+            "annotation_protocol_version": "protocol-1",
+            "provenance_manifest_ref": "restricted://manifest-001",
+            "minimum_independent_reviewers": 2,
+            "minimum_test_examples_per_cohort": 30,
         },
         "examples": examples,
     }
@@ -99,12 +116,29 @@ def test_reviewed_corpus_accepts_documented_governance_shape() -> None:
     assert validate_corpus(_valid_reviewed_corpus()) == []
 
 
+def test_generic_reviewed_corpus_does_not_require_release_cohort_sample_size() -> None:
+    corpus = _valid_reviewed_corpus()
+    governance = corpus["governance"]
+    assert isinstance(governance, dict)
+    governance.pop("minimum_test_examples_per_cohort")
+    examples = corpus["examples"]
+    assert isinstance(examples, list)
+    corpus["examples"] = [
+        example for example in examples
+        if example["language"] == "en" and (
+            example["split"] == "train" or example["id"] in {"test-en-0", "test-en-1"}
+        )
+    ]
+    assert validate_corpus(corpus) == []
+
+
 def test_reviewed_corpus_rejects_source_or_speaker_leakage() -> None:
     corpus = _valid_reviewed_corpus()
     examples = corpus["examples"]
     assert isinstance(examples, list)
-    examples[5]["source_id"] = examples[0]["source_id"]
-    examples[5]["speaker_id"] = examples[0]["speaker_id"]
+    train_example = next(example for example in examples if example["split"] == "train")
+    train_example["source_id"] = examples[0]["source_id"]
+    train_example["speaker_id"] = examples[0]["speaker_id"]
     errors = validate_corpus(corpus)
     assert any("source_id" in error and "crosses dataset splits" in error for error in errors)
     assert any("speaker_id" in error and "crosses dataset splits" in error for error in errors)
@@ -128,3 +162,25 @@ def test_release_profile_requires_each_language_in_held_out_test() -> None:
     ]
     errors = validate_corpus(corpus)
     assert any("missing required release cohorts: nd" in error for error in errors)
+
+
+def test_release_profile_enforces_minimum_held_out_support_and_distinct_reviewers() -> None:
+    corpus = _valid_reviewed_corpus()
+    governance = corpus["governance"]
+    assert isinstance(governance, dict)
+    governance["release_profile"] = "multilingual_music_v1"
+    examples = corpus["examples"]
+    assert isinstance(examples, list)
+    corpus["examples"] = [
+        example for example in examples
+        if example["id"] != "test-sn-0"
+    ]
+    errors = validate_corpus(corpus)
+    assert any("cohort 'sn' has support 29" in error for error in errors)
+
+    corpus = _valid_reviewed_corpus()
+    examples = corpus["examples"]
+    assert isinstance(examples, list)
+    examples[0]["reviewer_ids"] = ["reviewer-pseudo-1", "reviewer-pseudo-1"]
+    errors = validate_corpus(corpus)
+    assert any("distinct pseudonymous reviewers" in error for error in errors)

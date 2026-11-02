@@ -44,6 +44,13 @@ def validate_corpus(corpus: Any) -> list[str]:
         errors.append("examples must be a non-empty array")
         examples = []
 
+    governance = corpus.get("governance") if status == REVIEWED_STATUS else None
+    min_reviewers = 2
+    if isinstance(governance, dict):
+        configured_reviewers = governance.get("minimum_independent_reviewers", 2)
+        if isinstance(configured_reviewers, int) and not isinstance(configured_reviewers, bool):
+            min_reviewers = max(2, configured_reviewers)
+
     seen_ids: set[str] = set()
     source_splits: dict[str, set[str]] = {}
     speaker_splits: dict[str, set[str]] = {}
@@ -84,13 +91,14 @@ def validate_corpus(corpus: Any) -> list[str]:
             if example.get("review_status") != "native_speaker_reviewed":
                 errors.append(f"{prefix}.review_status must be 'native_speaker_reviewed'")
             reviewer_ids = example.get("reviewer_ids")
-            if not isinstance(reviewer_ids, list) or not reviewer_ids or any(
-                not isinstance(item, str) or not item.strip() for item in reviewer_ids
-            ):
-                errors.append(f"{prefix}.reviewer_ids must contain pseudonymous reviewer IDs")
+            distinct_reviewers = {
+                item for item in reviewer_ids
+                if isinstance(reviewer_ids, list) and isinstance(item, str) and item.strip()
+            } if isinstance(reviewer_ids, list) else set()
+            if len(distinct_reviewers) < min_reviewers:
+                errors.append(f"{prefix}.reviewer_ids must contain at least {min_reviewers} distinct pseudonymous reviewers")
 
     if status == REVIEWED_STATUS:
-        governance = corpus.get("governance")
         if not isinstance(governance, dict):
             errors.append("governance object is required for reviewed datasets")
         else:
@@ -108,6 +116,17 @@ def validate_corpus(corpus: Any) -> list[str]:
             split_policy = governance.get("split_policy")
             if not isinstance(split_policy, str) or not split_policy.strip():
                 errors.append("governance.split_policy must document source/speaker separation")
+            for field in ("dataset_version", "annotation_protocol_version", "provenance_manifest_ref"):
+                value = governance.get(field)
+                if not isinstance(value, str) or not value.strip():
+                    errors.append(f"governance.{field} must be a non-empty auditable reference")
+            min_reviewers = governance.get("minimum_independent_reviewers", 2)
+            if not isinstance(min_reviewers, int) or isinstance(min_reviewers, bool) or min_reviewers < 2:
+                errors.append("governance.minimum_independent_reviewers must be an integer >= 2")
+            if governance.get("release_profile") == "multilingual_music_v1":
+                minimum_support = governance.get("minimum_test_examples_per_cohort")
+                if not isinstance(minimum_support, int) or isinstance(minimum_support, bool) or minimum_support < 30:
+                    errors.append("governance.minimum_test_examples_per_cohort must be an integer >= 30 for multilingual_music_v1")
         split_names = {
             example["split"]
             for example in examples
@@ -130,6 +149,17 @@ def validate_corpus(corpus: Any) -> list[str]:
                     "reviewed test split is missing required release cohorts: "
                     + ", ".join(sorted(missing_test_languages))
                 )
+            minimum_support = governance.get("minimum_test_examples_per_cohort", 30)
+            for language in sorted(REQUIRED_RELEASE_LANGUAGES):
+                support = sum(
+                    1 for example in examples
+                    if isinstance(example, dict) and example.get("split") == "test"
+                    and example.get("language") == language
+                )
+                if support < minimum_support:
+                    errors.append(
+                        f"reviewed test cohort {language!r} has support {support}; requires at least {minimum_support}"
+                    )
         for source_id, splits in source_splits.items():
             if len(splits) > 1:
                 errors.append(f"source_id {source_id!r} crosses dataset splits")

@@ -79,6 +79,9 @@ def _reviewed_split_corpus() -> dict:
             "review_status": "native_speaker_reviewed",
             "adjudication_policy": "Two independent labels; disagreements adjudicated.",
             "split_policy": "Group by source and speaker before assigning splits.",
+            "dataset_version": "test-fixture-1",
+            "annotation_protocol_version": "test-protocol-1",
+            "provenance_manifest_ref": "restricted://language-id-test-manifest",
         },
         "examples": [
             {
