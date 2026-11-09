@@ -11,12 +11,12 @@
     "test:cinematic": "node --test ../tests/horizon_cinematic_world.test.mjs ../tests/horizon_character_performance.test.mjs ../tests/horizon_cinematic_direction.test.mjs"
   },
   "dependencies": {
-    "@remotion/cli": "^4.0.539",
-    "@types/three": "^0.186.0",
+    "@remotion/cli": "^4.0.540",
+    "@types/three": "^0.187.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "remotion": "^4.0.538",
-    "three": "^0.186.1"
+    "three": "^0.187.0"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
