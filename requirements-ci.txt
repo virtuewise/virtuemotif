@@ -11,7 +11,7 @@ cffi==2.1.1
 cfgv==3.5.0
 click==8.5.0
 distlib==0.4.4
-filelock==4.2.6
+filelock==4.2.7
 identify==2.6.20
 iniconfig==2.3.1
 isort==9.0.2
@@ -24,13 +24,13 @@ numpy==2.4.6
 packaging==26.3
 pathspec==1.1.1
 pdoc==16.0.0
-platformdirs==4.14.2
+platformdirs==4.14.3
 pluggy==1.7.0
 pre-commit==4.7.0
 pycparser==3.12
 Pygments==2.21.0
 pytest==9.2.0
-python-discovery==1.9.0
+python-discovery==1.9.1
 pytokens==0.4.1
 ruff==0.17.3
 soundfile==0.14.0
